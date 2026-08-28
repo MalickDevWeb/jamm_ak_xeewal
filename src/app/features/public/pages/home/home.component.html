@@ -81,36 +81,53 @@
                 <div class="hidden sm:block lg:w-2/5 w-full max-w-sm relative mt-4 lg:mt-0 mx-auto group z-20">
                     <!-- Glow Behind -->
                     <div class="absolute -inset-1 bg-gradient-to-r from-brand-yellow via-brand-yellow to-white rounded-[3rem] blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-700"></div>
-                    
+
                     <!-- Main Card -->
                     <div class="relative bg-white/95 backdrop-blur-2xl rounded-[2.5rem] p-6 sm:p-8 border-2 border-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] text-center overflow-hidden transform transition-transform duration-500 group-hover:-translate-y-2">
                         <!-- Decorative Top Banner -->
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-yellow via-yellow-400 to-brand-green"></div>
-                        
+
                         <div class="w-14 h-14 mx-auto bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-sm transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 border border-brand-green/20">
                             <i class="fa-solid fa-qrcode"></i>
                         </div>
-                        
+
                         <h3 class="text-xl sm:text-2xl font-black text-brand-dark mb-2 tracking-tight">Rejoignez-nous</h3>
-                        <p class="text-gray-600 text-xs sm:text-sm mb-6 font-medium px-2 leading-relaxed">Scannez ce code avec votre téléphone pour adhérer au mouvement en <strong class="text-brand-green font-black">1 minute</strong>.</p>
-                        
-                        <!-- Animated QR Code Area -->
+                        <p class="text-gray-600 text-xs sm:text-sm mb-6 font-medium px-2 leading-relaxed">
+                            Scannez ce code avec votre téléphone pour adhérer au mouvement en <strong class="text-brand-green font-black">1 minute</strong>.
+                        </p>
+
+                        <!-- QR Code Area -->
                         <div class="relative inline-block mb-6 p-4 sm:p-5 bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] border-2 border-gray-100 group/qr cursor-crosshair">
                             <!-- Scanner Corners -->
                             <div class="absolute top-3 left-3 w-4 h-4 border-t-4 border-l-4 border-brand-yellow rounded-tl-lg transition-colors group-hover/qr:border-brand-green"></div>
                             <div class="absolute top-3 right-3 w-4 h-4 border-t-4 border-r-4 border-brand-yellow rounded-tr-lg transition-colors group-hover/qr:border-brand-green"></div>
                             <div class="absolute bottom-3 left-3 w-4 h-4 border-b-4 border-l-4 border-brand-yellow rounded-bl-lg transition-colors group-hover/qr:border-brand-green"></div>
                             <div class="absolute bottom-3 right-3 w-4 h-4 border-b-4 border-r-4 border-brand-yellow rounded-br-lg transition-colors group-hover/qr:border-brand-green"></div>
-                            
+
                             <!-- Laser Line Animation -->
                             <div class="absolute top-4 left-4 right-4 h-0.5 bg-brand-green shadow-[0_0_15px_rgba(0,141,54,1)] opacity-0 group-hover/qr:opacity-100 group-hover/qr:animate-[scan_2.5s_ease-in-out_infinite] z-20 pointer-events-none"></div>
-                            
-                            <!-- The QR Image -->
-                            <img src="assets/media_1787594257584.png" alt="QR Code d'Adhésion" class="w-36 h-36 sm:w-40 sm:h-40 object-contain relative z-10 transition-transform duration-500 group-hover/qr:scale-105" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=022c16&data=https://jammakxeewal.com/rejoindre'">
+
+                            <!-- Skeleton pendant chargement du QR -->
+                            <div *ngIf="!qrImageUrl"
+                                 class="w-36 h-36 sm:w-40 sm:h-40 bg-gray-100 animate-pulse rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-spinner fa-spin text-gray-400 text-2xl"></i>
+                            </div>
+
+                            <!-- Vrai QR Code généré dynamiquement -->
+                            <img *ngIf="qrImageUrl"
+                                 [src]="qrImageUrl"
+                                 alt="QR Code d'adhésion — JÀMM AK XÉEWAL"
+                                 class="w-36 h-36 sm:w-40 sm:h-40 object-contain relative z-10 transition-transform duration-500 group-hover/qr:scale-105 rounded-lg">
                         </div>
-                        
+
+                        <!-- Label URL cible (discrète) -->
+                        <p *ngIf="qrTargetUrl" class="text-[10px] text-gray-400 mb-4 px-2 truncate">
+                            <i class="fa-solid fa-link mr-1"></i>{{ qrTargetUrl }}
+                        </p>
+
                         <!-- Action Button -->
-                        <a routerLink="/adherer" class="flex items-center justify-center w-full bg-brand-dark hover:bg-brand-green text-brand-yellow hover:text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-md group/btn">
+                        <a [href]="qrTargetUrl || '/adherer'" target="_blank"
+                           class="flex items-center justify-center w-full bg-brand-dark hover:bg-brand-green text-brand-yellow hover:text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-md group/btn">
                             <span>Ou cliquez ici</span>
                             <i class="fa-solid fa-arrow-right ml-2 transform group-hover/btn:translate-x-1 transition-transform"></i>
                         </a>

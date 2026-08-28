@@ -4,17 +4,68 @@
   <meta charset="utf-8">
   <title>JÀMM AK XÉEWAL - Agir ensemble | Thiès-Nord</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- ══════════════════════════════════════
+       VIEWPORT & SEO
+  ══════════════════════════════════════ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="JÀMM AK XÉEWAL — Le mouvement citoyen de Thiès-Nord. Rejoignez des centaines de citoyens engagés pour transformer notre quartier.">
+  <meta name="keywords" content="JAMM AK XEEWAL, Thiès-Nord, mouvement citoyen, Sénégal, engagement">
+  <meta name="author" content="JÀMM AK XÉEWAL">
+
+  <!-- ══════════════════════════════════════
+       PWA — MANIFEST & THEME
+  ══════════════════════════════════════ -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#022c16">
-  <!-- Font Awesome -->
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- ══════════════════════════════════════
+       PWA — APPLE iOS (Safari)
+       iOS utilise apple-touch-icon et ses propres méta,
+       il ignore le manifest pour les icônes.
+  ══════════════════════════════════════ -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Jàmm Xéewal">
+
+  <!-- Apple Touch Icons (toutes tailles pour tous les iPhones/iPads) -->
+  <link rel="apple-touch-icon" href="assets/icons/icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-128x128.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="assets/icons/icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180x180.png">
+
+  <!-- Apple Splash Screens (évite l'écran blanc au lancement sur iOS) -->
+  <meta name="apple-mobile-web-app-splash-screen" content="yes">
+
+  <!-- ══════════════════════════════════════
+       PWA — FAVICON & WINDOWS
+  ══════════════════════════════════════ -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192x192.png">
+  <!-- Windows Tiles -->
+  <meta name="msapplication-TileColor" content="#022c16">
+  <meta name="msapplication-TileImage" content="assets/icons/icon-144x144.png">
+
+  <!-- ══════════════════════════════════════
+       OPEN GRAPH (partage réseaux sociaux)
+  ══════════════════════════════════════ -->
+  <meta property="og:title" content="JÀMM AK XÉEWAL — Agir ensemble">
+  <meta property="og:description" content="Le mouvement citoyen de Thiès-Nord. Rejoignez des centaines de citoyens engagés.">
+  <meta property="og:image" content="assets/icons/icon-512x512.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- ══════════════════════════════════════
+       FONTS & ICONS
+  ══════════════════════════════════════ -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="flex flex-col min-h-screen bg-white overflow-x-hidden">
   <app-root></app-root>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <noscript>Veuillez activer JavaScript pour utiliser cette application.</noscript>
 </body>
 </html>

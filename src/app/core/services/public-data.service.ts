@@ -18,6 +18,9 @@ export class PublicDataService {
   // --- Sondages ---
   getSondages(): Observable<any> { return this.http.get(`${this.apiUrl}/sondages`); }
 
+  // --- Settings publics (qr_code_url, etc.) ---
+  getSettings(): Observable<any> { return this.http.get(`${this.apiUrl}/settings`); }
+
   // --- Formulaires d'engagement ---
   postAdherent(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/adherents`, data); }
   postBesoin(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/besoins`, data); }
