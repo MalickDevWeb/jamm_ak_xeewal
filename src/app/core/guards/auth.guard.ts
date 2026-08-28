@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -14,7 +14,8 @@ export const authGuard: CanActivateFn = (
   if (token) {
     return true;
   }
-  return new Router('/admin/login').createUrlTree(['/admin/login'], {
+  const router = inject(Router);
+  return router.createUrlTree(['/admin/login'], {
     queryParams: { returnUrl: state.url }
   });
 };

@@ -22,16 +22,23 @@ export class ContactComponent {
 
   isSubmitting = false;
   success = false;
+  errorMsg = '';
 
   constructor(private publicData: PublicDataService) {}
 
+  showError(msg: string) {
+    this.errorMsg = msg;
+    setTimeout(() => this.errorMsg = '', 5000);
+  }
+
   onSubmit() {
     if (!this.formData.nom || !this.formData.message) {
-      alert("Veuillez remplir votre nom et votre message.");
+      this.showError("Veuillez remplir votre nom et votre message.");
       return;
     }
 
     this.isSubmitting = true;
+    this.errorMsg = '';
     const payload = {
       nom: this.formData.nom,
       email: this.formData.email || this.formData.telephone || '',
@@ -47,7 +54,7 @@ export class ContactComponent {
       },
       error: () => {
         this.isSubmitting = false;
-        alert("Erreur d'envoi. Veuillez réessayer.");
+        this.showError("Erreur d'envoi. Veuillez réessayer.");
       }
     });
   }

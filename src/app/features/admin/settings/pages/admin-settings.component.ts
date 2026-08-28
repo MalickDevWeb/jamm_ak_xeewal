@@ -159,6 +159,11 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           <p class="text-xs text-gray-400 mb-5 ml-9">Changez le mot de passe de connexion au back-office.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1.5">Mot de passe actuel</label>
+              <input [(ngModel)]="settings.currentPassword" type="password" placeholder="••••••••"
+                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+            </div>
+            <div>
               <label class="block text-sm font-bold text-gray-700 mb-1.5">Nouveau mot de passe</label>
               <input [(ngModel)]="settings.newPassword" type="password" placeholder="••••••••"
                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
@@ -242,6 +247,7 @@ export class AdminSettingsComponent implements OnInit {
     facebook: '#',
     tiktok: '#',
     qr_code_url: '',
+    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   };
@@ -291,11 +297,34 @@ export class AdminSettingsComponent implements OnInit {
     delete dataToSave.newPassword;
     delete dataToSave.confirmPassword;
 
+    const passwordChange = this.settings.newPassword && this.settings.newPassword === this.settings.confirmPassword;
+
     this.adminData.saveSettings(dataToSave).subscribe({
       next: () => {
-        this.isSaving = false;
-        this.saved = true;
-        setTimeout(() => this.saved = false, 4000);
+        if (passwordChange) {
+          this.adminData.changePassword(this.settings.currentPassword || '', this.settings.newPassword).subscribe({
+            next: () => {
+              this.isSaving = false;
+              this.saved = true;
+              setTimeout(() => this.saved = false, 4000);
+              this.settings.newPassword = '';
+              this.settings.confirmPassword = '';
+              this.settings.currentPassword = '';
+            },
+            error: () => {
+              this.isSaving = false;
+              this.saved = true;
+              setTimeout(() => this.saved = false, 4000);
+              this.settings.newPassword = '';
+              this.settings.confirmPassword = '';
+              this.settings.currentPassword = '';
+            }
+          });
+        } else {
+          this.isSaving = false;
+          this.saved = true;
+          setTimeout(() => this.saved = false, 4000);
+        }
       },
       error: () => {
         this.isSaving = false;

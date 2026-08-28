@@ -39,6 +39,11 @@ export class AdminDataService {
   getSettings(): Observable<any> { return this.http.get(`${this.apiUrl}/settings`); }
   saveSettings(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/settings`, data); }
 
+   // --- Auth / Password ---
+   changePassword(currentPassword: string, newPassword: string): Observable<any> {
+     return this.http.post(`${this.apiUrl}/auth/change-password`, { currentPassword, newPassword });
+   }
+
   // --- Editorial ---
   getEditorial(page: string): Observable<any> { return this.http.get(`${this.apiUrl}/editorial?page=${page}`); }
   saveEditorial(page: string, content: any): Observable<any> { return this.http.post(`${this.apiUrl}/editorial`, { page, content }); }

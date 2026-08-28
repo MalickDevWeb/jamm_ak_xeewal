@@ -22,12 +22,18 @@ export class ProposerIdeeComponent {
 
   isSubmitting = false;
   success = false;
+  errorMsg = '';
 
   constructor(private publicData: PublicDataService) {}
 
+  showError(msg: string) {
+    this.errorMsg = msg;
+    setTimeout(() => this.errorMsg = '', 5000);
+  }
+
   onSubmit() {
     if (!this.formData.titre || !this.formData.description) {
-      alert("Veuillez remplir le titre et la description.");
+      this.showError("Veuillez remplir le titre et la description.");
       return;
     }
 
@@ -35,11 +41,12 @@ export class ProposerIdeeComponent {
       titre: this.formData.titre,
       description: this.formData.description,
       categorie: this.formData.axe_concerne,
-      auteur: this.formData.nom_citizen,
+      auteur: this.formData.nom_citoyen,
       pole: this.formData.axe_concerne
     };
 
     this.isSubmitting = true;
+    this.errorMsg = '';
     this.publicData.postIdee(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
@@ -47,7 +54,7 @@ export class ProposerIdeeComponent {
       },
       error: () => {
         this.isSubmitting = false;
-        alert("Erreur lors de l'envoi de la proposition.");
+        this.showError("Erreur lors de l'envoi de la proposition.");
       }
     });
   }
