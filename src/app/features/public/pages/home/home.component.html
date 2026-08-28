@@ -43,37 +43,37 @@
                     <div class="mt-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-6 lg:p-8 shadow-2xl relative overflow-hidden group hover:bg-white/15 transition-all duration-500 inline-block w-full max-w-4xl">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-yellow/30 transition-colors"></div>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 relative z-10">
-                            <div class="flex items-center gap-4 group/stat">
-                                <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
-                                    <i class="fa-solid fa-handshake-angle"></i>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 relative z-10">
+                                <div class="flex items-center gap-4 group/stat">
+                                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
+                                        <i class="fa-solid fa-handshake-angle"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="block text-2xl sm:text-3xl font-black text-white mb-0">{{ homeContent?.stat1Value || '500+' }}</span>
+                                        <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">{{ homeContent?.stat1Label || 'Citoyens actifs' }}</span>
+                                    </div>
                                 </div>
-                                <div class="text-left">
-                                    <span class="block text-2xl sm:text-3xl font-black text-white mb-0">500+</span>
-                                    <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">Citoyens actifs</span>
+                                
+                                <div class="flex items-center gap-4 group/stat">
+                                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
+                                        <i class="fa-solid fa-map-location-dot"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="block text-2xl sm:text-3xl font-black text-white mb-0">{{ homeContent?.stat2Value || '15' }}</span>
+                                        <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">{{ homeContent?.stat2Label || 'Quartiers' }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4 group/stat">
+                                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
+                                        <i class="fa-solid fa-hammer"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="block text-2xl sm:text-3xl font-black text-white mb-0">{{ homeContent?.stat3Value || '32' }}</span>
+                                        <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">{{ homeContent?.stat3Label || 'Actions réalisées' }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="flex items-center gap-4 group/stat">
-                                <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
-                                    <i class="fa-solid fa-map-location-dot"></i>
-                                </div>
-                                <div class="text-left">
-                                    <span class="block text-2xl sm:text-3xl font-black text-white mb-0">15</span>
-                                    <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">Quartiers</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-4 group/stat">
-                                <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-black/30 flex items-center justify-center text-brand-yellow text-xl border border-white/10 group-hover/stat:scale-110 group-hover/stat:bg-brand-yellow group-hover/stat:text-brand-dark transition-all shadow-sm">
-                                    <i class="fa-solid fa-hammer"></i>
-                                </div>
-                                <div class="text-left">
-                                    <span class="block text-2xl sm:text-3xl font-black text-white mb-0">32</span>
-                                    <span class="text-[10px] sm:text-xs font-bold text-brand-yellow uppercase tracking-widest">Actions réalisées</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
