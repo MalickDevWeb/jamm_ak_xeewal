@@ -1,0 +1,222 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  
+  <!-- Sidebar (Glassmorphism & Premium Design) -->
+  <aside class="w-72 bg-white/70 backdrop-blur-2xl border-r border-gray-100 flex-shrink-0 flex flex-col transition-all duration-300 relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+    <!-- Brand Logo Area -->
+    <div class="h-20 flex items-center px-5 border-b border-gray-100/70 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-[#022c16]/5 to-transparent"></div>
+      <a routerLink="/" class="flex items-center gap-3 relative z-10 group">
+        <img src="assets/media_1787573884036.jpg" alt="Logo JÀMM AK XÉEWAL"
+             class="h-11 w-11 rounded-full border-2 border-white shadow-md object-contain bg-white p-0.5 group-hover:scale-105 transition-transform">
+        <div>
+          <h1 class="text-base font-black text-gray-900 tracking-tight leading-tight">JÀMM AK<br/><span class="text-[#022c16]">XÉEWAL</span></h1>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Back-Office</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8 scrollbar-hide">
+      <!-- Section: Vue d'ensemble -->
+      <div>
+        <ul class="space-y-1">
+          <li>
+            <a routerLink="/admin/dashboard" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-chart-pie w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Tableau de Bord</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section: Engagement Citoyen -->
+      <div>
+        <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Engagement Citoyen</p>
+        <ul class="space-y-1">
+          <li>
+            <a routerLink="/admin/besoins" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-hand-holding-heart w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Besoins Déclarés</span>
+              <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/admin/idees" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-lightbulb w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Boîte à Idées</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/admin/sondages" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-square-poll-vertical w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Sondages</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section: Organisation -->
+      <div>
+        <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Organisation</p>
+        <ul class="space-y-1">
+          <li>
+            <a routerLink="/admin/adherents" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-users w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Adhérents</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/admin/commissions" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-sitemap w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Commissions</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section: Communication & Médias (correspondance pages publiques) -->
+      <div>
+        <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+          Communication
+        </p>
+        <ul class="space-y-1">
+          <!-- /activites -->
+          <li>
+            <a routerLink="/admin/activites" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-calendar-days w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Activités & Visites</span>
+            </a>
+          </li>
+
+          <!-- /compte-rendu -->
+          <li>
+            <a routerLink="/admin/comptes-rendus" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-file-lines w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Comptes-Rendus</span>
+            </a>
+          </li>
+          <!-- /contact -->
+          <li>
+            <a routerLink="/admin/messages" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-envelope w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Messages (Contact)</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section: Système -->
+      <div>
+        <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Système</p>
+        <ul class="space-y-1">
+          <!-- Contenu éditorial (/mouvement + /axes) -->
+          <li>
+            <a routerLink="/admin/editorial" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-pen-nib w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Contenu Éditorial</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/admin/settings" routerLinkActive="bg-[#022c16]/10 text-[#022c16] font-bold" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+              <i class="fa-solid fa-gear w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span>Paramètres Site</span>
+            </a>
+          </li>
+          <!-- Lien vers le site public -->
+          <li>
+            <a routerLink="/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-all group">
+              <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center group-hover:scale-110 transition-transform"></i>
+              <span class="text-xs">Voir le site public</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom: User info -->
+    <div class="p-4 border-t border-gray-100 mt-auto">
+      <!-- User card -->
+      <div class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100">
+        <div class="w-9 h-9 rounded-full bg-[#022c16] text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+          A
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-gray-900 truncate">Administrateur</p>
+          <p class="text-[11px] text-gray-400 truncate">admin&#64;jammakxeewal.org</p>
+        </div>
+      </div>
+      <button (click)="logout()" class="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <div class="flex-1 flex flex-col relative w-full h-full">
+    
+    <!-- Decorative background elements for the main view -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-brand-yellow/5 rounded-full blur-[100px]"></div>
+      <div class="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-brand-green/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Top Header -->
+    <header class="h-20 bg-white/60 backdrop-blur-xl border-b border-gray-100/80 flex items-center justify-between px-8 relative z-10 sticky top-0">
+      
+      <!-- Search Bar -->
+      <div class="flex-1 max-w-md">
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="fa-solid fa-magnifying-glass text-gray-400 group-focus-within:text-brand-green transition-colors"></i>
+          </div>
+          <input type="text" placeholder="Rechercher (membres, contenus, médias)..." class="block w-full pl-11 pr-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all" />
+        </div>
+      </div>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-4 ml-6">
+        <button (click)="toggleNotifications()" aria-label="Notifications" class="relative p-2.5 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full transition-all">
+          <i class="fa-regular fa-bell" aria-hidden="true"></i>
+          <span *ngIf="unreadCount" class="notification-ping absolute top-1.5 right-1.5 min-w-4 h-4 px-1 bg-red-500 text-white text-[9px] font-black rounded-full border-2 border-white flex items-center justify-center">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+        </button>
+      </div>
+      <div *ngIf="notificationsOpen" class="notification-panel absolute right-8 top-16 w-[min(390px,calc(100vw-2rem))] bg-white/95 backdrop-blur-xl border border-white shadow-2xl rounded-2xl overflow-hidden z-[110]">
+        <div class="px-5 py-4 bg-[#022c16] text-white flex items-center justify-between">
+          <div>
+            <p class="font-black">Notifications</p>
+            <p class="text-[11px] text-white/65 mt-0.5">Actualisation automatique toutes les 15 secondes</p>
+          </div>
+          <button (click)="markAllNotificationsRead()" class="text-[11px] font-bold text-white/80 hover:text-white">Tout lire</button>
+        </div>
+        <div *ngIf="!notifications.length" class="px-6 py-12 text-center text-gray-400">
+          <i class="fa-regular fa-bell-slash text-3xl mb-3"></i>
+          <p class="text-sm font-bold">Aucune notification</p>
+          <p class="text-xs mt-1">Les nouveaux événements apparaîtront ici.</p>
+        </div>
+        <div *ngIf="notifications.length" class="max-h-[390px] overflow-y-auto divide-y divide-gray-100">
+          <button *ngFor="let notification of notifications" (click)="openNotification(notification)" class="w-full flex items-start gap-3 px-5 py-3 text-left hover:bg-gray-50 transition-colors" [class.bg-green-50]="!readNotificationIds.has(notification.id)">
+            <span class="notification-icon shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" [ngClass]="'notification-' + notification.color"><i [class]="notification.icon"></i></span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-2">
+                <span class="text-sm font-bold text-gray-800 truncate">{{ notification.title }}</span>
+                <span *ngIf="!readNotificationIds.has(notification.id)" class="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
+              </span>
+              <span class="block text-xs text-gray-500 truncate mt-0.5">{{ notification.detail }}</span>
+              <span class="block text-[10px] text-gray-400 mt-1">{{ notificationTime(notification.createdAt) }}</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content Router Outlet -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto relative z-10 p-8">
+      <div class="max-w-7xl mx-auto h-full">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+    
+  </div>
+</div>

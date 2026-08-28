@@ -1,0 +1,182 @@
+
+        
+        <!-- Premium Internal Hero -->
+        <div class="relative bg-brand-dark overflow-hidden py-6 md:py-8 border-b border-brand-green/20">
+            <!-- Background effects -->
+            <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-green/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-yellow/10 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <!-- Breadcrumbs -->
+                <nav class="flex justify-center mb-2" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/5 backdrop-blur-md px-6 py-2 rounded-full border border-white/10 shadow-lg">
+                        <li class="inline-flex items-center">
+                            <a routerLink="/" class="inline-flex items-center text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                                <i class="fa-solid fa-house mr-2"></i> Accueil
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-chevron-right text-gray-600 text-xs mx-2"></i>
+                                <span class="text-sm font-bold text-brand-greenLight">Le Mouvement</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+                
+                <div class="inline-flex items-center gap-3 mb-4 justify-center">
+                    <div class="w-12 h-px bg-brand-yellow"></div>
+                    <span class="text-brand-yellow font-black uppercase tracking-[0.2em] text-sm">Le Mouvement</span>
+                    <div class="w-12 h-px bg-brand-yellow"></div>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-md">Qui sommes-<span class="text-brand-greenLight">nous ?</span></h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed">Découvrez l'histoire, la vision et les valeurs fondamentales qui animent JÀMM AK XÉEWAL.</p>
+            </div>
+        </div>
+
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pt-10 reveal">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <!-- Text and Modules Side -->
+                <div class="lg:w-1/2 relative z-10">
+                    <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-green/10 text-brand-green font-black text-xs mb-6 border border-brand-green/20 uppercase tracking-[0.2em] shadow-sm"><i class="fa-solid fa-seedling"></i> L'Origine du Mouvement</span>
+                    
+                    <h2 class="text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight tracking-tight" *ngIf="content" [innerHTML]="content.heroTitle"></h2>
+                    <h2 class="text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight tracking-tight" *ngIf="!content">
+                        Agir ensemble pour l'avenir de <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-greenLight">Thiès-Nord</span>
+                    </h2>
+                    
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6 font-medium" *ngIf="content" [innerHTML]="content.heroParagraph"></p>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6 font-medium" *ngIf="!content">
+                        Le mouvement <strong class="text-brand-dark font-black">JÀMM AK XÉEWAL</strong> est né d'un constat simple et d'une volonté citoyenne profonde : rassembler les forces vives de notre localité autour d'un idéal de Paix (<em class="text-brand-green font-bold not-italic">Jàmm</em>) et de Prospérité partagée (<em class="text-brand-green font-bold not-italic">Xéewal</em>).
+                    </p>
+                    
+                    <p class="text-base text-gray-600 leading-relaxed mb-8" *ngIf="content" [innerHTML]="content.heroSubParagraph"></p>
+                    <p class="text-base text-gray-600 leading-relaxed mb-8" *ngIf="!content">
+                        Loin des clivages politiques traditionnels, nous construisons une véritable plateforme d'action communautaire. Notre démarche s'articule autour de 3 piliers :
+                    </p>
+                    
+                    <!-- Interactive Modules -->
+                    <div class="space-y-4 mb-8">
+                        <!-- Module 1 -->
+                        <div class="group bg-white border border-gray-100 hover:border-brand-green/30 rounded-2xl p-4 md:p-5 flex items-start gap-5 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(0,141,54,0.15)] transition-all duration-300">
+                            <div class="w-14 h-14 rounded-[1rem] bg-gray-50 text-brand-green flex items-center justify-center text-xl shrink-0 group-hover:bg-brand-green group-hover:text-white transition-colors duration-300 shadow-inner">
+                                <i class="fa-solid fa-ear-listen"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-gray-900 text-lg mb-1 group-hover:text-brand-green transition-colors">Écoute active</h4>
+                                <p class="text-gray-600 text-sm leading-snug">Aller à la rencontre des populations dans chaque quartier pour comprendre profondément leurs réalités quotidiennes.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Module 2 -->
+                        <div class="group bg-white border border-gray-100 hover:border-brand-yellow/50 rounded-2xl p-4 md:p-5 flex items-start gap-5 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(242,169,0,0.2)] transition-all duration-300">
+                            <div class="w-14 h-14 rounded-[1rem] bg-gray-50 text-brand-yellowDark flex items-center justify-center text-xl shrink-0 group-hover:bg-brand-yellow group-hover:text-white transition-colors duration-300 shadow-inner">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-gray-900 text-lg mb-1 group-hover:text-brand-yellowDark transition-colors">Co-construction</h4>
+                                <p class="text-gray-600 text-sm leading-snug">Impliquer directement et activement les citoyens dans l'élaboration de solutions durables et adaptées.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Module 3 -->
+                        <div class="group bg-white border border-gray-100 hover:border-brand-greenLight/30 rounded-2xl p-4 md:p-5 flex items-start gap-5 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(58,170,53,0.15)] transition-all duration-300">
+                            <div class="w-14 h-14 rounded-[1rem] bg-gray-50 text-brand-greenLight flex items-center justify-center text-xl shrink-0 group-hover:bg-brand-greenLight group-hover:text-white transition-colors duration-300 shadow-inner">
+                                <i class="fa-solid fa-hammer"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-gray-900 text-lg mb-1 group-hover:text-brand-greenLight transition-colors">Action concrète</h4>
+                                <p class="text-gray-600 text-sm leading-snug">Transformer les propositions citoyennes en projets viables, mesurables et impactants pour Thiès-Nord.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visual Side -->
+                <div class="lg:w-1/2 w-full relative">
+                    <!-- Glow behind image -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-brand-green/20 to-brand-yellow/20 blur-[80px] rounded-full scale-90 -z-10"></div>
+                    
+                    <div class="relative group">
+                        <!-- Main Logo Glass Card -->
+                        <div class="bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] rounded-[3rem] p-10 md:p-14 relative z-10 transition-transform duration-700 group-hover:scale-[1.02]">
+                            <img src="assets/media_1787573884036.jpg" alt="Logo JÀMM AK XÉEWAL" class="w-full max-w-sm mx-auto object-contain drop-shadow-xl relative z-10">
+                            <!-- Subtle decorative inner border -->
+                            <div class="absolute inset-4 rounded-[2.2rem] border border-brand-green/10 pointer-events-none"></div>
+                        </div>
+                        
+                        <!-- Premium Floating Badge -->
+                        <div class="absolute -bottom-6 -left-6 md:-left-12 bg-white rounded-3xl p-2 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] z-20 transform -rotate-3 group-hover:rotate-0 transition-all duration-500 hover:scale-105 border border-gray-100 flex items-stretch">
+                            <div class="bg-gradient-to-br from-brand-yellow to-yellow-500 rounded-2xl p-5 flex flex-col items-center justify-center text-white min-w-[120px] relative overflow-hidden">
+                                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay"></div>
+                                <i class="fa-solid fa-users text-3xl mb-1 drop-shadow-sm opacity-90"></i>
+                                <span class="block text-4xl font-black leading-none drop-shadow-md">100%</span>
+                            </div>
+                            <div class="flex items-center px-6">
+                                <span class="font-black text-brand-dark uppercase tracking-[0.2em] text-lg leading-tight">Mouvement<br><span class="text-brand-green">Citoyen</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    <!-- Vision, Mission, Valeurs Section -->
+    <div class="bg-[#f8fafc] py-24 border-t border-gray-100 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 reveal">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-3 mb-4 justify-center"><div class="w-10 h-px bg-brand-green"></div><span class="text-brand-green font-black uppercase tracking-[0.2em] text-xs"><i class="fa-solid fa-compass mr-2"></i> Notre Boussole</span></div>
+                <h2 class="text-4xl md:text-5xl font-black text-brand-dark tracking-tight">Ce qui nous anime</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+                <!-- Vision -->
+                <div class="bg-white rounded-[2.5rem] p-10 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,141,54,0.15)] hover:border-brand-green/20 transition-all duration-500 relative overflow-hidden group transform hover:-translate-y-3">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-brand-green opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center text-4xl mb-8 transform group-hover:rotate-6 transition-transform">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Notre Vision</h3>
+                    <p class="text-gray-600 leading-relaxed text-lg">Bâtir un Thiès-Nord prospère, solidaire et durable, où chaque citoyen est acteur du développement de son quartier et moteur du changement.</p>
+                </div>
+
+                <!-- Mission -->
+                <div class="bg-white rounded-[2.5rem] p-10 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,141,54,0.15)] hover:border-brand-green/20 transition-all duration-500 relative overflow-hidden group transform hover:-translate-y-3">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-brand-yellow opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-brand-yellow/15 text-brand-yellowDark rounded-2xl flex items-center justify-center text-4xl mb-8 transform group-hover:-rotate-6 transition-transform">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Notre Mission</h3>
+                    <p class="text-gray-600 leading-relaxed text-lg">Fédérer les énergies locales, écouter attentivement les populations et co-construire un programme d'actions concrètes, inclusives et réalisables.</p>
+                </div>
+
+                <!-- Valeurs -->
+                <div class="bg-white rounded-[2.5rem] p-10 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,141,54,0.15)] hover:border-brand-green/20 transition-all duration-500 relative overflow-hidden group transform hover:-translate-y-3">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-[#022c16] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-[#022c16]/10 text-[#022c16] rounded-2xl flex items-center justify-center text-4xl mb-8 transform group-hover:rotate-6 transition-transform">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-gray-900 mb-2">Nos Valeurs</h3>
+                    <ul class="space-y-4 text-gray-600 text-lg">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-[#022c16] mt-1.5 text-base"></i> 
+                            <span><strong>Paix</strong> (Jàmm) & <strong>Prospérité</strong> (Xéewal)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-[#022c16] mt-1.5 text-base"></i> 
+                            <span><strong>Transparence</strong> & Justice sociale</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check text-[#022c16] mt-1.5 text-base"></i> 
+                            <span><strong>Engagement</strong> citoyen absolu</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    

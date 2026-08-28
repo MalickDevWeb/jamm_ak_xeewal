@@ -1,0 +1,172 @@
+
+        
+    <!-- Premium Internal Hero -->
+    <div class="relative bg-brand-dark overflow-hidden pt-8 pb-14 md:pt-10 md:pb-16 border-b border-brand-green/20">
+        <!-- Background effects -->
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-green/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-yellow/10 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            
+            <!-- Breadcrumbs -->
+            <nav class="flex justify-center mb-3" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-lg">
+                    <li class="inline-flex items-center">
+                        <a routerLink="/" class="inline-flex items-center text-xs font-medium text-gray-200 hover:text-white transition-colors">
+                            <i class="fa-solid fa-house mr-1.5"></i> Accueil
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-chevron-right text-gray-500 text-[10px] mx-1.5"></i>
+                            <span class="text-xs font-bold text-white drop-shadow-sm">Adhésion</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <h1 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight drop-shadow-lg">
+                Rejoindre le <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow to-yellow-300 drop-shadow-none">Mouvement</span>
+            </h1>
+            <p class="text-gray-300 text-sm md:text-base max-w-xl mx-auto font-medium leading-relaxed">
+                Devenez acteur du changement. Remplissez ce formulaire ultra-simplifié pour faire partie de la dynamique JÀMM AK XÉEWAL.
+            </p>
+        </div>
+    </div>
+
+    <!-- Container du Formulaire -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative -mt-8 md:-mt-12 pb-16">
+        
+        <!-- Formulaire avec Timeline Verticale -->
+        <form class="relative max-w-3xl mx-auto" id="adhesion-form" (ngSubmit)="onSubmit()">
+            
+            <!-- Ligne Verticale (Timeline) -->
+            <div class="absolute left-6 md:left-8 top-8 bottom-24 w-1 bg-gray-200 rounded-full z-0 hidden md:block"></div>
+
+            <!-- Étape 1 : Identité -->
+            <div class="relative mb-6 group" id="step-container-1">
+                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full shadow-md flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300 step-dot">1</div>
+                
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+                    <div class="p-5 md:p-6 flex items-center justify-between">
+                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">1</span> 
+                            Vos Informations Personnelles
+                        </h3>
+                    </div>
+                    
+                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-1">
+                        <div class="space-y-6 mt-6">
+                            <div>
+                                <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Prénom et Nom <span class="text-red-500">*</span></label>
+                                <input type="text" name="prenom" [(ngModel)]="formData.prenom" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base transition-all" placeholder="Ex: Modou Fall">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Numéro de téléphone <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold border-r border-gray-200 pr-2">+221</span>
+                                        <input type="tel" name="telephone" [(ngModel)]="formData.telephone" required class="w-full border-2 border-gray-100 rounded-xl p-4 pl-20 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base transition-all font-bold tracking-wider" placeholder="77 123 45 67">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Votre Quartier <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select name="quartier" [(ngModel)]="formData.quartier" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base text-gray-700 transition-all appearance-none cursor-pointer">
+                                            <option value="">Sélectionnez votre quartier...</option>
+                                            <option value="Nguinth">Nguinth</option>
+                                            <option value="Grand Thiès">Grand Thiès</option>
+                                            <option value="Keur Mame El Hadj">Keur Mame El Hadj</option>
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 2 : Motivation -->
+            <div class="relative mb-6 group" id="step-container-2">
+                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">2</div>
+                
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+                    <div class="p-5 md:p-6 flex items-center justify-between">
+                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">2</span> 
+                            Votre Motivation <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
+                        </h3>
+                    </div>
+                    
+                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-2">
+                        <div class="space-y-6 mt-6">
+                            <div class="w-full transition-all">
+                                <textarea name="motivation" [(ngModel)]="formData.motivation" rows="4" class="w-full border-2 border-gray-100 rounded-2xl p-5 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green text-base transition-all resize-none placeholder-gray-400" placeholder="Exprimez votre motivation..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 3 : Engagement -->
+            <div class="relative mb-6 group" id="step-container-3">
+                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">3</div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+                    <div class="p-5 md:p-6 flex items-center justify-between">
+                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">3</span> 
+                            Votre Engagement <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
+                        </h3>
+                    </div>
+                    
+                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-3">
+                        <div class="space-y-6 mt-6">
+                            <label class="block text-gray-800 font-extrabold mb-3 text-sm uppercase tracking-wide">Choisissez votre pôle d'action <span class="text-gray-400 font-normal normal-case ml-1">(Optionnel)</span></label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <label class="flex flex-col p-4 border-2 border-gray-100 bg-gray-50/50 rounded-2xl cursor-pointer hover:border-brand-green hover:bg-brand-green/5 transition-all text-center group" [class.border-brand-green]="formData.pole === 'Dev Humain'">
+                                    <input type="radio" name="pole" value="Dev Humain" [(ngModel)]="formData.pole" class="peer sr-only">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-brand-green shadow-sm group-hover:scale-110 transition-transform"><i class="fa-solid fa-users text-lg"></i></div>
+                                    <span class="block font-black text-brand-dark text-sm mb-1">Dév. Humain</span>
+                                </label>
+                                
+                                <label class="flex flex-col p-4 border-2 border-gray-100 bg-gray-50/50 rounded-2xl cursor-pointer hover:border-brand-yellow hover:bg-brand-yellow/5 transition-all text-center group" [class.border-brand-yellow]="formData.pole === 'Economie'">
+                                    <input type="radio" name="pole" value="Economie" [(ngModel)]="formData.pole" class="peer sr-only">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-brand-yellow shadow-sm group-hover:scale-110 transition-transform"><i class="fa-solid fa-chart-line text-lg"></i></div>
+                                    <span class="block font-black text-brand-dark text-sm mb-1">Éco. & Innovation</span>
+                                </label>
+
+                                <label class="flex flex-col p-4 border-2 border-gray-100 bg-gray-50/50 rounded-2xl cursor-pointer hover:border-brand-greenLight hover:bg-brand-greenLight/5 transition-all text-center group" [class.border-brand-greenLight]="formData.pole === 'Environnement'">
+                                    <input type="radio" name="pole" value="Environnement" [(ngModel)]="formData.pole" class="peer sr-only">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-brand-greenLight shadow-sm group-hover:scale-110 transition-transform"><i class="fa-solid fa-leaf text-lg"></i></div>
+                                    <span class="block font-black text-brand-dark text-sm mb-1">Cadre de vie</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Submit Button (Always Visible) -->
+            <div class="md:ml-16 mt-6 relative z-10" *ngIf="!success">
+                <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:hover:translate-y-0">
+                    <span *ngIf="!isSubmitting">Valider mon adhésion <i class="fa-solid fa-check-circle text-xl"></i></span>
+                    <span *ngIf="isSubmitting"><i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...</span>
+                </button>
+                <p class="text-center text-xs font-medium text-gray-500 mt-4"><i class="fa-solid fa-lock text-brand-green mr-1"></i> Données sécurisées.</p>
+            </div>
+
+            <!-- Success Message -->
+            <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-6 rounded-2xl text-center" *ngIf="success">
+                <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 mb-2">Félicitations !</h3>
+                <p class="text-gray-600">Votre demande d'adhésion a bien été envoyée au mouvement JÀMM AK XÉEWAL.</p>
+            </div>
+            
+        </form>
+    </div>

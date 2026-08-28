@@ -1,0 +1,39 @@
+
+        
+        <div class="max-w-3xl mx-auto px-4 py-16">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 mx-auto bg-brand-green text-white rounded-full flex items-center justify-center text-2xl mb-4"><i class="fa-solid fa-lightbulb"></i></div>
+                <h1 class="text-3xl font-black">Proposer une idée</h1>
+                <p class="text-gray-600 mt-2">Soumettez votre projet pour enrichir le programme du mouvement.</p>
+            </div>
+            <form class="bg-white p-8 rounded-xl shadow-sm border border-gray-100" (ngSubmit)="onSubmit()" *ngIf="!success">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre de votre proposition <span class="text-red-500">*</span></label>
+                    <input type="text" name="titre" [(ngModel)]="formData.titre" required class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-brand-green focus:border-brand-green">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Axe concerné</label>
+                    <select name="axe_concerne" [(ngModel)]="formData.axe_concerne" required class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-brand-green focus:border-brand-green">
+                        <option value="Éducation et formation">Éducation et formation</option>
+                        <option value="Emploi et entrepreneuriat">Emploi et entrepreneuriat</option>
+                        <option value="Jeunesse, sport et culture">Jeunesse, sport et culture</option>
+                        <option value="Environnement et cadre de vie">Environnement et cadre de vie</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Détails de la solution proposée <span class="text-red-500">*</span></label>
+                    <textarea name="description" [(ngModel)]="formData.description" required rows="5" class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-brand-green focus:border-brand-green"></textarea>
+                </div>
+                <button type="submit" [disabled]="isSubmitting" class="w-full bg-brand-green text-white font-bold py-3 rounded-lg hover:bg-brand-dark disabled:opacity-50">
+                    <span *ngIf="!isSubmitting">Envoyer ma proposition</span>
+                    <span *ngIf="isSubmitting">Envoi en cours...</span>
+                </button>
+            </form>
+            <div class="bg-green-50 border-2 border-green-500 p-6 rounded-2xl text-center" *ngIf="success">
+                <h3 class="text-2xl font-black text-gray-900 mb-2">Idée Envoyée !</h3>
+                <p class="text-gray-600">Merci de votre contribution, votre idée a bien été reçue par l'équipe JÀMM AK XÉEWAL.</p>
+            </div>
+        </div>
+    
+    

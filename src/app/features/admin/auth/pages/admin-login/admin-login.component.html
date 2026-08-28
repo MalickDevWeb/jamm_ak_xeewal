@@ -1,0 +1,74 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-green/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-yellow/10 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/3"></div>
+    </div>
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div class="flex justify-center mb-6">
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-gray-100">
+                <i class="fa-solid fa-shield-halved text-4xl text-brand-green"></i>
+            </div>
+        </div>
+        <h2 class="mt-2 text-center text-3xl font-black text-gray-900 tracking-tight">Espace Administration</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">Veuillez vous connecter pour gérer la plateforme</p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div class="bg-white/80 backdrop-blur-xl py-8 px-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] sm:rounded-3xl sm:px-10 border border-white/40 relative">
+            <form class="space-y-6" (submit)="onSubmit($event)">
+                <div>
+                    <label for="email" class="block text-sm font-bold text-gray-700">Adresse email</label>
+                    <div class="mt-2 relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+                        <input id="email" name="email" type="email" [(ngModel)]="email" required class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-green focus:border-brand-green sm:text-sm transition-colors bg-white/50 focus:bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-bold text-gray-700">Mot de passe</label>
+                    <div class="mt-2 relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <input id="password" name="password" type="password" [(ngModel)]="password" required class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-green focus:border-brand-green sm:text-sm transition-colors bg-white/50 focus:bg-white">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-green focus:ring-brand-green border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-600">Se souvenir de moi</label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-bold text-brand-green hover:text-brand-greenLight">Mot de passe oublié ?</a>
+                    </div>
+                </div>
+
+                <div *ngIf="errorMessage" class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errorMessage }}
+                </div>
+
+                <div>
+                    <button type="submit" [disabled]="isLoading" class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-black text-white bg-brand-green hover:bg-brand-greenLight focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:transform-none">
+                        <i class="fa-solid fa-circle-notch fa-spin" *ngIf="isLoading"></i>
+                        <i class="fa-solid fa-right-to-bracket" *ngIf="!isLoading"></i> 
+                        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Development indicator -->
+            <div class="mt-6 text-center">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    <i class="fa-solid fa-person-digging mr-1.5"></i> En construction (Prêt pour intégration NestJS)
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

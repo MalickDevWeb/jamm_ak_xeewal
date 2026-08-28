@@ -1,0 +1,16 @@
+
+        
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <h1 class="text-3xl font-black mb-8">Galerie Photos</h1>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" *ngIf="photos.length > 0">
+                <div *ngFor="let photo of photos" class="bg-gray-200 aspect-square rounded-lg flex items-center justify-center overflow-hidden">
+                    <img [src]="photo" class="w-full h-full object-cover">
+                </div>
+            </div>
+            <div *ngIf="photos.length === 0" class="text-center py-20 text-gray-500">
+                <i class="fa-solid fa-image text-4xl mb-4"></i>
+                <p>Aucune photo dans la galerie.</p>
+            </div>
+        </div>
+    
+    
