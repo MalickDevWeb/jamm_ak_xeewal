@@ -113,6 +113,12 @@
                 </div>
             </div>
 
+            <!-- Message d'erreur personnalisé -->
+            <div *ngIf="errorMsg" class="md:ml-16 mt-6 mb-2 relative z-10 bg-red-50 border border-red-200 text-red-600 px-5 py-4 rounded-2xl flex items-start sm:items-center gap-3 animate-fade-in-up">
+                <i class="fa-solid fa-circle-exclamation text-xl mt-0.5 sm:mt-0 text-red-500"></i>
+                <span class="font-medium text-sm leading-snug">{{ errorMsg }}</span>
+            </div>
+
             <!-- Bouton -->
             <div class="md:ml-16 mt-2 relative z-10">
                 <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-50">

@@ -32,7 +32,15 @@ export class ContactComponent {
     }
 
     this.isSubmitting = true;
-    this.publicData.postMessage(this.formData).subscribe({
+    const payload = {
+      nom: this.formData.nom,
+      email: this.formData.email || this.formData.telephone || '',
+      telephone: this.formData.telephone || '',
+      sujet: this.formData.sujet || 'Contact depuis le site',
+      contenu: this.formData.message
+    };
+
+    this.publicData.postMessage(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.success = true;

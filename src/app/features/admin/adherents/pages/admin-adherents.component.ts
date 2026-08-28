@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -6,6 +7,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 @Component({
   selector: 'app-admin-adherents',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
@@ -65,7 +67,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
               </td>
               <td class="py-4 px-6">
                 <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button (click)="action('Valider', a.id)" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" *ngIf="a.statut === 'EN_ATTENTE'"><i class="fa-solid fa-check text-xs"></i></button>
+                  <button (click)="action('Valider', a.id)" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" *ngIf="a.statut === 'NOUVEAU'"><i class="fa-solid fa-check text-xs"></i></button>
                   <button (click)="action('Éditer', a.id)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
                   <button (click)="action('Supprimer', a.id)" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
@@ -113,7 +115,8 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminAdherentsComponent implements OnInit {
+export class AdminadherentsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   adherents: any[] = [];
   total = 0;
   isLoading = true;
@@ -126,7 +129,8 @@ export class AdminAdherentsComponent implements OnInit {
     quartier: ''
   };
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.adminData.getAdherents().subscribe({
@@ -138,8 +142,8 @@ export class AdminAdherentsComponent implements OnInit {
   getStatutClass(statut: string): string {
     const map: any = {
       'ACTIF': 'bg-green-100 text-green-700',
-      'EN_ATTENTE': 'bg-yellow-100 text-yellow-700',
-      'INACTIF': 'bg-gray-100 text-gray-500'
+      'NOUVEAU': 'bg-yellow-100 text-yellow-700',
+      'SUSPENDU': 'bg-gray-100 text-gray-500'
     };
     return map[statut] || 'bg-gray-100 text-gray-500';
   }
@@ -169,5 +173,10 @@ export class AdminAdherentsComponent implements OnInit {
     this.isLoading = true;
     this.showModal = false;
     this.adminData.createEntity('adherents', this.formData).subscribe(() => this.ngOnInit());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

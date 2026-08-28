@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AdminDataService } from '../../core/services/admin-data.service';
-import { forkJoin, interval, Subscription } from 'rxjs';
+import { Subject, forkJoin, takeUntil, finalize } from 'rxjs';
 
 interface AdminNotification {
   id: string;
@@ -19,25 +19,37 @@ interface AdminNotification {
   selector: 'app-admin-dashboard-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-dashboard-layout.component.html',
   styleUrl: './admin-dashboard-layout.component.css'
 })
 export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
   notifications: AdminNotification[] = [];
   notificationsOpen = false;
-  private polling?: Subscription;
+  isLoading = false;
+  private destroy$ = new Subject<void>();
   private readonly readStorageKey = 'jamm-admin-read-notifications';
 
-  constructor(private authService: AuthService, private router: Router, private adminData: AdminDataService) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router, 
+    private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.refreshNotifications();
-    this.polling = interval(15000).subscribe(() => this.refreshNotifications());
   }
 
-  ngOnDestroy() { this.polling?.unsubscribe(); }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   refreshNotifications() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+
     forkJoin({
       adherents: this.adminData.getAdherents(),
       besoins: this.adminData.getBesoins(),
@@ -47,7 +59,12 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
       sondages: this.adminData.getSondages(),
       activites: this.adminData.getActivites(),
       comptesRendus: this.adminData.getComptesRendus()
-    }).subscribe({
+    }).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    ).subscribe({
       next: response => {
         const items: AdminNotification[] = [];
         this.addNotifications(items, response.adherents?.data, 'Nouvel adhérent', item => `${item.prenom} ${item.nom}`, 'fa-solid fa-user-plus', 'green', '/admin/adherents');
@@ -59,6 +76,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
         this.addNotifications(items, response.activites?.data, 'Nouvelle activité', item => item.titre, 'fa-solid fa-calendar-days', 'purple', '/admin/activites');
         this.addNotifications(items, response.comptesRendus?.data, 'Nouveau compte-rendu', item => item.titre, 'fa-solid fa-file-lines', 'teal', '/admin/comptes-rendus');
         this.notifications = items.sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()).slice(0, 40);
+        this.cdr.markForCheck();
       }
     });
   }

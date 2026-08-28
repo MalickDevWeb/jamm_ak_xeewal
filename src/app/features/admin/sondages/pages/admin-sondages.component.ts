@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -6,6 +7,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 @Component({
   selector: 'app-admin-sondages',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
@@ -27,7 +29,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     </div>
 
     <div *ngIf="!isLoading" class="space-y-6">
-      <div *ngFor="let s of sondages" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div *ngFor="let s of sondages; trackBy: trackById" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
         <div class="flex items-start justify-between gap-4 mb-5">
           <div class="flex-1">
             <div class="flex items-center gap-3 mb-2">
@@ -43,7 +45,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
         <!-- Results bars -->
         <div class="space-y-3">
-          <div *ngFor="let option of s.options" class="group">
+          <div *ngFor="let option of s.options; trackBy: trackByOptionId" class="group">
             <div class="flex items-center justify-between mb-1">
               <span class="text-sm font-medium text-gray-700">{{ option.texte }}</span>
               <div class="flex items-center gap-2">
@@ -98,7 +100,8 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminSondagesComponent implements OnInit {
+export class AdminsondagesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   sondages: any[] = [];
   total = 0;
   isLoading = true;
@@ -109,13 +112,34 @@ export class AdminSondagesComponent implements OnInit {
     optionsStr: ''
   };
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(
+    private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.adminData.getSondages().subscribe({
-      next: (res: any) => { this.sondages = res.data; this.total = res.total; this.isLoading = false; },
-      error: () => { this.isLoading = false; }
+    this.adminData.getSondages().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => { 
+        this.sondages = res.data; 
+        this.total = res.total; 
+        this.isLoading = false; 
+        this.cdr.markForCheck();
+      },
+      error: () => { 
+        this.isLoading = false; 
+        this.cdr.markForCheck();
+      }
     });
+  }
+
+  trackById(index: number, item: any): string {
+    return item.id;
+  }
+
+  trackByOptionId(index: number, item: any): string {
+    return item.id;
   }
 
   getPct(votes: number, total: number): number {
@@ -128,11 +152,15 @@ export class AdminSondagesComponent implements OnInit {
       this.showModal = true;
     } else if (type === 'Clôturer' && id) {
       this.isLoading = true;
-      this.adminData.updateEntity('sondages', id, { statut: 'CLOTURE' }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('sondages', id, { statut: 'CLOTURE' }).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(() => this.ngOnInit());
     } else if (type === 'Supprimer' && id) {
       if (confirm('Supprimer ce sondage ?')) {
         this.isLoading = true;
-        this.adminData.deleteEntity('sondages', id).subscribe(() => this.ngOnInit());
+        this.adminData.deleteEntity('sondages', id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe(() => this.ngOnInit());
       }
     }
   }
@@ -145,6 +173,13 @@ export class AdminSondagesComponent implements OnInit {
     const options = this.formData.optionsStr.split(',').map(o => o.trim()).filter(o => o.length > 0);
     this.isLoading = true;
     this.showModal = false;
-    this.adminData.createEntity('sondages', { question: this.formData.question, options }).subscribe(() => this.ngOnInit());
+    this.adminData.createEntity('sondages', { question: this.formData.question, options }).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.ngOnInit());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

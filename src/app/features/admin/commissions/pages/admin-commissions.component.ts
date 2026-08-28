@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -6,6 +7,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 @Component({
   selector: 'app-admin-commissions',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
@@ -32,7 +34,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
         <div class="flex items-start justify-between mb-4">
           <div class="w-12 h-12 rounded-xl bg-[#022c16]/10 text-[#022c16] flex items-center justify-center text-xl font-black">
-            {{ c.nom.charAt(11) }}
+            {{ c.nom.charAt(0) }}
           </div>
           <span [class]="c.statut === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
                 class="text-[11px] font-bold px-2.5 py-1 rounded-full">{{ c.statut }}</span>
@@ -40,12 +42,12 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
         <h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">{{ c.nom }}</h3>
         <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
-          <i class="fa-solid fa-user-tie"></i> {{ c.president }}
+          <i class="fa-solid fa-user-tie"></i> {{ c.responsable || 'Non assigné' }}
         </p>
 
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="bg-gray-50 rounded-xl p-3 text-center">
-            <p class="text-xl font-black text-[#022c16]">{{ c.membres }}</p>
+            <p class="text-xl font-black text-[#022c16]">{{ c.membresCount }}</p>
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Membres</p>
           </div>
           <div class="bg-gray-50 rounded-xl p-3 text-center">
@@ -94,7 +96,8 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminCommissionsComponent implements OnInit {
+export class AdmincommissionsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   commissions: any[] = [];
   total = 0;
   isLoading = true;
@@ -104,7 +107,8 @@ export class AdminCommissionsComponent implements OnInit {
     nom: ''
   };
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.adminData.getCommissions().subscribe({
@@ -141,5 +145,10 @@ export class AdminCommissionsComponent implements OnInit {
     this.isLoading = true;
     this.showModal = false;
     this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.ngOnInit());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

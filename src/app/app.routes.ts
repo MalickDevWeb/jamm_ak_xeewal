@@ -1,33 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './features/public/pages/home/home.component';
-import { MouvementComponent } from './features/public/pages/mouvement/mouvement.component';
-import { AxesComponent } from './features/public/pages/axes/axes.component';
-import { ContactComponent } from './features/public/pages/contact/contact.component';
-
-import { AdhererComponent } from './features/engagement/pages/adherer/adherer.component';
-import { ProposerIdeeComponent } from './features/engagement/pages/proposer-idee/proposer-idee.component';
-import { DeclarerBesoinComponent } from './features/engagement/pages/declarer-besoin/declarer-besoin.component';
-import { SondageComponent } from './features/engagement/pages/sondage/sondage.component';
-import { CommissionsComponent } from './features/engagement/pages/commissions/commissions.component';
-
-import { ActivitesComponent } from './features/media/pages/activites/activites.component';
-import { GalerieComponent } from './features/media/pages/galerie/galerie.component';
-import { CompteRenduComponent } from './features/media/pages/compte-rendu/compte-rendu.component';
-
-// === ADMIN ===
-import { AdminLoginComponent } from './features/admin/auth/pages/admin-login/admin-login.component';
-import { AdminDashboardComponent } from './features/admin/dashboard/pages/admin-dashboard/admin-dashboard.component';
-import { AdminAdherentsComponent } from './features/admin/adherents/pages/admin-adherents.component';
-import { AdminBesoinsComponent } from './features/admin/besoins/pages/admin-besoins.component';
-import { AdminIdeesComponent } from './features/admin/idees/pages/admin-idees.component';
-import { AdminMessagesComponent } from './features/admin/messages/pages/admin-messages.component';
-import { AdminCommissionsComponent } from './features/admin/commissions/pages/admin-commissions.component';
-import { AdminSondagesComponent } from './features/admin/sondages/pages/admin-sondages.component';
-import { AdminSettingsComponent } from './features/admin/settings/pages/admin-settings.component';
-import { AdminPlaceholderComponent } from './features/admin/shared/components/admin-placeholder/admin-placeholder.component';
-import { AdminEditorialComponent } from './features/admin/editorial/pages/admin-editorial.component';
-import { AdminActivitesComponent } from './features/admin/activites/pages/admin-activites.component';
-import { AdminComptesRendusComponent } from './features/admin/comptes-rendus/pages/admin-comptes-rendus.component';
+import { authGuard } from './core/guards/auth.guard';
 
 // === LAYOUTS ===
 import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
@@ -39,44 +11,141 @@ export const routes: Routes = [
   {
     path: 'admin/login',
     component: AdminAuthLayoutComponent,
-    children: [{ path: '', component: AdminLoginComponent }]
+    children: [{ 
+      path: '', 
+      loadComponent: () => import('./features/admin/auth/pages/admin-login/admin-login.component')
+        .then(m => m.AdminLoginComponent)
+    }]
   },
-  // --- Admin Back-office (toutes les routes opérationnelles) ---
+  // --- Admin Back-office (lazy loaded) ---
   {
     path: 'admin',
     component: AdminDashboardLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: AdminDashboardComponent },
-      { path: 'adherents', component: AdminAdherentsComponent },
-      { path: 'besoins', component: AdminBesoinsComponent },
-      { path: 'idees', component: AdminIdeesComponent },
-      { path: 'messages', component: AdminMessagesComponent },
-      { path: 'commissions', component: AdminCommissionsComponent },
-      { path: 'sondages', component: AdminSondagesComponent },
-      { path: 'settings', component: AdminSettingsComponent },
-      { path: 'editorial', component: AdminEditorialComponent },
-      { path: 'activites', component: AdminActivitesComponent },
-      { path: 'comptes-rendus', component: AdminComptesRendusComponent }
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('./features/admin/dashboard/pages/admin-dashboard/admin-dashboard.component')
+          .then(m => m.AdminDashboardComponent)
+      },
+      { 
+        path: 'adherents', 
+        loadComponent: () => import('./features/admin/adherents/pages/admin-adherents.component')
+          .then(m => m.AdminadherentsComponent)
+      },
+      { 
+        path: 'besoins', 
+        loadComponent: () => import('./features/admin/besoins/pages/admin-besoins.component')
+          .then(m => m.AdminbesoinsComponent)
+      },
+      { 
+        path: 'idees', 
+        loadComponent: () => import('./features/admin/idees/pages/admin-idees.component')
+          .then(m => m.AdminideesComponent)
+      },
+      { 
+        path: 'messages', 
+        loadComponent: () => import('./features/admin/messages/pages/admin-messages.component')
+          .then(m => m.AdminmessagesComponent)
+      },
+      { 
+        path: 'commissions', 
+        loadComponent: () => import('./features/admin/commissions/pages/admin-commissions.component')
+          .then(m => m.AdmincommissionsComponent)
+      },
+      { 
+        path: 'sondages', 
+        loadComponent: () => import('./features/admin/sondages/pages/admin-sondages.component')
+          .then(m => m.AdminsondagesComponent)
+      },
+      { 
+        path: 'settings', 
+        loadComponent: () => import('./features/admin/settings/pages/admin-settings.component')
+          .then(m => m.AdminSettingsComponent)
+      },
+      { 
+        path: 'editorial', 
+        loadComponent: () => import('./features/admin/editorial/pages/admin-editorial.component')
+          .then(m => m.AdminEditorialComponent)
+      },
+      { 
+        path: 'activites', 
+        loadComponent: () => import('./features/admin/activites/pages/admin-activites.component')
+          .then(m => m.AdminactivitesComponent)
+      },
+      { 
+        path: 'comptes-rendus', 
+        loadComponent: () => import('./features/admin/comptes-rendus/pages/admin-comptes-rendus.component')
+          .then(m => m.AdminComptesRendusComponent)
+      }
     ]
   },
-  // --- Site Public ---
+  // --- Site Public (lazy loaded) ---
   {
     path: '',
     component: PublicLayoutComponent,
     children: [
-      { path: '', component: HomeComponent },
-      { path: 'mouvement', component: MouvementComponent },
-      { path: 'axes', component: AxesComponent },
-      { path: 'activites', component: ActivitesComponent },
-      { path: 'declarer-besoin', component: DeclarerBesoinComponent },
-      { path: 'adherer', component: AdhererComponent },
-      { path: 'proposer-idee', component: ProposerIdeeComponent },
-      { path: 'contact', component: ContactComponent },
-      { path: 'galerie', component: GalerieComponent },
-      { path: 'sondage', component: SondageComponent },
-      { path: 'commissions', component: CommissionsComponent },
-      { path: 'compte-rendu', component: CompteRenduComponent }
+      { 
+        path: '', 
+        loadComponent: () => import('./features/public/pages/home/home.component')
+          .then(m => m.HomeComponent)
+      },
+      { 
+        path: 'mouvement', 
+        loadComponent: () => import('./features/public/pages/mouvement/mouvement.component')
+          .then(m => m.MouvementComponent)
+      },
+      { 
+        path: 'axes', 
+        loadComponent: () => import('./features/public/pages/axes/axes.component')
+          .then(m => m.AxesComponent)
+      },
+      { 
+        path: 'activites', 
+        loadComponent: () => import('./features/media/pages/activites/activites.component')
+          .then(m => m.ActivitesComponent)
+      },
+      { 
+        path: 'declarer-besoin', 
+        loadComponent: () => import('./features/engagement/pages/declarer-besoin/declarer-besoin.component')
+          .then(m => m.DeclarerBesoinComponent)
+      },
+      { 
+        path: 'adherer', 
+        loadComponent: () => import('./features/engagement/pages/adherer/adherer.component')
+          .then(m => m.AdhererComponent)
+      },
+      { 
+        path: 'proposer-idee', 
+        loadComponent: () => import('./features/engagement/pages/proposer-idee/proposer-idee.component')
+          .then(m => m.ProposerIdeeComponent)
+      },
+      { 
+        path: 'contact', 
+        loadComponent: () => import('./features/public/pages/contact/contact.component')
+          .then(m => m.ContactComponent)
+      },
+      { 
+        path: 'galerie', 
+        loadComponent: () => import('./features/media/pages/galerie/galerie.component')
+          .then(m => m.GalerieComponent)
+      },
+      { 
+        path: 'sondage', 
+        loadComponent: () => import('./features/engagement/pages/sondage/sondage.component')
+          .then(m => m.SondageComponent)
+      },
+      { 
+        path: 'commissions', 
+        loadComponent: () => import('./features/engagement/pages/commissions/commissions.component')
+          .then(m => m.CommissionsComponent)
+      },
+      { 
+        path: 'compte-rendu', 
+        loadComponent: () => import('./features/media/pages/compte-rendu/compte-rendu.component')
+          .then(m => m.CompteRenduComponent)
+      }
     ]
   },
   { path: '**', redirectTo: '' }

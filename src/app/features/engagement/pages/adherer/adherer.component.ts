@@ -24,24 +24,31 @@ export class AdhererComponent {
   
   isSubmitting = false;
   success = false;
+  errorMsg = '';
 
   constructor(private publicData: PublicDataService) {}
 
+  showError(msg: string) {
+    this.errorMsg = msg;
+    setTimeout(() => this.errorMsg = '', 5000);
+  }
+
   onSubmit() {
     if (!this.formData.prenom || !this.formData.telephone || !this.formData.quartier) {
-      alert("Veuillez remplir les champs obligatoires (Nom, Téléphone, Quartier).");
+      this.showError("Veuillez remplir les champs obligatoires (Prénom et Nom, Téléphone, Quartier).");
       return;
     }
 
     this.isSubmitting = true;
+    this.errorMsg = '';
     
     // Convertir prenom/nom
-    const parts = this.formData.prenom.split(' ');
-    const nom = parts.pop() || '';
-    const prenom = parts.join(' ');
+    const parts = this.formData.prenom.trim().split(' ');
+    const nom = parts.length > 1 ? (parts.pop() || '') : '';
+    const prenom = parts.join(' ') || this.formData.prenom;
 
     const payload = {
-      prenom: prenom || this.formData.prenom,
+      prenom: prenom,
       nom: nom,
       telephone: this.formData.telephone,
       quartier: this.formData.quartier,
@@ -54,9 +61,13 @@ export class AdhererComponent {
         this.isSubmitting = false;
         this.success = true;
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
-        alert("Une erreur est survenue.");
+        if (err.status === 409) {
+          this.showError("Ce numéro de téléphone est déjà enregistré. Veuillez utiliser un autre numéro.");
+        } else {
+          this.showError("Une erreur est survenue lors de l'envoi de votre adhésion. Veuillez réessayer.");
+        }
       }
     });
   }

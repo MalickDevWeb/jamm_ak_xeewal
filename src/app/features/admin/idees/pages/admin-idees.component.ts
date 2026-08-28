@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-admin-idees',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
   <div class="animate-fade-in-up">
@@ -51,12 +53,14 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminIdeesComponent implements OnInit {
+export class AdminideesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   idees: any[] = [];
   total = 0;
   isLoading = true;
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.adminData.getIdees().subscribe({
@@ -66,14 +70,14 @@ export class AdminIdeesComponent implements OnInit {
   }
 
   getStatutClass(s: string): string {
-    const map: any = { 'APPROUVEE': 'bg-green-100 text-green-700', 'EN_ETUDE': 'bg-blue-100 text-blue-700', 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'REJETEE': 'bg-red-100 text-red-700' };
+    const map: any = { 'NOUVELLE': 'bg-yellow-100 text-yellow-700', 'A_LETUDE': 'bg-blue-100 text-blue-700', 'VALIDEE': 'bg-green-100 text-green-700', 'REJETEE': 'bg-red-100 text-red-700' };
     return map[s] || 'bg-gray-100 text-gray-500';
   }
 
   action(type: string, id: string) {
     if (type === 'Approuver') {
       this.isLoading = true;
-      this.adminData.updateEntity('idees', id, { statut: 'APPROUVEE' }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('idees', id, { statut: 'VALIDEE' }).subscribe(() => this.ngOnInit());
     } else if (type === 'Rejeter') {
       this.isLoading = true;
       this.adminData.updateEntity('idees', id, { statut: 'REJETEE' }).subscribe(() => this.ngOnInit());
@@ -83,5 +87,10 @@ export class AdminIdeesComponent implements OnInit {
         this.adminData.deleteEntity('idees', id).subscribe(() => this.ngOnInit());
       }
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

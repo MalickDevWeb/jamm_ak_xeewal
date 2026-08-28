@@ -19,7 +19,7 @@ export class GalerieComponent implements OnInit {
     this.publicData.getActivites().subscribe({
       next: (res: any) => {
         if (res.data) {
-          this.photos = res.data.map((a: any) => a.media_url).filter((url: any) => url);
+          this.photos = res.data.map((a: any) => a.mediaUrl).filter((url: any) => url);
         }
       }
     });

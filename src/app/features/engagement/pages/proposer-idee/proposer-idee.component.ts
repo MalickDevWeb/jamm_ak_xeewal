@@ -31,8 +31,16 @@ export class ProposerIdeeComponent {
       return;
     }
 
+    const payload = {
+      titre: this.formData.titre,
+      description: this.formData.description,
+      categorie: this.formData.axe_concerne,
+      auteur: this.formData.nom_citizen,
+      pole: this.formData.axe_concerne
+    };
+
     this.isSubmitting = true;
-    this.publicData.postIdee(this.formData).subscribe({
+    this.publicData.postIdee(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.success = true;

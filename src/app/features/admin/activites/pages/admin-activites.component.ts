@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -6,6 +7,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 @Component({
   selector: 'app-admin-activites',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
@@ -88,7 +90,8 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminActivitesComponent implements OnInit {
+export class AdminactivitesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   activites: any[] = [];
   total = 0;
   isLoading = true;
@@ -99,7 +102,8 @@ export class AdminActivitesComponent implements OnInit {
     categorie: 'PROJET'
   };
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.adminData.getActivites().subscribe({
@@ -133,5 +137,10 @@ export class AdminActivitesComponent implements OnInit {
     this.isLoading = true;
     this.showModal = false;
     this.adminData.createEntity('activites', { titre: this.formData.titre, categorie: this.formData.categorie, date: new Date().toISOString() }).subscribe(() => this.ngOnInit());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

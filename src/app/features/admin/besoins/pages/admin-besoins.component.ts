@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-admin-besoins',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
   <div class="animate-fade-in-up">
@@ -53,12 +55,14 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminBesoinsComponent implements OnInit {
+export class AdminbesoinsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   besoins: any[] = [];
   total = 0;
   isLoading = true;
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.adminData.getBesoins().subscribe({
@@ -93,5 +97,10 @@ export class AdminBesoinsComponent implements OnInit {
   getStatutClass(s: string): string {
     const map: any = { 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'EN_COURS': 'bg-blue-100 text-blue-700', 'RESOLU': 'bg-green-100 text-green-700' };
     return map[s] || 'bg-gray-100 text-gray-500';
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

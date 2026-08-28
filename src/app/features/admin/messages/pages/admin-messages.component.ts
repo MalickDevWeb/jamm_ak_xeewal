@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-admin-messages',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
   <div class="animate-fade-in-up">
@@ -23,7 +25,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     </div>
 
     <div *ngIf="!isLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50">
-      <div *ngFor="let m of messages"
+      <div *ngFor="let m of messages; trackBy: trackById"
         [class]="m.lu ? 'p-6 hover:bg-gray-50/50 transition-colors group' : 'p-6 bg-[#022c16]/[0.02] hover:bg-[#022c16]/[0.04] transition-colors group border-l-4 border-[#022c16]'">
         <div class="flex items-start gap-4">
           <div [class]="m.lu ? 'w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-sm shrink-0' : 'w-10 h-10 rounded-full bg-[#022c16] text-white flex items-center justify-center font-bold text-sm shrink-0'">
@@ -39,7 +41,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             </div>
             <p class="text-xs text-gray-400 mb-1">{{ m.email }}</p>
             <p class="text-sm font-semibold text-gray-700 mb-1">{{ m.sujet }}</p>
-            <p class="text-sm text-gray-500 line-clamp-2">{{ m.message }}</p>
+            <p class="text-sm text-gray-500 line-clamp-2">{{ m.contenu }}</p>
           </div>
           <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             <button (click)="action('Marquer lu', m.id)" *ngIf="!m.lu" class="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" title="Marquer comme lu">
@@ -58,37 +60,60 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   </div>
   `
 })
-export class AdminMessagesComponent implements OnInit {
+export class AdminmessagesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   messages: any[] = [];
   total = 0;
   nonLus = 0;
   isLoading = true;
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(
+    private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.adminData.getMessages().subscribe({
+    this.adminData.getMessages().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (res: any) => {
         this.messages = res.data;
         this.total = res.total;
         this.nonLus = res.data.filter((m: any) => !m.lu).length;
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.isLoading = false; }
+      error: () => { 
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
     });
+  }
+
+  trackById(index: number, item: any): string {
+    return item.id;
   }
 
   action(type: string, id: string) {
     if (type === 'Marquer lu') {
       this.isLoading = true;
-      this.adminData.updateEntity('messages', id, { lu: true }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('messages', id, { lu: true }).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(() => this.ngOnInit());
     } else if (type === 'Supprimer') {
       if (confirm('Supprimer ce message ?')) {
         this.isLoading = true;
-        this.adminData.deleteEntity('messages', id).subscribe(() => this.ngOnInit());
+        this.adminData.deleteEntity('messages', id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe(() => this.ngOnInit());
       }
     } else if (type === 'Répondre') {
       alert('La fonctionnalité d\'envoi d\'email (Répondre) est en cours d\'intégration.');
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

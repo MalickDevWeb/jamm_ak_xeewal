@@ -24,23 +24,36 @@ export class DeclarerBesoinComponent {
 
   isSubmitting = false;
   success = false;
+  errorMsg = '';
 
   constructor(private publicData: PublicDataService) {}
 
+  showError(msg: string) {
+    this.errorMsg = msg;
+    setTimeout(() => this.errorMsg = '', 5000);
+  }
+
   onSubmit() {
     if (!this.formData.description || !this.formData.quartier || !this.formData.telephone_citoyen) {
-      alert("Veuillez remplir la description, le quartier et le téléphone.");
+      this.showError("Veuillez remplir les champs obligatoires (Description, Quartier et Téléphone).");
       return;
     }
+
+    // Mémoriser le nom pour le backend s'il est fourni
+    const contactInfo = this.formData.nom_citoyen 
+      ? `${this.formData.nom_citoyen} - ${this.formData.telephone_citoyen}` 
+      : this.formData.telephone_citoyen;
 
     const payload = {
       description: this.formData.description,
       quartier: this.formData.quartier,
-      contact: this.formData.telephone_citoyen,
+      contact: contactInfo,
       urgence: this.formData.urgence.toUpperCase()
     };
 
     this.isSubmitting = true;
+    this.errorMsg = '';
+    
     this.publicData.postBesoin(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
@@ -48,7 +61,7 @@ export class DeclarerBesoinComponent {
       },
       error: () => {
         this.isSubmitting = false;
-        alert("Erreur lors de l'envoi.");
+        this.showError("Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer.");
       }
     });
   }
