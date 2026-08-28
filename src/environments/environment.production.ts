@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://jamm-backend.vercel.app/api/v1'
+  apiUrl: 'https://backofficexammakxeewal.vercel.app/api/v1'
 };
