@@ -231,14 +231,16 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   refreshData() {
-    this.adminData.getAdherents().subscribe({
+    this.adminData.getAdherents().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.adherents = res.data;
         this.total = res.total;
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -274,8 +276,10 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.itemToDelete = id;
       this.confirmTitle = 'Supprimer cet adhérent ?';
       this.showConfirmDialog = true;
+      this.cdr.markForCheck();
     } else if (type === 'Valider' && id) {
       this.isLoading = true;
+      this.cdr.markForCheck();
       this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe(() => this.refreshData());
     } else {
       alert(type + ' : Formulaire en cours de développement.');
@@ -291,6 +295,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
       this.showConfirmDialog = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -301,6 +306,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+    this.cdr.markForCheck();
     this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
   }
 
