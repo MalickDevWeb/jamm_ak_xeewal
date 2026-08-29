@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,134 +12,283 @@ import { environment } from '../../../../../environments/environment';
   imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
+    <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-black text-gray-900">Activités</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ total }} activités enregistrées.</p>
+        <h2 class="text-3xl font-black text-gray-900 flex items-center gap-3">
+          <i class="fa-solid fa-images text-2xl text-[#022c16]"></i>
+          Activités
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">{{ total }} activité(s) enregistrée(s).</p>
       </div>
-      <button (click)="action('Créer une activité')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
-        <i class="fa-solid fa-plus"></i> Créer une activité
+      <button (click)="openCreateModal()"
+              class="px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
+        <i class="fa-solid fa-plus text-lg"></i>
+        <span>Créer une activité</span>
       </button>
     </div>
 
+    <!-- Loading state -->
     <div *ngIf="isLoading" class="flex items-center justify-center py-20">
       <div class="text-center">
-        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-500 text-sm">Chargement depuis l'API...</p>
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#022c16] mb-4"></i>
+        <p class="text-gray-500 text-lg">Chargement depuis l'API...</p>
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="space-y-6">
-      <div *ngFor="let a of activites; trackBy: trackById" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-        <div class="flex items-start justify-between gap-4">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-2">
-              <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">{{ a.categorie }}</span>
-              <span class="text-xs text-gray-400">{{ a.date | date:'dd/MM/yyyy' }}</span>
-              <span *ngIf="a.typeMedia === 'VIDEOS'" class="text-xs font-bold text-red-500"><i class="fa-solid fa-video"></i> Vidéo</span>
-              <span *ngIf="a.typeMedia === 'PHOTOS'" class="text-xs font-bold text-green-500"><i class="fa-solid fa-image"></i> Photo</span>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">{{ a.titre }}</h3>
-            <p *ngIf="a.description" class="text-sm text-gray-600 mt-2 line-clamp-2">{{ a.description }}</p>
-          </div>
-          <div class="flex gap-2">
-            <button (click)="action('Supprimer', a.id)" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>
-      </div>
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && activites.length === 0" class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+      <i class="fa-solid fa-photo-film text-6xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg mb-2">Aucune activité enregistrée</p>
+      <button (click)="openCreateModal()" class="text-[#022c16] font-bold hover:underline">Créer la première activité →</button>
     </div>
-    
-    <!-- Modal Création -->
-    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up my-8">
-        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="font-black text-gray-900 text-lg">Nouvelle activité</h3>
-          <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+    <!-- Activities grid -->
+    <div *ngIf="!isLoading && activites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let a of activites; trackBy: trackById"
+           class="group relative bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-2xl hover:border-gray-200 transition-all duration-300">
+
+        <!-- Media preview -->
+        <div class="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+          <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)"
+               [src]="getFirstMedia(a)"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <video *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)"
+                 [src]="getFirstMedia(a)"
+                 class="w-full h-40 object-cover"
+                 muted></video>
+          <div *ngIf="!getFirstMedia(a)" class="w-full h-full flex items-center justify-center text-gray-400">
+            <i class="fa-solid fa-image text-4xl"></i>
+          </div>
+
+          <!-- Media count badge -->
+          <div *ngIf="a.mediaCount > 1"
+               class="absolute top-3 right-3 bg-black/60 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <i class="fa-solid fa-images text-xs"></i>
+            {{ a.mediaCount }}
+          </div>
+
+          <!-- Type badge -->
+          <div class="absolute top-3 left-3">
+            <span *ngIf="a.typeMedia === 'VIDEOS'" class="bg-red-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-video text-xs"></i> Vidéo
+            </span>
+            <span *ngIf="a.typeMedia === 'PHOTOS'" class="bg-green-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-image text-xs"></i> Photo
+            </span>
+          </div>
         </div>
-        <div class="p-6 max-h-[75vh] overflow-y-auto">
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Titre <span class="text-red-500">*</span></label>
-            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Description <span class="text-gray-400 font-normal">(Optionnel)</span></label>
-            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"></textarea>
+
+        <!-- Content -->
+        <div class="p-6">
+          <!-- Category badge -->
+          <div class="flex items-center gap-2 mb-3">
+            <span class="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+              {{ a.categorie }}
+            </span>
+            <span class="text-xs text-gray-400">{{ a.date | date:'dd/MM/yyyy' }}</span>
           </div>
 
-          <!-- Section Media Upload -->
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Média (Photos ou Vidéos)</label>
-            
-            <input type="file" id="mediaUpload" class="hidden" accept="image/*,video/*" multiple (change)="onMediaSelected($event)">
-            
-            <div (click)="triggerUpload()" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-50 hover:border-[#022c16] transition-colors mb-3">
-              <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
-              <p class="text-sm font-bold text-gray-600">Cliquez pour ajouter des médias</p>
-              <p class="text-xs text-gray-400 mt-1">Vous pouvez sélectionner plusieurs fichiers (max 15MB chacun)</p>
-            </div>
+          <!-- Title -->
+          <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">{{ a.titre }}</h3>
 
-            <!-- Previews Grid -->
-            <div *ngIf="mediaFiles.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div *ngFor="let media of mediaFiles; let i = index" class="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-black h-24 group">
-                <img *ngIf="media.type === 'PHOTOS'" [src]="media.previewUrl" class="w-full h-full object-cover">
-                <video *ngIf="media.type === 'VIDEOS'" [src]="media.previewUrl" class="w-full h-full object-cover" muted></video>
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <button (click)="removeMedia(i)" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 shadow-md">
-                  <i class="fa-solid fa-xmark text-[10px]"></i>
-                </button>
-                <div class="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">{{ media.type === 'VIDEOS' ? 'VIDÉO' : 'PHOTO' }}</div>
-              </div>
-            </div>
-            
-            <p *ngIf="mediaError" class="text-red-500 text-xs font-bold mt-2"><i class="fa-solid fa-circle-exclamation"></i> {{ mediaError }}</p>
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Catégorie</label>
-            <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-              <option *ngFor="let c of categories; trackBy: trackByOption" [value]="c.value">{{ c.label }}</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Date</label>
-            <input type="date" [(ngModel)]="formData.date" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-          </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showModal = false" [disabled]="isSubmitting" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors disabled:opacity-50">Annuler</button>
-            <button (click)="submitForm()" [disabled]="isSubmitting" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30 flex items-center gap-2 disabled:opacity-70">
-              <span *ngIf="!isSubmitting">Publier l'activité</span>
-              <span *ngIf="isSubmitting && !isUploadingFiles"><i class="fa-solid fa-circle-notch fa-spin"></i> Publication...</span>
-              <span *ngIf="isUploadingFiles"><i class="fa-solid fa-cloud-arrow-up animate-bounce"></i> Upload média...</span>
-            </button>
-          </div>
+          <!-- Description -->
+          <p *ngIf="a.description" class="text-sm text-gray-600 line-clamp-3 mb-4">{{ a.description }}</p>
+
+          <!-- Status -->
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
+                [ngClass]="a.statut === 'PUBLIE' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'">
+            <i class="fa-solid mr-1"
+               [ngClass]="a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-clock'"></i>
+            {{ a.statut }}
+          </span>
+        </div>
+
+        <!-- Action buttons (visible on hover) -->
+        <div class="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button (click)="openEditModal(a)"
+                  class="w-10 h-10 bg-white/90 backdrop-blur rounded-xl shadow-lg flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-all"
+                  title="Modifier">
+            <i class="fa-solid fa-pen text-sm"></i>
+          </button>
+          <button (click)="deleteActivite(a.id)"
+                  class="w-10 h-10 bg-white/90 backdrop-blur rounded-xl shadow-lg flex items-center justify-center text-red-600 hover:bg-red-100 transition-all"
+                  title="Supprimer">
+            <i class="fa-solid fa-trash text-sm"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
-  `
+
+  <!-- Modal: Créer / Modifier -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl animate-fade-in-up my-8">
+
+      <!-- Modal Header -->
+      <div class="px-8 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl">
+        <div class="flex items-center justify-between">
+          <h3 class="font-black text-2xl text-gray-900 flex items-center gap-3">
+            <i class="fa-solid text-[#022c16]" [class.fa-plus-circle]="isCreating" [class.fa-edit]="!isCreating"></i>
+            {{ isCreating ? 'Nouvelle activité' : 'Modifier l\'activité' }}
+          </h3>
+          <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-all">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-8 space-y-6">
+
+        <!-- Title -->
+        <div>
+          <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-heading text-[#022c16]"></i>
+            Titre <span class="text-red-500">*</span>
+          </label>
+          <input type="text" [(ngModel)]="formData.titre"
+                 placeholder="Entrez le titre de l'activité..."
+                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base text-gray-900 font-medium focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-align-left text-[#022c16]"></i>
+            Description
+          </label>
+          <textarea [(ngModel)]="formData.description"
+                    rows="4"
+                    placeholder="Décrivez l'activité en détail..."
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base text-gray-700 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"></textarea>
+        </div>
+
+        <!-- Category & Date -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-tag text-[#022c16]"></i>
+              Catégorie
+            </label>
+            <select [(ngModel)]="formData.categorie"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
+              <option *ngFor="let c of categories; trackBy: trackByOption" [value]="c.value">{{ c.label }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-calendar text-[#022c16]"></i>
+              Date
+            </label>
+            <input type="date" [(ngModel)]="formData.date"
+                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
+          </div>
+        </div>
+
+        <!-- Media Upload -->
+        <div>
+          <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-photo-film text-[#022c16]"></i>
+            Médias (Photos ou Vidéos)
+          </label>
+
+          <label class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"></i>
+              <p class="text-sm font-bold text-gray-600">Cliquez pour ajouter des médias</p>
+              <p class="text-xs text-gray-400 mt-1">JPG, PNG, MP4 — max 15MB chacun</p>
+            </div>
+            <input type="file" #mediaInput (change)="onMediaSelected($event)" accept="image/*,video/*" multiple class="hidden">
+          </label>
+
+          <!-- Media Preview Grid -->
+          <div *ngIf="mediaFiles.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+            <div *ngFor="let media of mediaFiles; let i = index"
+                 class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24">
+              <img *ngIf="media.type === 'PHOTOS'" [src]="media.previewUrl" class="w-full h-full object-cover">
+              <video *ngIf="media.type === 'VIDEOS'" [src]="media.previewUrl" class="w-full h-full object-cover" muted></video>
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button (click)="removeMedia(i)" class="w-7 h-7 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600 transition-all">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+              <div class="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase">
+                {{ media.type === 'VIDEOS' ? 'VIDÉO' : 'PHOTO' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Existing media (edit mode) -->
+          <div *ngIf="!isCreating && existingMediaUrls.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+            <div *ngFor="let url of existingMediaUrls; let i = index"
+                 class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24">
+              <img *ngIf="formData.typeMedia === 'PHOTOS'" [src]="url" class="w-full h-full object-cover">
+              <video *ngIf="formData.typeMedia === 'VIDEOS'" [src]="url" class="w-full h-full object-cover" muted></video>
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button (click)="removeExistingMedia(i)" class="w-7 h-7 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p *ngIf="mediaError" class="text-red-500 text-sm font-bold mt-2 flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-8 py-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-3xl">
+        <button (click)="closeModal()"
+                class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+          Annuler
+        </button>
+        <button (click)="submitForm()" [disabled]="isSubmitting || !formData.titre"
+                class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-70">
+          <span *ngIf="!isSubmitting">
+            <i class="fa-solid" [class.fa-plus]="isCreating" [class.fa-save]="!isCreating"></i>
+            {{ isCreating ? 'Créer' : 'Enregistrer' }}
+          </span>
+          <span *ngIf="isSubmitting">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            Enregistrement...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+`,
+  styles: []
 })
 export class AdminactivitesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
   activites: any[] = [];
   total = 0;
   isLoading = true;
 
-  // Options dynamiques depuis la base de données
   categories: Option[] = [];
-
   showModal = false;
+  currentActiviteId: string | null = null;
+  isCreating = true;
   isUploadingFiles = false;
   isSubmitting = false;
+
+  @ViewChild('mediaInput') mediaInput!: ElementRef;
 
   formData = {
     titre: '',
     description: '',
     categorie: '',
-    date: ''
+    date: '',
+    typeMedia: 'PHOTOS'
   };
 
   mediaFiles: { blob: File | Blob, previewUrl: string, type: string, name: string }[] = [];
-  mediaError: string = '';
+  existingMediaUrls: string[] = [];
+  mediaError = '';
 
   constructor(
     private adminData: AdminDataService,
@@ -147,20 +296,17 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadOptions();
+    this.loadCategories();
     this.loadActivites();
   }
 
-  private loadOptions() {
+  private loadCategories() {
     this.adminData.getOptions('categorie_activite').pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res.success) {
           this.categories = res.data;
-          if (this.categories.length > 0 && !this.formData.categorie) {
-            this.formData.categorie = this.categories[0].value;
-          }
           this.cdr.markForCheck();
         }
       }
@@ -181,31 +327,61 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
-        this.activites = res.data;
-        this.total = res.total;
+        this.activites = res.data || [];
+        this.total = res.total || 0;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err: any) => {
         this.isLoading = false;
+        this.mediaError = err?.message || 'Erreur de chargement';
         this.cdr.markForCheck();
       }
     });
   }
 
-  action(type: string, id?: string) {
-    if (type === 'Créer une activité') {
-      this.formData = { titre: '', description: '', categorie: this.categories[0]?.value || '', date: '' };
-      this.mediaFiles = [];
-      this.mediaError = '';
-      this.showModal = true;
-    } else if (type === 'Supprimer' && id) {
-      if (confirm('Supprimer cette activité ?')) {
-        this.adminData.deleteEntity('activites', id).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe(() => this.loadActivites());
-      }
-    }
+  refreshData() { this.loadActivites(); }
+
+  getFirstMedia(a: any): string | null {
+    if (!a.mediaUrl) return null;
+    return a.mediaUrl.split(',')[0];
+  }
+
+  openCreateModal() {
+    this.isCreating = true;
+    this.formData = {
+      titre: '',
+      description: '',
+      categorie: this.categories[0]?.value || '',
+      date: new Date().toISOString().split('T')[0],
+      typeMedia: 'PHOTOS'
+    };
+    this.mediaFiles = [];
+    this.existingMediaUrls = [];
+    this.mediaError = '';
+    this.showModal = true;
+  }
+
+  openEditModal(a: any) {
+    this.isCreating = false;
+    this.formData = {
+      titre: a.titre || '',
+      description: a.description || '',
+      categorie: a.categorie || this.categories[0]?.value || '',
+      date: a.date ? new Date(a.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      typeMedia: a.typeMedia || 'PHOTOS'
+    };
+
+    // Parse existing media URLs
+    this.existingMediaUrls = a.mediaUrl ? a.mediaUrl.split(',').filter((u: string) => u.trim()) : [];
+    this.mediaFiles = [];
+    this.mediaError = '';
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.mediaError = '';
   }
 
   async compressImage(file: File): Promise<File> {
@@ -252,6 +428,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       const file = files[i];
       if (file.size > 15 * 1024 * 1024) {
         this.mediaError = `Le fichier ${file.name} est trop lourd (max 15MB).`;
+        this.cdr.markForCheck();
         continue;
       }
 
@@ -281,30 +458,30 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerUpload() {
-    document.getElementById('mediaUpload')?.click();
-  }
-
   removeMedia(index: number) {
     this.mediaFiles.splice(index, 1);
   }
 
+  removeExistingMedia(index: number) {
+    this.existingMediaUrls.splice(index, 1);
+  }
+
   async submitForm() {
     if (!this.formData.titre) {
-      alert('Veuillez saisir un titre');
+      this.mediaError = 'Veuillez saisir un titre.';
       return;
     }
+
     this.isSubmitting = true;
     this.mediaError = '';
 
     try {
-      let finalMediaUrls: string[] = [];
+      let allMediaUrls: string[] = [...this.existingMediaUrls];
 
       if (this.mediaFiles.length > 0) {
         this.isUploadingFiles = true;
         this.cdr.markForCheck();
-        
-        // Upload all files in parallel
+
         const uploadPromises = this.mediaFiles.map(async (media) => {
           const fd = new FormData();
           fd.append('file', media.blob);
@@ -312,48 +489,69 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
             method: 'POST',
             body: fd
           });
-          const uploadResult = await res.json();
-          if (uploadResult.success) {
-            return uploadResult.url;
-          } else {
-            throw new Error(`Erreur lors de l'upload de ${media.name}.`);
-          }
+          const result = await res.json();
+          if (result.success) return result.url;
+          else throw new Error(`Erreur upload ${media.name}`);
         });
 
-        finalMediaUrls = await Promise.all(uploadPromises);
+        const newUrls = await Promise.all(uploadPromises);
+        allMediaUrls = [...allMediaUrls, ...newUrls];
         this.isUploadingFiles = false;
       }
 
-      // Determine main media type (if mixed, default to PHOTOS, or keep whatever is first)
-      const typeMedia = this.mediaFiles.length > 0 ? this.mediaFiles[0].type : 'PHOTOS';
-
-      this.adminData.createEntity('activites', { 
+      const totalMedia = allMediaUrls.length;
+      const data = {
         titre: this.formData.titre,
         description: this.formData.description,
         categorie: this.formData.categorie,
         date: this.formData.date ? new Date(this.formData.date).toISOString() : new Date().toISOString(),
-        typeMedia: typeMedia,
-        mediaUrl: finalMediaUrls.length > 0 ? finalMediaUrls.join(',') : undefined,
-        mediaCount: finalMediaUrls.length
-      }).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.showModal = false;
-          this.loadActivites();
-        },
-        error: () => {
-          this.isSubmitting = false;
-          alert("Erreur lors de la création de l'activité.");
-          this.cdr.markForCheck();
-        }
-      });
+        typeMedia: totalMedia > 0 ? this.formData.typeMedia : 'PHOTOS',
+        mediaUrl: totalMedia > 0 ? allMediaUrls.join(',') : undefined,
+        mediaCount: totalMedia,
+        statut: 'PUBLIE'
+      };
+
+      if (this.isCreating) {
+        this.adminData.createEntity('activites', data).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.showModal = false;
+            this.loadActivites();
+          },
+          error: () => {
+            this.isSubmitting = false;
+            this.mediaError = 'Erreur lors de la création.';
+            this.cdr.markForCheck();
+          }
+        });
+      } else {
+        this.adminData.updateEntity('activites', this.currentActiviteId!, data).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.showModal = false;
+            this.loadActivites();
+          },
+          error: () => {
+            this.isSubmitting = false;
+            this.mediaError = 'Erreur lors de la modification.';
+            this.cdr.markForCheck();
+          }
+        });
+      }
     } catch (err: any) {
       this.isSubmitting = false;
       this.isUploadingFiles = false;
-      this.mediaError = err.message || "Erreur réseau.";
+      this.mediaError = err.message || 'Erreur réseau.';
       this.cdr.markForCheck();
+    }
+  }
+
+  deleteActivite(id: string) {
+    if (confirm('Supprimer cette activité ?')) {
+      this.adminData.deleteEntity('activites', id).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => this.loadActivites(),
+        error: () => { this.mediaError = 'Erreur lors de la suppression.'; this.cdr.markForCheck(); }
+      });
     }
   }
 
