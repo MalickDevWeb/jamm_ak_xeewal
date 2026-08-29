@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PublicDataService } from '../../../../core/services/public-data.service';
@@ -7,14 +7,17 @@ import { PublicDataService } from '../../../../core/services/public-data.service
   selector: 'app-activites',
   standalone: true,
   imports: [CommonModule, RouterLink, DatePipe],
-  // NO custom providers - use the root singleton so HTTP calls work correctly
   templateUrl: './activites.component.html',
   styleUrl: './activites.component.css'
 })
 export class ActivitesComponent implements OnInit {
   activites: any[] = [];
   isLoading = true;
-  selectedActivite: any = null; // for lightbox
+
+  // Lightbox state
+  selectedActivite: any = null;
+  lightboxMediaUrls: string[] = [];
+  lightboxIndex = 0;
 
   constructor(private publicData: PublicDataService) {}
 
@@ -32,7 +35,7 @@ export class ActivitesComponent implements OnInit {
 
   getMediaUrls(url: string | null): string[] {
     if (!url) return [];
-    return url.split(',').filter(u => u.trim());
+    return url.split(',').map(u => u.trim()).filter(Boolean);
   }
 
   getFirstMedia(url: string | null): string {
@@ -46,9 +49,37 @@ export class ActivitesComponent implements OnInit {
 
   openLightbox(activite: any) {
     this.selectedActivite = activite;
+    this.lightboxMediaUrls = this.getMediaUrls(activite.mediaUrl);
+    this.lightboxIndex = 0;
   }
 
   closeLightbox() {
     this.selectedActivite = null;
+    this.lightboxMediaUrls = [];
+    this.lightboxIndex = 0;
+  }
+
+  nextMedia() {
+    if (this.lightboxIndex < this.lightboxMediaUrls.length - 1) {
+      this.lightboxIndex++;
+    } else {
+      this.lightboxIndex = 0; // loop
+    }
+  }
+
+  prevMedia() {
+    if (this.lightboxIndex > 0) {
+      this.lightboxIndex--;
+    } else {
+      this.lightboxIndex = this.lightboxMediaUrls.length - 1; // loop
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent) {
+    if (!this.selectedActivite) return;
+    if (event.key === 'ArrowRight') this.nextMedia();
+    if (event.key === 'ArrowLeft') this.prevMedia();
+    if (event.key === 'Escape') this.closeLightbox();
   }
 }
