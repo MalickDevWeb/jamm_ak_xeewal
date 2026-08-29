@@ -13,7 +13,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   selector: 'app-admin-besoins',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
 
@@ -318,7 +318,16 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           </div>
         </div>
       </div>
-    </div>
+    
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
+  </div>
   `
 })
 export class AdminbesoinsComponent implements OnInit, OnDestroy {
@@ -331,6 +340,9 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   total = 0;
 
   showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
   formData = {
     quartier: '',
     description: '',
@@ -485,10 +497,16 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   deleteBesoin(besoin: any) {
-    if (!confirm(`Supprimer définitivement ce signalement de ${besoin.quartier} ?`)) return;
+    this.itemToDelete = besoin.id;
+      this.confirmTitle = `Supprimer le signalement de ${besoin.quartier} ?`;
+      this.showConfirmDialog = true;
     this.besoins = this.besoins.filter(b => b.id !== besoin.id);
     this.applyClientFilters();
-    this.adminData.deleteEntity('besoins', besoin.id).subscribe({
+    this.deleteItem = (id: string) => {
+      this.adminData.deleteEntity('besoins', id).subscribe({
+        next: () => this.refreshData()
+      });
+    };
       error: () => this.loadBesoins() // Reload si erreur
     });
   }
@@ -522,6 +540,9 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('besoins', {
       quartier: this.formData.quartier,
       description: this.formData.description,
@@ -533,6 +554,15 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     }).subscribe(() => {
       this.loadBesoins();
     });
+  }
+
+  
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
+    }
   }
 
   ngOnDestroy() {

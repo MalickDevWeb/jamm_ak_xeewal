@@ -57,6 +57,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
       </div>
     </div>
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -66,6 +75,9 @@ export class AdminmessagesComponent implements OnInit, OnDestroy {
   total = 0;
   nonLus = 0;
   isLoading = true;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
 
   constructor(
     private adminData: AdminDataService,
@@ -99,18 +111,41 @@ export class AdminmessagesComponent implements OnInit, OnDestroy {
   action(type: string, id: string) {
     if (type === 'Marquer lu') {
       this.isLoading = true;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
       this.adminData.updateEntity('messages', id, { lu: true }).pipe(
         takeUntil(this.destroy$)
       ).subscribe(() => this.refreshData());
     } else if (type === 'Supprimer') {
-      if (confirm('Supprimer ce message ?')) {
+      this.itemToDelete = id;
+      this.confirmTitle = 'Supprimer ce message ?';
+      this.showConfirmDialog = true;
         this.isLoading = true;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
         this.adminData.deleteEntity('messages', id).pipe(
           takeUntil(this.destroy$)
         ).subscribe(() => this.refreshData());
       }
     } else if (type === 'Répondre') {
       alert('La fonctionnalité d\'envoi d\'email (Répondre) est en cours d\'intégration.');
+    }
+  }
+
+  
+  deleteItem = (id: string) => {
+    this.deleteMessage(id);
+  };
+  deleteItem = (id: string) => {
+    this.deleteMessage(id);
+  };
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
     }
   }
 

@@ -47,6 +47,30 @@ export class ActivitesComponent implements OnInit {
     return url.includes('/video/') || url.endsWith('.mp4') || url.endsWith('.webm');
   }
 
+  /**
+   * Retourne une URL d'aperçu STATIQUE optimisée pour la carte :
+   * - Vidéo Cloudinary  → miniature JPG extraite automatiquement (frame 0)
+   * - Image Cloudinary  → compressée w_600,q_auto,f_auto
+   * - Autres URLs       → retournées telles quelles
+   */
+  getCardThumbnail(url: string): string {
+    if (!url) return 'https://picsum.photos/seed/default/600/400';
+
+    // Vidéo Cloudinary : /video/upload/... → /video/upload/w_600,q_auto,so_0/...(ext → .jpg)
+    if (url.includes('res.cloudinary.com') && this.isVideo(url)) {
+      return url
+        .replace('/video/upload/', '/video/upload/w_600,q_auto,so_0/')
+        .replace(/\.(mp4|webm|mov|avi)$/i, '.jpg');
+    }
+
+    // Image Cloudinary : ajouter transformations de compression
+    if (url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
+      return url.replace('/image/upload/', '/image/upload/w_600,q_auto,f_auto/');
+    }
+
+    return url;
+  }
+
   openLightbox(activite: any) {
     this.selectedActivite = activite;
     this.lightboxMediaUrls = this.getMediaUrls(activite.mediaUrl);

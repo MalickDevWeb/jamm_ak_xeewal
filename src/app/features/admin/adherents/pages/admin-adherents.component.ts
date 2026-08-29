@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-adherents',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -112,6 +112,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       </div>
     </div>
 
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -122,6 +131,9 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
   formData = {
     prenom: '',
     nom: '',
@@ -155,7 +167,9 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.formData = { prenom: '', nom: '', telephone: '', quartier: '' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      if (confirm('Voulez-vous vraiment supprimer cet adhérent ?')) {
+      this.itemToDelete = id;
+      this.confirmTitle = 'Supprimer cet adhérent ?';
+      this.showConfirmDialog = true;
         this.isLoading = true;
         this.adminData.deleteEntity('adherents', id).subscribe(() => this.refreshData());
       }
@@ -174,7 +188,22 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
+  }
+
+  
+  deleteItem = (id: string) => {
+    this.deleteAdherent(id);
+  };
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
+    }
   }
 
   ngOnDestroy() {

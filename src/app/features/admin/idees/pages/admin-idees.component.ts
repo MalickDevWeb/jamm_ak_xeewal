@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-idees',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -88,6 +88,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       </div>
     </div>
 
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -98,6 +107,9 @@ export class AdminideesComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
   formData = {
     titre: '',
     categorie: 'Environnement',
@@ -132,7 +144,9 @@ export class AdminideesComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.adminData.updateEntity('idees', id, { statut: 'REJETEE' }).subscribe(() => this.refreshData());
     } else if (id && type === 'Supprimer') {
-      if (confirm('Voulez-vous vraiment supprimer cette idée ?')) {
+      this.itemToDelete = id;
+      this.confirmTitle = 'Supprimer cette idée ?';
+      this.showConfirmDialog = true;
         this.isLoading = true;
         this.adminData.deleteEntity('idees', id).subscribe(() => this.refreshData());
       }
@@ -146,6 +160,9 @@ export class AdminideesComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('idees', {
       titre: this.formData.titre,
       categorie: this.formData.categorie,
@@ -154,6 +171,18 @@ export class AdminideesComponent implements OnInit, OnDestroy {
       votes: 0,
       createdAt: new Date().toISOString()
     }).subscribe(() => this.refreshData());
+  }
+
+  
+  deleteItem = (id: string) => {
+    this.deleteIdee(id);
+  };
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
+    }
   }
 
   ngOnDestroy() {

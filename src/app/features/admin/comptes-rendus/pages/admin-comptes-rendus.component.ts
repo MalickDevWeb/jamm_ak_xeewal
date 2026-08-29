@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-comptes-rendus',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -75,6 +75,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
       </div>
     </div>
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -85,6 +94,9 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
   formData = {
     titre: '',
     lieu: '',
@@ -133,7 +145,9 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
       this.formData = { titre: '', lieu: '', auteur: 'Admin' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      if (confirm('Supprimer ce compte-rendu ?')) {
+      this.itemToDelete = id;
+      this.confirmTitle = 'Supprimer ce compte-rendu ?';
+      this.showConfirmDialog = true;
         this.isLoading = true;
         this.adminData.deleteEntity('comptes-rendus', id).pipe(
           takeUntil(this.destroy$)
@@ -149,6 +163,9 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('comptes-rendus', { 
       titre: this.formData.titre, 
       contenu: 'Contenu généré...', 
@@ -158,6 +175,18 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     }).pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => this.refreshData());
+  }
+
+  
+  deleteItem = (id: string) => {
+    this.deleteCompteRendu(id);
+  };
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
+    }
   }
 
   ngOnDestroy() {

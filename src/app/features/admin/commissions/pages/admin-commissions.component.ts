@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-commissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -93,6 +93,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       </div>
     </div>
 
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -103,6 +112,9 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
   formData = {
     nom: ''
   };
@@ -124,7 +136,9 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
       this.formData = { nom: '' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      if (confirm('Voulez-vous vraiment supprimer cette commission ?')) {
+      this.itemToDelete = id;
+      this.confirmTitle = 'Supprimer cette commission ?';
+      this.showConfirmDialog = true;
         this.isLoading = true;
         this.adminData.deleteEntity('commissions', id).subscribe(() => this.refreshData());
       }
@@ -146,7 +160,22 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
+  showConfirmDialog = false;
+  itemToDelete: string | null = null;
+  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.refreshData());
+  }
+
+  
+  deleteItem = (id: string) => {
+    this.deleteCommission(id);
+  };
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
+    }
   }
 
   ngOnDestroy() {

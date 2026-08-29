@@ -50,16 +50,22 @@
                  (click)="openLightbox(activite)"
                  class="relative rounded-3xl overflow-hidden cursor-pointer h-[280px] group shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
 
-                <!-- Background media -->
-                <video *ngIf="isVideo(getFirstMedia(activite.mediaUrl))"
-                       [src]="getFirstMedia(activite.mediaUrl)"
-                       class="absolute inset-0 w-full h-full object-cover"
-                       autoplay muted loop playsinline>
-                </video>
-                <img *ngIf="!isVideo(getFirstMedia(activite.mediaUrl))"
-                     [src]="getFirstMedia(activite.mediaUrl)"
+                <!-- 
+                  CARTE : toujours une image statique (thumbnail) pour ne pas charger
+                  la vidéo entière. La vidéo se charge uniquement dans le lightbox.
+                -->
+                <img [src]="getCardThumbnail(getFirstMedia(activite.mediaUrl))"
                      [alt]="activite.titre"
-                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                     loading="lazy"
+                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+
+                <!-- Bouton Play centré pour les vidéos -->
+                <div *ngIf="isVideo(getFirstMedia(activite.mediaUrl))"
+                     class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div class="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-play text-[#022c16] text-xl ml-1"></i>
+                    </div>
+                </div>
 
                 <!-- Gradient -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>

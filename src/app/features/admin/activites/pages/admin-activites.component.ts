@@ -628,6 +628,9 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 }
 
   // Confirmation dialog
+  deleteItem = (id: string) => {
+    this.deleteActivite(id);
+  };
   confirmDelete() {
     if (this.itemToDelete) {
       this.adminData.deleteEntity('activites', this.itemToDelete).pipe(
