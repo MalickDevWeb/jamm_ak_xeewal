@@ -48,6 +48,10 @@ export class AdhererComponent implements OnInit, OnDestroy {
   carteVersoName = '';
   rectoError = '';
   versoError = '';
+  
+  rectoBlob: File | null = null;
+  versoBlob: File | null = null;
+  isUploadingFiles = false;
 
   constructor(
     private publicData: PublicDataService,
@@ -100,7 +104,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
       alert('Veuillez remplir tous les champs obligatoires.');
       return;
@@ -108,20 +112,55 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
     this.isSubmitting = true;
 
-    this.publicData.postAdherent(this.formData).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.success = true;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.isSubmitting = false;
-        alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+    try {
+      if (this.rectoBlob || this.versoBlob) {
+        this.isUploadingFiles = true;
         this.cdr.markForCheck();
       }
-    });
+
+      if (this.rectoBlob && !this.formData.carteRectoUrl) {
+        const fd = new FormData();
+        fd.append('file', this.rectoBlob);
+        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+        if (res.success) {
+          this.formData.carteRectoUrl = res.url;
+        } else {
+          throw new Error("Erreur d'upload du recto.");
+        }
+      }
+
+      if (this.versoBlob && !this.formData.carteVersoUrl) {
+        const fd = new FormData();
+        fd.append('file', this.versoBlob);
+        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+        if (res.success) {
+          this.formData.carteVersoUrl = res.url;
+        } else {
+          throw new Error("Erreur d'upload du verso.");
+        }
+      }
+
+      this.isUploadingFiles = false;
+      this.publicData.postAdherent(this.formData).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.success = true;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.isSubmitting = false;
+          alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+          this.cdr.markForCheck();
+        }
+      });
+    } catch (err: any) {
+      this.isSubmitting = false;
+      this.isUploadingFiles = false;
+      alert(err.message || "Erreur réseau. Veuillez réessayer.");
+      this.cdr.markForCheck();
+    }
   }
 
   resetForm() {
@@ -147,31 +186,15 @@ export class AdhererComponent implements OnInit, OnDestroy {
     }
 
     this.carteRectoName = file.name;
-    this.cdr.markForCheck();
-
-    // Upload vers Cloudinary
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
-      if (res.success) {
-        this.formData.carteRectoUrl = res.url;
-        // Also show preview
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.carteRectoBase64 = e.target.result;
-          this.cdr.markForCheck();
-        };
-        reader.readAsDataURL(file);
-      } else {
-        this.rectoError = res.message || "Erreur lors de l'envoi de l'image.";
-        this.cdr.markForCheck();
-      }
-    } catch (err: any) {
-      this.rectoError = "Erreur réseau lors de l'envoi de l'image. Veuillez réessayer.";
-      console.error('Upload recto error:', err);
+    this.rectoBlob = file;
+    
+    // Preview locale
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.carteRectoBase64 = e.target.result;
       this.cdr.markForCheck();
-    }
+    };
+    reader.readAsDataURL(file);
   }
 
   async onVersoSelected(event: any) {
@@ -189,43 +212,31 @@ export class AdhererComponent implements OnInit, OnDestroy {
     }
 
     this.carteVersoName = file.name;
-    this.cdr.markForCheck();
+    this.versoBlob = file;
 
-    // Upload vers Cloudinary
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
-      if (res.success) {
-        this.formData.carteVersoUrl = res.url;
-        // Also show preview
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.carteVersoBase64 = e.target.result;
-          this.cdr.markForCheck();
-        };
-        reader.readAsDataURL(file);
-      } else {
-        this.versoError = res.message || "Erreur lors de l'envoi de l'image.";
-        this.cdr.markForCheck();
-      }
-    } catch (err: any) {
-      this.versoError = "Erreur réseau lors de l'envoi de l'image. Veuillez réessayer.";
-      console.error('Upload verso error:', err);
+    // Preview locale
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.carteVersoBase64 = e.target.result;
       this.cdr.markForCheck();
-    }
+    };
+    reader.readAsDataURL(file);
   }
 
   removeRecto() {
     this.carteRectoBase64 = null;
     this.carteRectoName = '';
     this.rectoError = '';
+    this.rectoBlob = null;
+    this.formData.carteRectoUrl = '';
   }
 
   removeVerso() {
     this.carteVersoBase64 = null;
     this.carteVersoName = '';
     this.versoError = '';
+    this.versoBlob = null;
+    this.formData.carteVersoUrl = '';
   }
 
   triggerRectoUpload() {

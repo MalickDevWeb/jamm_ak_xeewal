@@ -230,7 +230,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
           if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
           this.audioUrl = URL.createObjectURL(this.audioBlob);
           this.stream?.getTracks().forEach(t => t.stop());
-          this.uploadVocalToCloudinary();
+          this.cdr.markForCheck();
         };
         mr.start(250);
         (this.recorder as any) = { _native: mr };
@@ -346,32 +346,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  uploadVocalToCloudinary() {
-    if (!this.audioBlob) return;
-    this.isUploadingVocal = true;
-    this.vocalError = '';
-
-    const fd = new FormData();
-    fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
-
-    this.http.post<{ success: boolean; url: string }>(`${environment.apiUrl}/upload-audio`, fd).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (res) => {
-        this.isUploadingVocal = false;
-        if (res.success) {
-          this.cloudinaryVocalUrl = res.url;
-        } else {
-          this.vocalError = "Échec de l'envoi du message vocal. Réessayez.";
-        }
-      },
-      error: () => {
-        this.isUploadingVocal = false;
-        this.vocalError = "Erreur réseau lors de l'envoi du message vocal.";
-      }
-    });
-  }
-
   // =====================
   //  IMAGE UPLOAD
   // =====================
@@ -387,33 +361,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(file);
     }
-  }
-
-  uploadImageToCloudinary() {
-    if (!this.imageBlob) return;
-    this.isUploadingImage = true;
-    this.imageError = '';
-    const fd = new FormData();
-    fd.append('file', this.imageBlob);
-
-    this.http.post<{ success: boolean; url: string; message?: string }>(`${environment.apiUrl}/upload-public`, fd).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (res) => {
-        this.isUploadingImage = false;
-        if (res.success) {
-          this.cloudinaryImageUrl = res.url;
-        } else {
-          this.imageError = res.message || "Erreur d'upload.";
-        }
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.isUploadingImage = false;
-        this.imageError = "Erreur réseau lors de l'envoi de l'image.";
-        this.cdr.markForCheck();
-      }
-    });
   }
 
   // =====================

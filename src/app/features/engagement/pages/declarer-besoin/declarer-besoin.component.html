@@ -245,14 +245,21 @@
         <p class="text-sm text-red-600 font-medium">{{ errorMsg }}</p>
       </div>
 
-      <!-- SUCCESS MSG -->
-      <div *ngIf="success" class="p-6 bg-[#e6f4ea] rounded-[2rem] text-center animate-fade-in border border-[#bbf7d0]">
-        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-[#00a651]">
-          <i class="fa-solid fa-check text-3xl"></i>
+      <!-- SUCCESS POPUP (MODAL) -->
+      <div *ngIf="success" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-[#022c16]/60 backdrop-blur-md animate-fade-in">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 sm:p-10 text-center shadow-2xl transform transition-all scale-100 animate-fade-in-up border border-white/20">
+          <div class="w-24 h-24 bg-[#e6f4ea] text-[#00a651] rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border-[4px] border-white ring-8 ring-[#e6f4ea]/50 relative">
+            <div class="absolute inset-0 rounded-full animate-ping bg-[#00a651]/20"></div>
+            <i class="fa-solid fa-check text-5xl relative z-10"></i>
+          </div>
+          <h3 class="text-3xl font-black text-[#022c16] mb-3 tracking-tight">C'est noté !</h3>
+          <p class="text-gray-500 text-[15px] font-medium mb-8 leading-relaxed">
+            Votre signalement a été envoyé avec succès à l'équipe municipale de JÀMM AK XÉEWAL. Merci pour votre engagement citoyen !
+          </p>
+          <button (click)="resetForm()" class="w-full py-4 px-6 rounded-2xl shadow-[0_8px_20px_rgba(2,44,22,0.15)] text-white bg-[#022c16] hover:bg-[#034020] focus:outline-none font-black text-[15px] sm:text-base transition-transform active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-wide">
+            <i class="fa-solid fa-plus-circle text-lg"></i> Faire un nouveau signalement
+          </button>
         </div>
-        <h3 class="text-xl font-black text-[#022c16] mb-2">Signalement envoyé !</h3>
-        <p class="text-sm text-[#022c16]/80 font-medium">L'équipe municipale a été notifiée.</p>
-        <button (click)="resetForm()" class="mt-4 text-sm font-bold text-[#00a651] hover:underline">Signaler un autre problème</button>
       </div>
 
       <!-- SUBMIT BUTTON -->

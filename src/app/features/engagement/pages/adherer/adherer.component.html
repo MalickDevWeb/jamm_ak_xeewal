@@ -136,19 +136,26 @@
                                 </div>
 
                                 <!-- Aperçu après sélection -->
-                                <div *ngIf="carteRectoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md">
-                                    <img [src]="carteRectoBase64" alt="Recto carte d'identité" class="w-full h-44 object-cover">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                                <div *ngIf="carteRectoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md transition-all">
+                                    <img [src]="carteRectoBase64" alt="Recto carte d'identité" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles" [class.scale-105]="isUploadingFiles">
+                                    
+                                    <!-- Overlay de chargement -->
+                                    <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20 animate-fade-in">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-brand-yellow"></i>
+                                        <span class="font-bold text-sm tracking-wide">Sécurisation...</span>
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3 pointer-events-none">
                                         <div class="flex items-center gap-2 flex-1 min-w-0">
                                             <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
                                             <span class="text-white text-xs font-bold truncate">{{ carteRectoName }}</span>
                                         </div>
-                                        <button type="button" (click)="removeRecto()" title="Supprimer"
-                                                class="shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg">
-                                            <i class="fa-solid fa-trash text-xs"></i>
-                                        </button>
                                     </div>
-                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow">✓ Recto</div>
+                                    <button *ngIf="!isUploadingFiles" type="button" (click)="removeRecto()" title="Supprimer"
+                                            class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Recto</div>
                                 </div>
 
                                 <!-- Erreur Recto -->
@@ -181,19 +188,26 @@
                                 </div>
 
                                 <!-- Aperçu après sélection -->
-                                <div *ngIf="carteVersoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md">
-                                    <img [src]="carteVersoBase64" alt="Verso carte d'identité" class="w-full h-44 object-cover">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                                <div *ngIf="carteVersoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md transition-all">
+                                    <img [src]="carteVersoBase64" alt="Verso carte d'identité" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles" [class.scale-105]="isUploadingFiles">
+                                    
+                                    <!-- Overlay de chargement -->
+                                    <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20 animate-fade-in">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-brand-yellow"></i>
+                                        <span class="font-bold text-sm tracking-wide">Sécurisation...</span>
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3 pointer-events-none">
                                         <div class="flex items-center gap-2 flex-1 min-w-0">
                                             <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
                                             <span class="text-white text-xs font-bold truncate">{{ carteVersoName }}</span>
                                         </div>
-                                        <button type="button" (click)="removeVerso()" title="Supprimer"
-                                                class="shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg">
-                                            <i class="fa-solid fa-trash text-xs"></i>
-                                        </button>
                                     </div>
-                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow">✓ Verso</div>
+                                    <button *ngIf="!isUploadingFiles" type="button" (click)="removeVerso()" title="Supprimer"
+                                            class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Verso</div>
                                 </div>
 
                                 <!-- Erreur Verso -->
@@ -300,11 +314,18 @@
 
             <!-- Submit Button (Always Visible) -->
             <div class="md:ml-16 mt-6 relative z-10" *ngIf="!success">
-                <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:hover:translate-y-0">
+                <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-80 disabled:hover:translate-y-0 relative overflow-hidden">
+                    
+                    <!-- Effet de brillance pendant le chargement -->
+                    <div *ngIf="isSubmitting" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                    
                     <span *ngIf="!isSubmitting">Valider mon adhésion <i class="fa-solid fa-check-circle text-xl"></i></span>
-                    <span *ngIf="isSubmitting"><i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...</span>
+                    <span *ngIf="isSubmitting && !isUploadingFiles"><i class="fa-solid fa-circle-notch fa-spin"></i> Validation en cours...</span>
+                    <span *ngIf="isUploadingFiles" class="flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up animate-bounce"></i> Transfert sécurisé des pièces jointes...
+                    </span>
                 </button>
-                <p class="text-center text-xs font-medium text-gray-500 mt-4"><i class="fa-solid fa-lock text-brand-green mr-1"></i> Données sécurisées.</p>
+                <p class="text-center text-xs font-medium text-gray-500 mt-4"><i class="fa-solid fa-lock text-brand-green mr-1"></i> Vos pièces d'identité sont chiffrées de bout en bout.</p>
             </div>
 
         </form>
