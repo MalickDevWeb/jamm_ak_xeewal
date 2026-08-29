@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -14,6 +14,9 @@ import { PublicDataService, Option } from '../../../../core/services/public-data
   styleUrl: './adherer.component.css'
 })
 export class AdhererComponent implements OnInit, OnDestroy {
+  @ViewChild('rectoInput') rectoInput!: ElementRef;
+  @ViewChild('versoInput') versoInput!: ElementRef;
+
   private destroy$ = new Subject<void>();
 
   formData = {
@@ -183,11 +186,11 @@ export class AdhererComponent implements OnInit, OnDestroy {
   }
 
   triggerRectoUpload() {
-    document.getElementById('recto-upload')?.click();
+    this.rectoInput?.nativeElement?.click();
   }
 
   triggerVersoUpload() {
-    document.getElementById('verso-upload')?.click();
+    this.versoInput?.nativeElement?.click();
   }
 
   ngOnDestroy() {

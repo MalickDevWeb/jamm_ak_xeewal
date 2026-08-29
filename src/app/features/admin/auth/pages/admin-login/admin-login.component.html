@@ -1,60 +1,81 @@
 <div class="min-h-screen bg-[#022c16] flex items-center justify-center relative overflow-hidden">
     <!-- Image de fond en plein écran -->
     <div class="absolute inset-0 bg-[url('assets/image.png')] bg-cover bg-center md:bg-right bg-no-repeat"></div>
-
+    
     <!-- Overlay léger pour mobile afin de s'assurer que le formulaire soit lisible si l'image est zoomée -->
     <div class="absolute inset-0 bg-black/30 md:bg-transparent"></div>
 
-    <!-- Conteneur du formulaire aligné sur la droite pour recouvrir la carte blanche de l'image -->
-    <div class="relative z-10 w-[50] max-w-[600px] px-1 md:ml-auto md:mr-8 lg:mr-16 xl:mr-24">
+    <!-- Conteneur du formulaire aligné sur la droite et décalé de 95px vers la droite, 30px vers le bas -->
+    <div class="relative z-10 w-full max-w-[465px] px-6 md:ml-auto md:mr-[8%] lg:mr-[10%] translate-x-[95px] translate-y-[30px]">
 
-        <!-- Carte Formulaire -->
-        <div class="bg-white p-8 sm:p-12 rounded-[3rem] shadow-2xl w-full min-h-[750px] flex flex-col justify-center border border-gray-100">
+        <!-- Wrapper de l'animation Serpent Magnifique (Glow Edition) -->
+        <div class="relative rounded-[2.5rem] overflow-hidden p-[5px] shadow-[0_20px_50px_rgba(2,44,22,0.4)]">
+            
+            <!-- Fond statique de la bordure (gris clair subtil) -->
+            <div class="absolute inset-0 bg-gray-100"></div>
 
-            <!-- Icône d'utilisateur (similaire à celle sur l'image) -->
-            <div class="flex justify-center mb-8">
-                <div class="w-16 h-16 bg-[#e6f4ea] rounded-3xl flex items-center justify-center shadow-inner">
-                    <i class="fa-solid fa-user text-[#022c16] text-2xl"></i>
-                </div>
-            </div>
+            <!-- Serpent 1 (Queue d'Or avec effet néon) -->
+            <div class="absolute -inset-[100%] bg-[conic-gradient(from_0deg,transparent_60%,#facc15_95%,#fef08a_100%)] animate-[spin_3s_linear_infinite] blur-[2px]"></div>
+            
+            <!-- Serpent 2 (Vert Profond) -->
+            <div class="absolute -inset-[100%] bg-[conic-gradient(from_180deg,transparent_60%,#022c16_95%,#22c55e_100%)] animate-[spin_3s_linear_infinite] blur-[2px]"></div>
 
-            <!-- Affichage des erreurs -->
-            <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 animate-fade-in">
-                <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
-                <p class="text-sm text-red-600 font-medium">{{ errorMessage }}</p>
-            </div>
+            <!-- Carte Formulaire -->
+            <div class="relative z-10 bg-white p-8 sm:p-10 rounded-[2.4rem] w-full min-h-[525px] flex flex-col justify-center">
 
-            <form class="space-y-6" (submit)="onSubmit($event)">
-
-                <!-- Email -->
-                <div>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-envelope"></i>
-                        </div>
-                        <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="Email"
-                               class="block w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#022c16] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
+                <!-- Icône d'utilisateur (similaire à celle sur l'image) -->
+                <div class="flex justify-center mb-8 relative group">
+                    <div class="w-16 h-16 bg-[#e6f4ea] rounded-3xl flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-110">
+                        <i class="fa-solid fa-user text-[#022c16] text-2xl"></i>
                     </div>
                 </div>
 
-                <!-- Mot de passe -->
-                <div>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <input id="password" name="password" type="password" [(ngModel)]="password" required placeholder="Mot de passe"
-                               class="block w-full pl-12 pr-12 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#022c16] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
-                    </div>
+                <!-- Affichage des erreurs -->
+                <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 animate-fade-in">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                    <p class="text-sm text-red-600 font-medium">{{ errorMessage }}</p>
                 </div>
 
-                <!-- Bouton de connexion -->
-                <button type="submit" [disabled]="isLoading"
-                        class="w-full py-4 px-6 rounded-2xl shadow-lg shadow-[#022c16]/30 text-white bg-[#022c16] hover:bg-[#034423] focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-[#022c16]/50 font-black text-lg transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed mt-8 uppercase tracking-wide">
-                    <span *ngIf="!isLoading">Se connecter</span>
-                    <i *ngIf="isLoading" class="fa-solid fa-circle-notch fa-spin"></i>
-                </button>
-            </form>
+                <form class="space-y-6" (submit)="onSubmit($event)">
+                    
+                    <!-- Email -->
+                    <div>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#022c16] transition-colors">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="Email"
+                                   class="block w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#facc15] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
+                        </div>
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#022c16] transition-colors">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            
+                            <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" required placeholder="Mot de passe"
+                                   class="block w-full pl-12 pr-12 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#facc15] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
+                            
+                            <!-- Bouton Afficher/Masquer -->
+                            <button type="button" (click)="togglePassword()" tabindex="-1"
+                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#022c16] transition-colors outline-none">
+                                <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bouton de connexion -->
+                    <button type="submit" [disabled]="isLoading"
+                            class="w-full py-4 px-6 rounded-2xl shadow-lg shadow-[#022c16]/30 text-white bg-[#022c16] hover:bg-[#034423] focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-[#022c16]/50 font-black text-lg transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed mt-8 uppercase tracking-wide group overflow-hidden relative">
+                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+                        <span *ngIf="!isLoading" class="relative z-10 flex items-center gap-2">Se connecter <i class="fa-solid fa-arrow-right-to-bracket text-sm opacity-80"></i></span>
+                        <i *ngIf="isLoading" class="fa-solid fa-circle-notch fa-spin relative z-10"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

@@ -13,10 +13,15 @@ import { AuthService } from '../../../../../core/services/auth.service';
 export class AdminLoginComponent {
   email = '';
   password = '';
+  showPassword = false;
   errorMessage = '';
   isLoading = false;
 
   constructor(private router: Router, private authService: AuthService) {}
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   onSubmit(event: Event) {
     event.preventDefault();

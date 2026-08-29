@@ -107,8 +107,8 @@
                         </p>
 
                         <!-- Inputs fichiers cachés -->
-                        <input #rectoInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-file-input" (change)="onRectoSelected($event)">
-                        <input #versoInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-file-input" (change)="onVersoSelected($event)">
+                        <input #rectoInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-upload" (change)="onRectoSelected($event)">
+                        <input #versoInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-upload" (change)="onVersoSelected($event)">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
