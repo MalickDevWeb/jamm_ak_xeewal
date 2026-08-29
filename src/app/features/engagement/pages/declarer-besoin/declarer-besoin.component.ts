@@ -323,8 +323,13 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    if (!this.formData.quartier || !this.formData.telephone_citoyen) {
-      this.showError("Veuillez remplir les champs obligatoires (Quartier et Téléphone).");
+    if (!this.formData.quartier) {
+      this.showError("Veuillez sélectionner votre quartier.");
+      return;
+    }
+
+    if (!this.formData.telephone_citoyen) {
+      this.showError("Veuillez renseigner votre numéro de téléphone.");
       return;
     }
 
