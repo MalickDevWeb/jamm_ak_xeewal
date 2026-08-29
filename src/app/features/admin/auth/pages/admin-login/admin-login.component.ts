@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { AdminDataService } from '../../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -17,7 +18,11 @@ export class AdminLoginComponent {
   errorMessage = '';
   isLoading = false;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private adminData: AdminDataService
+  ) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -31,6 +36,8 @@ export class AdminLoginComponent {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading = false;
+        // Précharger toutes les données en arrière-plan pour que le dashboard soit instantané
+        this.prefetchAllData();
         this.router.navigate(['/admin/dashboard']);
       },
       error: (err: any) => {
@@ -38,5 +45,20 @@ export class AdminLoginComponent {
         this.errorMessage = err.message || 'Erreur de connexion';
       }
     });
+  }
+
+  private prefetchAllData() {
+    // Appels en parallèle, silencieux (erreurs ignorées, but: peupler le cache)
+    [
+      this.adminData.getAdherents(),
+      this.adminData.getBesoins(),
+      this.adminData.getIdees(),
+      this.adminData.getMessages(),
+      this.adminData.getCommissions(),
+      this.adminData.getSondages(),
+      this.adminData.getActivites(),
+      this.adminData.getComptesRendus(),
+      this.adminData.getSettings(),
+    ].forEach(req$ => req$.subscribe({ error: () => {} }));
   }
 }
