@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { AdminDataService } from '../../../../../core/services/admin-data.service';
 
 @Component({
@@ -93,32 +94,113 @@ export class AdminDashboardComponent {
 
   private downloadPdf(report: Record<string, any[]>, from: Date, to: Date) {
     const pdf = new jsPDF();
-    let y = 20;
-    pdf.setFontSize(18); pdf.text('Rapport d’activité', 15, y);
-    pdf.setFontSize(10); pdf.text(`JÀMM AK XÉEWAL | ${this.formatDate(from)} au ${this.formatDate(to)}`, 15, y + 8); y += 24;
+    let yPos = 20;
+
+    // Header Design
+    pdf.setFillColor(2, 44, 22); // Primary Green #022c16
+    pdf.rect(0, 0, 210, 30, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(22);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('RAPPORT D’ACTIVITÉ', 15, 20);
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('JÀMM AK XÉEWAL', 140, 16);
+    pdf.text(`Période du ${this.formatDate(from)} au ${this.formatDate(to)}`, 140, 22);
+
+    pdf.setTextColor(0, 0, 0);
+    yPos = 40;
+
+    // Iterate over sections
     this.reportSources.forEach(source => {
-      if (y > 275) { pdf.addPage(); y = 20; }
-      pdf.setFontSize(12); pdf.setFont('helvetica', 'bold'); pdf.text(`${source.label} (${report[source.key].length})`, 15, y);
-      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9); y += 6;
-      const rows = report[source.key];
-      if (!rows.length) { pdf.text('Aucune donnée sur cette période.', 20, y); y += 8; return; }
-      rows.slice(0, 25).forEach(item => {
-        const line = Object.entries(this.flatten(item)).map(([key, value]) => `${key}: ${value}`).join(' | ');
-        const wrapped = pdf.splitTextToSize(line, 175);
-        if (y + wrapped.length * 4 > 280) { pdf.addPage(); y = 20; }
-        pdf.text(wrapped, 20, y); y += wrapped.length * 4 + 2;
+      const items = report[source.key];
+      if (items.length === 0) return; // Skip empty sections
+
+      // Add section title
+      if (yPos > 260) {
+        pdf.addPage();
+        yPos = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(2, 44, 22);
+      pdf.text(`${source.label} (${items.length})`, 14, yPos);
+      yPos += 5;
+
+      // Extract and translate keys, filter out useless ones
+      const rawRows = items.map(item => this.flatten(item));
+      const firstRow = rawRows[0];
+      const allKeys = Object.keys(firstRow);
+      
+      const filteredKeys = allKeys.filter(k => 
+        !['id', 'photoUrl', 'mediaUrl', 'carteRectoUrl', 'carteVersoUrl', 'vocalUrl', 'createdAt', 'updatedAt'].includes(k)
+      );
+
+      // Prepare table data
+      const head = [filteredKeys.map(k => this.translateKey(k))];
+      const body = rawRows.map(row => filteredKeys.map(k => String(row[k] || '-').substring(0, 50)));
+
+      // Draw beautiful table
+      autoTable(pdf, {
+        startY: yPos,
+        head: head,
+        body: body,
+        theme: 'striped',
+        headStyles: { fillColor: [3, 66, 86], textColor: 255, fontStyle: 'bold' }, // #034256
+        alternateRowStyles: { fillColor: [249, 250, 251] },
+        styles: { fontSize: 8, cellPadding: 3 },
+        margin: { top: 20 },
       });
-      if (rows.length > 25) { pdf.text(`... ${rows.length - 25} ligne(s) supplémentaire(s), disponibles dans l’Excel.`, 20, y); y += 6; }
-      y += 5;
+
+      yPos = (pdf as any).lastAutoTable.finalY + 15;
     });
+
+    // Check if totally empty
+    const totalItems = this.reportSources.reduce((acc, src) => acc + report[src.key].length, 0);
+    if (totalItems === 0) {
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Aucune donnée trouvée pour cette période.', 15, 50);
+    }
+
     pdf.save(`rapport-jamm-${this.fileDate(from)}-${this.fileDate(to)}.pdf`);
+  }
+
+  private translateKey(key: string): string {
+    const translations: Record<string, string> = {
+      prenom: 'Prénom',
+      nom: 'Nom',
+      telephone: 'Téléphone',
+      quartier: 'Quartier',
+      profession: 'Profession',
+      competences: 'Compétences',
+      statut: 'Statut',
+      description: 'Description',
+      contact: 'Contact',
+      urgence: 'Urgence',
+      titre: 'Titre',
+      date: 'Date',
+      categorie: 'Catégorie',
+      typeMedia: 'Type Média',
+      sujet: 'Sujet',
+      email: 'Email',
+      lieu: 'Lieu',
+      auteur: 'Auteur',
+      responsable: 'Responsable'
+    };
+    return translations[key] || key.charAt(0).toUpperCase() + key.slice(1);
   }
 
   private flatten(item: any): Record<string, string | number> {
     return Object.keys(item).reduce((result, key) => {
       const value = item[key];
-      if (key === 'options' && Array.isArray(value)) result[key] = value.map(option => option.texte).join(', ');
-      else if (value !== null && value !== undefined && typeof value !== 'object') result[key] = key.toLowerCase().includes('at') || key === 'date' ? this.formatDate(value) : value;
+      if (key === 'options' && Array.isArray(value)) {
+        result[key] = value.map(option => option.texte).join(', ');
+      }
+      else if (value !== null && value !== undefined && typeof value !== 'object') {
+        result[key] = (key.toLowerCase().includes('at') || key === 'date') ? this.formatDate(value) : value;
+      }
       return result;
     }, {} as Record<string, string | number>);
   }
@@ -127,3 +209,4 @@ export class AdminDashboardComponent {
   private fileDate(value: Date): string { return value.toISOString().slice(0, 10); }
   private toInputDate(value: Date): string { return this.fileDate(value); }
 }
+
