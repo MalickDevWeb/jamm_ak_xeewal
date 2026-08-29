@@ -8,7 +8,7 @@ import {
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { AdminDataService, Option } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -123,13 +123,35 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
               <input type="text" [(ngModel)]="formData.nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
             </div>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone</label>
-            <input type="text" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone</label>
+              <input type="text" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Profession</label>
+              <input type="text" [(ngModel)]="formData.profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Quartier</label>
+              <select [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <option value="">Sélectionnez un quartier</option>
+                <option *ngFor="let q of quartiers" [value]="q.label">{{ q.label }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Pôle d'expertise</label>
+              <select [(ngModel)]="formData.pole" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <option value="">Sélectionnez un pôle</option>
+                <option *ngFor="let p of poles" [value]="p.label">{{ p.label }}</option>
+              </select>
+            </div>
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Quartier</label>
-            <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+            <label class="block text-sm font-bold text-gray-700 mb-1">Motivation / Compétences particulières</label>
+            <textarea [(ngModel)]="formData.motivation" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"></textarea>
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
@@ -212,14 +234,20 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   showIdCardModal = false;
   selectedAdherent: any = null;
   itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
+  confirmTitle = 'Confirmer la suppression';
 
   formData = {
     prenom: '',
     nom: '',
     telephone: '',
     quartier: '',
+    profession: '',
+    pole: '',
+    motivation: ''
   };
+
+  quartiers: Option[] = [];
+  poles: Option[] = [];
 
   constructor(
     private adminData: AdminDataService,
@@ -228,6 +256,18 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.refreshData();
+    this.loadOptions();
+  }
+
+  loadOptions() {
+    this.adminData.getOptions('quartier').pipe(takeUntil(this.destroy$)).subscribe(res => {
+      this.quartiers = res?.data || [];
+      this.cdr.markForCheck();
+    });
+    this.adminData.getOptions('pole_activite').pipe(takeUntil(this.destroy$)).subscribe(res => {
+      this.poles = res?.data || [];
+      this.cdr.markForCheck();
+    });
   }
 
   refreshData() {
@@ -255,7 +295,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   openCreateModal() {
-    this.formData = { prenom: '', nom: '', telephone: '', quartier: '' };
+    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '' };
     this.showModal = true;
   }
 
@@ -287,7 +327,13 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   deleteItem = (id: string) => {
-    this.adminData.deleteEntity('adherents', id).subscribe(() => this.refreshData());
+    this.adminData.deleteEntity('adherents', id).subscribe({
+      next: () => this.refreshData(),
+      error: (err) => {
+        alert('Erreur lors de la suppression: ' + (err.message || 'Erreur inconnue'));
+        this.cdr.markForCheck();
+      }
+    });
   };
 
   confirmDelete() {

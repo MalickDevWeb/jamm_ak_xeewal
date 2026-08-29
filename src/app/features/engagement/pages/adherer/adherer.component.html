@@ -1,344 +1,179 @@
+<!-- Hero Section -->
+<section class="relative bg-gradient-hero overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=&apos;60&apos; height=&apos;60&apos; viewBox=&apos;0 0 60&apos;60&apos; xmlns=&apos;http://www.w3.org/2000/svg&apos;%3E%3Cg fill=&apos;none&apos; fill-rule=&apos;evenodd&apos;%3E%3Cg fill=&apos;%2310b981&apos; fill-opacity=&apos;0.4&apos;%3E%3Cpath d=&apos;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&apos;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  </div>
+  <div class="container-custom relative z-10 py-12 lg:py-16">
+    <nav class="flex justify-center mb-6" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+        <li><a routerLink="/" class="text-sm text-slate-300 hover:text-white"><i class="fa-solid fa-house mr-1"></i> Accueil</a></li>
+        <li><i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i></li>
+        <li><span class="text-sm font-bold text-emerald-400">Adhésion</span></li>
+      </ol>
+    </nav>
+    <div class="text-center">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        Rejoindre le <span class="text-gradient from-amber-400 to-yellow-300">Mouvement</span>
+      </h1>
+      <p class="text-slate-300 max-w-xl mx-auto">Devenez acteur du changement. Remplissez ce formulaire pour faire partie de JÀMM AK XÉEWAL.</p>
+    </div>
+  </div>
+</section>
 
-        
-    <!-- Premium Internal Hero -->
-    <div class="relative bg-brand-dark overflow-hidden pt-8 pb-14 md:pt-10 md:pb-16 border-b border-brand-green/20">
-        <!-- Background effects -->
-        <div class="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
-        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-green/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-yellow/10 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
-        
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            
-            <!-- Breadcrumbs -->
-            <nav class="flex justify-center mb-3" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-lg">
-                    <li class="inline-flex items-center">
-                        <a routerLink="/" class="inline-flex items-center text-xs font-medium text-gray-200 hover:text-white transition-colors">
-                            <i class="fa-solid fa-house mr-1.5"></i> Accueil
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fa-solid fa-chevron-right text-gray-500 text-[10px] mx-1.5"></i>
-                            <span class="text-xs font-bold text-white drop-shadow-sm">Adhésion</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-            
-            <h1 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight drop-shadow-lg">
-                Rejoindre le <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow to-yellow-300 drop-shadow-none">Mouvement</span>
-            </h1>
-            <p class="text-gray-300 text-sm md:text-base max-w-xl mx-auto font-medium leading-relaxed">
-                Devenez acteur du changement. Remplissez ce formulaire ultra-simplifié pour faire partie de la dynamique JÀMM AK XÉEWAL.
-            </p>
-        </div>
+<!-- Formulaire -->
+<section class="py-12 lg:py-20 bg-slate-50" *ngIf="!success">
+  <div class="container-custom max-w-3xl">
+    <!-- Error Message -->
+    <div *ngIf="errorMsg" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+      <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+      <span class="text-sm text-red-600">{{ errorMsg }}</span>
     </div>
 
-    <!-- Container du Formulaire -->
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative -mt-8 md:-mt-12 pb-16">
-        
-        <!-- Formulaire avec Timeline Verticale -->
-        <form class="relative max-w-3xl mx-auto" id="adhesion-form" (ngSubmit)="onSubmit()" *ngIf="!success">
-            
-            <!-- Ligne Verticale (Timeline) -->
-            <div class="absolute left-6 md:left-8 top-8 bottom-24 w-1 bg-gray-200 rounded-full z-0 hidden md:block"></div>
-
-            <!-- Étape 1 : Identité -->
-            <div class="relative mb-6 group" id="step-container-1">
-                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full shadow-md flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300 step-dot">1</div>
-                
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
-                    <div class="p-5 md:p-6 flex items-center justify-between">
-                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">1</span> 
-                            Vos Informations Personnelles
-                        </h3>
-                    </div>
-                    
-                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-1">
-                        <div class="space-y-6 mt-6">
-                            <div>
-                                <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Prénom et Nom <span class="text-red-500">*</span></label>
-                                <input type="text" name="prenom" [(ngModel)]="formData.prenom" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base transition-all" placeholder="Ex: Modou Fall">
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Numéro de téléphone <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold border-r border-gray-200 pr-2">+221</span>
-                                        <input type="tel" name="telephone" [(ngModel)]="formData.telephone" required class="w-full border-2 border-gray-100 rounded-xl p-4 pl-20 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base transition-all font-bold tracking-wider" placeholder="77 123 45 67">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Votre Quartier <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <select name="quartier" [(ngModel)]="formData.quartier" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base text-gray-700 transition-all appearance-none cursor-pointer">
-                                            <option value="">Sélectionnez votre quartier...</option>
-                                            <option *ngFor="let q of quartiers; trackBy: trackByOption" [value]="q.value">{{ q.label }}</option>
-                                        </select>
-                                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <form (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Étape 1 : Identité -->
+      <div class="card">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">1</div>
+            <h3 class="text-lg font-bold text-slate-800">Vos Informations Personnelles</h3>
+          </div>
+          <div class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="input-label">Prénom <span class="text-red-500">*</span></label>
+                <input type="text" [(ngModel)]="formData.prenom" name="prenom" required class="input-field" placeholder="Ex: Modou">
+              </div>
+              <div>
+                <label class="input-label">Nom <span class="text-red-500">*</span></label>
+                <input type="text" [(ngModel)]="formData.nom" name="nom" required class="input-field" placeholder="Ex: Fall">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="input-label">Téléphone <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium border-r border-slate-200 pr-2">+221</span>
+                  <input type="tel" [(ngModel)]="formData.telephone" name="telephone" required class="input-field pl-16" placeholder="77 123 45 67">
                 </div>
+              </div>
+              <div>
+                <label class="input-label">Quartier <span class="text-red-500">*</span></label>
+                <select [(ngModel)]="formData.quartier" name="quartier" required class="input-field">
+                  <option value="">Sélectionnez...</option>
+                  <option *ngFor="let q of quartiers; trackBy: trackByOption" [value]="q.value">{{ q.label }}</option>
+                </select>
+              </div>
             </div>
+            <div>
+              <label class="input-label">Profession</label>
+              <input type="text" [(ngModel)]="formData.profession" name="profession" class="input-field" placeholder="Votre profession">
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Étape 2 : Carte d'Identité -->
-            <div class="relative mb-6 group" id="step-container-2">
-                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">2</div>
-
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
-                    <div class="p-5 md:p-6 flex items-center justify-between">
-                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">2</span>
-                            Carte d'Identité
-                            <span class="text-red-500 text-lg leading-none">*</span>
-                        </h3>
-                    </div>
-
-                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
-                        <p class="text-sm text-gray-500 font-medium mt-4 mb-5 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved text-brand-green"></i>
-                            Photographiez les deux faces de votre pièce d'identité nationale. Données chiffrées et sécurisées.
-                        </p>
-
-                        <!-- Inputs fichiers cachés -->
-                        <input #rectoInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-upload" (change)="onRectoSelected($event)">
-                        <input #versoInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-upload" (change)="onVersoSelected($event)">
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                            <!-- Recto -->
-                            <div>
-                                <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
-                                    <i class="fa-regular fa-id-card mr-1 text-brand-green"></i> Face Avant (Recto)
-                                </label>
-
-                                <!-- Zone de drop / upload (sans preview) -->
-                                <div *ngIf="!carteRectoBase64"
-                                     (click)="triggerRectoUpload()"
-                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
-                                     [ngClass]="rectoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
-                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
-                                        <i class="fa-regular fa-id-card"></i>
-                                    </div>
-                                    <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Recto</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Face avant · JPG, PNG · max 5 Mo</p>
-                                    </div>
-                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
-                                    </span>
-                                </div>
-
-                                <!-- Aperçu après sélection -->
-                                <div *ngIf="carteRectoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md transition-all">
-                                    <img [src]="carteRectoBase64" alt="Recto carte d'identité" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles" [class.scale-105]="isUploadingFiles">
-                                    
-                                    <!-- Overlay de chargement -->
-                                    <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20 animate-fade-in">
-                                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-brand-yellow"></i>
-                                        <span class="font-bold text-sm tracking-wide">Sécurisation...</span>
-                                    </div>
-
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3 pointer-events-none">
-                                        <div class="flex items-center gap-2 flex-1 min-w-0">
-                                            <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
-                                            <span class="text-white text-xs font-bold truncate">{{ carteRectoName }}</span>
-                                        </div>
-                                    </div>
-                                    <button *ngIf="!isUploadingFiles" type="button" (click)="removeRecto()" title="Supprimer"
-                                            class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30">
-                                        <i class="fa-solid fa-trash text-xs"></i>
-                                    </button>
-                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Recto</div>
-                                </div>
-
-                                <!-- Erreur Recto -->
-                                <p *ngIf="rectoError" class="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> {{ rectoError }}
-                                </p>
-                            </div>
-
-                            <!-- Verso -->
-                            <div>
-                                <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
-                                    <i class="fa-solid fa-rotate-180 mr-1 text-brand-green"></i> Face Arrière (Verso)
-                                </label>
-
-                                <!-- Zone de drop / upload (sans preview) -->
-                                <div *ngIf="!carteVersoBase64"
-                                     (click)="triggerVersoUpload()"
-                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
-                                     [ngClass]="versoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
-                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
-                                        <i class="fa-solid fa-id-card-clip"></i>
-                                    </div>
-                                    <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Verso</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Face arrière · JPG, PNG · max 5 Mo</p>
-                                    </div>
-                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
-                                    </span>
-                                </div>
-
-                                <!-- Aperçu après sélection -->
-                                <div *ngIf="carteVersoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md transition-all">
-                                    <img [src]="carteVersoBase64" alt="Verso carte d'identité" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles" [class.scale-105]="isUploadingFiles">
-                                    
-                                    <!-- Overlay de chargement -->
-                                    <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20 animate-fade-in">
-                                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-brand-yellow"></i>
-                                        <span class="font-bold text-sm tracking-wide">Sécurisation...</span>
-                                    </div>
-
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3 pointer-events-none">
-                                        <div class="flex items-center gap-2 flex-1 min-w-0">
-                                            <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
-                                            <span class="text-white text-xs font-bold truncate">{{ carteVersoName }}</span>
-                                        </div>
-                                    </div>
-                                    <button *ngIf="!isUploadingFiles" type="button" (click)="removeVerso()" title="Supprimer"
-                                            class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30">
-                                        <i class="fa-solid fa-trash text-xs"></i>
-                                    </button>
-                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Verso</div>
-                                </div>
-
-                                <!-- Erreur Verso -->
-                                <p *ngIf="versoError" class="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> {{ versoError }}
-                                </p>
-                            </div>
-
-                        </div>
-                    </div>
+      <!-- Étape 2 : Pôle -->
+      <div class="card">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold">2</div>
+            <h3 class="text-lg font-bold text-slate-800">Votre Pôle d'Action</h3>
+          </div>
+          <div>
+            <label class="input-label">Choisissez un pôle <span class="text-red-500">*</span></label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label *ngFor="let p of poles; trackBy: trackByOption" class="relative cursor-pointer">
+                <input type="radio" name="pole" [value]="p.value" [(ngModel)]="formData.pole" class="peer sr-only" required>
+                <div class="p-4 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 transition-all text-center hover:border-slate-300">
+                  <div class="font-semibold text-sm text-slate-700 peer-checked:text-emerald-700">{{ p.label }}</div>
                 </div>
+              </label>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Étape 3 : Motivation -->
-            <div class="relative mb-6 group" id="step-container-3">
-                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">3</div>
-                
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
-                    <div class="p-5 md:p-6 flex items-center justify-between">
-                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">3</span>
-                            Votre Motivation <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
-                        </h3>
-                    </div>
-                    
-                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-2">
-                        <div class="space-y-6 mt-6">
-                            <div class="w-full transition-all">
-                                <textarea name="motivation" [(ngModel)]="formData.motivation" rows="4" class="w-full border-2 border-gray-100 rounded-2xl p-5 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green text-base transition-all resize-none placeholder-gray-400" placeholder="Exprimez votre motivation..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Étape 3 : Motivation -->
+      <div class="card">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold">3</div>
+            <h3 class="text-lg font-bold text-slate-800">Votre Motivation</h3>
+          </div>
+          <div>
+            <label class="input-label">Pourquoi souhaitez-vous rejoindre ?</label>
+            <textarea [(ngModel)]="formData.motivation" name="motivation" rows="4" class="input-field resize-none" placeholder="Décrivez brièvement votre motivation..."></textarea>
+          </div>
+        </div>
+      </div>
 
-            <!-- Étape 4 : Engagement -->
-            <div class="relative mb-6 group" id="step-container-4">
-                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">4</div>
-
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
-                    <div class="p-5 md:p-6 flex items-center justify-between">
-                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">4</span>
-                            Votre Engagement <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
-                        </h3>
-                    </div>
-                    
-                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-3">
-                        <div class="space-y-6 mt-6">
-                            <label class="block text-gray-800 font-extrabold mb-3 text-sm uppercase tracking-wide">Choisissez votre pôle d'action <span class="text-gray-400 font-normal normal-case ml-1">(Optionnel)</span></label>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Dev Humain' ? 'border-brand-green bg-brand-green/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Dev Humain" [(ngModel)]="formData.pole" class="peer sr-only">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-green text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Dev Humain'" [class.scale-100]="formData.pole === 'Dev Humain'">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Dev Humain' ? 'bg-brand-green text-white scale-110' : 'bg-white text-brand-green group-hover:scale-110'">
-                                        <i class="fa-solid fa-users text-lg"></i>
-                                    </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Dev Humain' ? 'text-brand-green' : 'text-brand-dark'">Dév. Humain</span>
-                                </label>
-                                
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Economie' ? 'border-brand-yellow bg-brand-yellow/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Economie" [(ngModel)]="formData.pole" class="peer sr-only">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-yellow text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Economie'" [class.scale-100]="formData.pole === 'Economie'">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Economie' ? 'bg-brand-yellow text-white scale-110' : 'bg-white text-brand-yellow group-hover:scale-110'">
-                                        <i class="fa-solid fa-chart-line text-lg"></i>
-                                    </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Economie' ? 'text-brand-yellow' : 'text-brand-dark'">Éco. & Innovation</span>
-                                </label>
-
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Environnement' ? 'border-brand-green bg-brand-green/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Environnement" [(ngModel)]="formData.pole" class="peer sr-only">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-green text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Environnement'" [class.scale-100]="formData.pole === 'Environnement'">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Environnement' ? 'bg-brand-green text-white scale-110' : 'bg-white text-brand-green group-hover:scale-110'">
-                                        <i class="fa-solid fa-leaf text-lg"></i>
-                                    </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Environnement' ? 'text-brand-green' : 'text-brand-dark'">Cadre de vie</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Message d'erreur personnalisé -->
-            <div *ngIf="errorMsg" class="md:ml-16 mt-6 relative z-10 bg-red-50 border border-red-200 text-red-600 px-5 py-4 rounded-2xl flex items-start sm:items-center gap-3 animate-fade-in-up">
-                <i class="fa-solid fa-circle-exclamation text-xl mt-0.5 sm:mt-0 text-red-500"></i>
-                <span class="font-medium text-sm leading-snug">{{ errorMsg }}</span>
-            </div>
-
-            <!-- Submit Button (Always Visible) -->
-            <div class="md:ml-16 mt-6 relative z-10" *ngIf="!success">
-                <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-80 disabled:hover:translate-y-0 relative overflow-hidden">
-                    
-                    <!-- Effet de brillance pendant le chargement -->
-                    <div *ngIf="isSubmitting" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-                    
-                    <span *ngIf="!isSubmitting">Valider mon adhésion <i class="fa-solid fa-check-circle text-xl"></i></span>
-                    <span *ngIf="isSubmitting && !isUploadingFiles"><i class="fa-solid fa-circle-notch fa-spin"></i> Validation en cours...</span>
-                    <span *ngIf="isUploadingFiles" class="flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up animate-bounce"></i> Transfert sécurisé des pièces jointes...
-                    </span>
+      <!-- Étape 4 : Carte d'Identité -->
+      <div class="card">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center font-bold">4</div>
+            <h3 class="text-lg font-bold text-slate-800">Pièce d'Identité (optionnel)</h3>
+          </div>
+          <p class="text-sm text-slate-500 mb-4">Téléversez votre carte d'identité (recto et verso) pour vérification.</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Recto -->
+            <div>
+              <label class="input-label">Recto</label>
+              <div *ngIf="!carteRectoBase64" (click)="triggerRectoUpload()" class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-300 mb-2"></i>
+                <p class="text-sm text-slate-500">Cliquez pour téléverser</p>
+                <input #rectoInput type="file" accept="image/*" (change)="onRectoSelected($event)" class="hidden">
+              </div>
+              <div *ngIf="carteRectoBase64" class="relative rounded-xl overflow-hidden border border-slate-200">
+                <img [src]="carteRectoBase64" class="w-full h-40 object-cover">
+                <button type="button" (click)="removeRecto()" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
+                  <i class="fa-solid fa-xmark"></i>
                 </button>
-                <p class="text-center text-xs font-medium text-gray-500 mt-4"><i class="fa-solid fa-lock text-brand-green mr-1"></i> Vos pièces d'identité sont chiffrées de bout en bout.</p>
+              </div>
+              <p *ngIf="rectoError" class="text-xs text-red-500 mt-1">{{ rectoError }}</p>
             </div>
-
-        </form>
-
-        <!-- Success Message (Hors du formulaire pour qu'il reste visible) -->
-        <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-8 rounded-3xl text-center shadow-lg animate-fade-in-up" *ngIf="success">
-            <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-                <i class="fa-solid fa-check"></i>
+            <!-- Verso -->
+            <div>
+              <label class="input-label">Verso</label>
+              <div *ngIf="!carteVersoBase64" (click)="triggerVersoUpload()" class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-300 mb-2"></i>
+                <p class="text-sm text-slate-500">Cliquez pour téléverser</p>
+                <input #versoInput type="file" accept="image/*" (change)="onVersoSelected($event)" class="hidden">
+              </div>
+              <div *ngIf="carteVersoBase64" class="relative rounded-xl overflow-hidden border border-slate-200">
+                <img [src]="carteVersoBase64" class="w-full h-40 object-cover">
+                <button type="button" (click)="removeVerso()" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <p *ngIf="versoError" class="text-xs text-red-500 mt-1">{{ versoError }}</p>
             </div>
-            <h3 class="text-3xl font-black text-gray-900 mb-3">Félicitations !</h3>
-            <p class="text-gray-600 text-lg font-medium mb-6">Votre demande d'adhésion a bien été envoyée au mouvement JÀMM AK XÉEWAL.</p>
-            <button (click)="resetForm()" type="button" class="px-6 py-3 bg-[#022c16] text-white font-bold rounded-xl shadow-md hover:bg-[#022c16]/90 transition-colors inline-flex items-center gap-2">
-                <i class="fa-solid fa-user-plus"></i> Inscrire une autre personne
-            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" [disabled]="isSubmitting || isUploadingFiles" class="w-full btn-primary py-4 text-base">
+        <i *ngIf="isSubmitting || isUploadingFiles" class="fa-solid fa-circle-notch fa-spin"></i>
+        <i *ngIf="!isSubmitting && !isUploadingFiles" class="fa-solid fa-paper-plane"></i>
+        {{ isSubmitting || isUploadingFiles ? 'Envoi en cours...' : 'Envoyer ma demande' }}
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- Success State -->
+<section *ngIf="success" class="py-20 lg:py-32 bg-slate-50">
+  <div class="container-custom max-w-lg text-center">
+    <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+      <i class="fa-solid fa-check text-emerald-600 text-3xl"></i>
     </div>
+    <h2 class="text-2xl font-bold text-slate-800 mb-4">Demande envoyée !</h2>
+    <p class="text-slate-600 mb-8">Votre demande d'adhésion a été enregistrée. Nous vous contacterons bientôt.</p>
+    <button (click)="resetForm()" class="btn-secondary">
+      <i class="fa-solid fa-rotate-left"></i>
+      Nouvelle demande
+    </button>
+  </div>
+</section>
