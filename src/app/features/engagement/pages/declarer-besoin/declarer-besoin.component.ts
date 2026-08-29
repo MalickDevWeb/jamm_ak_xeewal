@@ -350,16 +350,62 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   //  IMAGE UPLOAD
   // =====================
 
-  onImageSelected(event: any) {
+  async compressImage(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event: any) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+          } else {
+            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
+              resolve(compressedFile);
+            } else reject(new Error('Compression failed'));
+          }, 'image/jpeg', 0.7);
+        };
+        img.onerror = (error) => reject(error);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
+  async onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.imageBlob = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imagePreviewUrl = e.target.result;
+      this.imageError = '';
+      if (file.size > 15 * 1024 * 1024) {
+        this.imageError = "L'image est trop lourde (max 15MB).";
         this.cdr.markForCheck();
-      };
-      reader.readAsDataURL(file);
+        return;
+      }
+      try {
+        this.imageBlob = await this.compressImage(file);
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imagePreviewUrl = e.target.result;
+          this.cdr.markForCheck();
+        };
+        reader.readAsDataURL(this.imageBlob!);
+      } catch (err) {
+        this.imageError = "Erreur de compression d'image.";
+        this.cdr.markForCheck();
+      }
     }
   }
 

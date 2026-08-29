@@ -41,17 +41,31 @@
                 <!-- Dynamic Card -->
                 <div *ngFor="let activite of activites" class="w-full h-[380px] md:h-[420px] rounded-[2rem] overflow-hidden shadow-lg hover:shadow-[0_20px_50px_-10px_rgba(0,141,54,0.3)] relative flex flex-col group/card cursor-pointer border border-transparent transition-all duration-700 reveal">
                     <div class="absolute inset-0 border border-white/20 rounded-[2rem] z-20 pointer-events-none group-hover/card:border-white/40 transition-colors duration-700"></div>
-                    <img [src]="getMediaUrl(activite.mediaUrl)" [alt]="activite.titre" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out">
-                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent opacity-80 group-hover/card:opacity-95 transition-opacity duration-700"></div>
-                    <div class="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl text-white text-xs font-medium flex items-center gap-2 border border-white/20 shadow-sm group-hover/card:bg-white group-hover/card:text-brand-dark transition-all duration-500 z-20">
-                        <i class="fa-regular fa-images"></i> Média
+                    
+                    <img *ngIf="activite.typeMedia === 'PHOTOS' || !activite.typeMedia" [src]="getMediaUrl(activite.mediaUrl)" [alt]="activite.titre" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out">
+                    
+                    <video *ngIf="activite.typeMedia === 'VIDEOS'" [src]="getMediaUrl(activite.mediaUrl)" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out" autoplay muted loop playsinline></video>
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent opacity-80 group-hover/card:opacity-95 transition-opacity duration-700"></div>
+                    
+                    <div class="absolute top-6 right-6 flex flex-col gap-2 items-end z-20">
+                        <div class="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl text-white text-xs font-medium flex items-center gap-2 border border-white/20 shadow-sm group-hover/card:bg-white group-hover/card:text-brand-dark transition-all duration-500">
+                            <i *ngIf="activite.typeMedia === 'VIDEOS'" class="fa-solid fa-play"></i>
+                            <i *ngIf="activite.typeMedia === 'PHOTOS' || !activite.typeMedia" class="fa-regular fa-images"></i>
+                            Média
+                        </div>
+                        <div *ngIf="activite.mediaCount > 1" class="bg-brand-yellow px-2 py-1 rounded-lg text-brand-dark text-xs font-black shadow-md">
+                            +{{ activite.mediaCount - 1 }}
+                        </div>
                     </div>
+                    
                     <div class="relative z-10 mt-auto p-6 md:p-8 text-white transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-700 ease-out">
                         <div class="mb-4">
                             <span class="bg-brand-yellow text-brand-dark text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-[0.15em] shadow-lg border border-white/10">{{activite.categorie}}</span>
                         </div>
                         <h3 class="font-extrabold text-xl md:text-2xl mb-2 drop-shadow-lg leading-tight group-hover/card:text-brand-yellow transition-colors duration-500">{{activite.titre}}</h3>
-                        <p class="text-white/80 text-xs flex items-center gap-2 font-semibold tracking-widest uppercase"><i class="fa-regular fa-calendar-alt text-brand-yellow"></i> {{activite.date | date:'dd MMM yyyy'}}</p>
+                        <p *ngIf="activite.description" class="text-white/80 text-sm mb-3 line-clamp-2">{{activite.description}}</p>
+                        <p class="text-white/60 text-xs flex items-center gap-2 font-semibold tracking-widest uppercase"><i class="fa-regular fa-calendar-alt text-brand-yellow"></i> {{activite.date | date:'dd MMM yyyy'}}</p>
                     </div>
                 </div>
 

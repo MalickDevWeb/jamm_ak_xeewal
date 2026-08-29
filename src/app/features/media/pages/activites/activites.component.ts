@@ -27,6 +27,7 @@ export class ActivitesComponent implements OnInit {
   }
 
   getMediaUrl(url: string | null): string {
-    return url || 'https://picsum.photos/seed/default/600/400';
+    if (!url) return 'https://picsum.photos/seed/default/600/400';
+    return url.split(',')[0];
   }
 }
