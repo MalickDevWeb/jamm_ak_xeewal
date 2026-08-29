@@ -76,9 +76,7 @@
                                     <div class="relative">
                                         <select name="quartier" [(ngModel)]="formData.quartier" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base text-gray-700 transition-all appearance-none cursor-pointer">
                                             <option value="">Sélectionnez votre quartier...</option>
-                                            <option value="Nguinth">Nguinth</option>
-                                            <option value="Grand Thiès">Grand Thiès</option>
-                                            <option value="Keur Mame El Hadj">Keur Mame El Hadj</option>
+                                            <option *ngFor="let q of quartiers; trackBy: trackByOption" [value]="q.value">{{ q.label }}</option>
                                         </select>
                                         <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                                     </div>

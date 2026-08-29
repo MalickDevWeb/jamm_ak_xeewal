@@ -1,39 +1,69 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PublicDataService } from '../../../../core/services/public-data.service';
+import { Subject, takeUntil } from 'rxjs';
+import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 
 @Component({
   selector: 'app-proposer-idee',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  providers: [PublicDataService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './proposer-idee.component.html',
   styleUrl: './proposer-idee.component.css'
 })
-export class ProposerIdeeComponent {
+export class ProposerIdeeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   formData = {
     titre: '',
-    axe_concerne: 'Éducation et formation',
+    axe_concerne: '',
     description: '',
     nom_citoyen: 'Anonyme',
     telephone_citoyen: ''
   };
 
+  // Options dynamiques depuis la base de données
+  axes: Option[] = [];
+
   isSubmitting = false;
-  success = false;
   errorMsg = '';
+  success = false;
 
-  constructor(private publicData: PublicDataService) {}
+  constructor(
+    private publicData: PublicDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  showError(msg: string) {
-    this.errorMsg = msg;
-    setTimeout(() => this.errorMsg = '', 5000);
+  ngOnInit() {
+    this.loadOptions();
+  }
+
+  private loadOptions() {
+    // Charger les axes
+    this.publicData.getOptions('axe').pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.axes = res.data;
+          if (this.axes.length > 0 && !this.formData.axe_concerne) {
+            this.formData.axe_concerne = this.axes[0].value;
+          }
+          this.cdr.markForCheck();
+        }
+      }
+    });
+  }
+
+  // TrackBy pour les options
+  trackByOption(index: number, item: Option): string {
+    return item.id;
   }
 
   onSubmit() {
     if (!this.formData.titre || !this.formData.description) {
-      this.showError("Veuillez remplir le titre et la description.");
+      alert("Veuillez remplir le titre et la description.");
       return;
     }
 
@@ -46,23 +76,32 @@ export class ProposerIdeeComponent {
     };
 
     this.isSubmitting = true;
-    this.errorMsg = '';
-    this.publicData.postIdee(payload).subscribe({
+    this.publicData.postIdee(payload).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.success = true;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isSubmitting = false;
-        this.showError("Erreur lors de l'envoi de la proposition.");
+        this.errorMsg = "Erreur lors de l'envoi de la proposition.";
+        setTimeout(() => this.errorMsg = '', 5000);
+        this.cdr.markForCheck();
+        this.cdr.markForCheck();
       }
     });
   }
 
   resetForm() {
-    this.success = false;
-    this.errorMsg = '';
-    this.formData = { titre: '', axe_concerne: 'Éducation et formation', description: '', nom_citoyen: 'Anonyme', telephone_citoyen: '' };
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this!.success = false;
+    const defaultAxe = this!.axes[0];
+    this!.formData = { titre: '', axe_concerne: defaultAxe ? defaultAxe.value : '', description: '', nom_citoyen: 'Anonyme', telephone_citoyen: '' };
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

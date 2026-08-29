@@ -27,11 +27,17 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           <span class="text-blue-600 font-semibold">{{ textCount }} textes</span>
         </p>
       </div>
-      <button (click)="loadBesoins()"
-              class="flex items-center gap-2 px-4 py-2 bg-[#022c16] text-white text-sm font-bold rounded-xl hover:bg-[#022c16]/80 transition-all shadow-sm">
-        <i [class]="isLoading ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-rotate'"></i>
-        Actualiser
-      </button>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="loadBesoins()"
+                class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all shadow-sm">
+          <i [class]="isLoading ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-rotate'"></i>
+          Actualiser
+        </button>
+        <button (click)="openModal()" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Nouveau besoin
+        </button>
+      </div>
     </div>
 
     <!-- ═══════════════════════════ FILTRES ═══════════════════════════ -->
@@ -60,9 +66,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
             <select [(ngModel)]="filters.statut" (change)="applyFilters()"
                     class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#022c16] appearance-none bg-white">
               <option value="">Tous les statuts</option>
-              <option value="EN_ATTENTE">En attente</option>
-              <option value="EN_COURS">En cours</option>
-              <option value="RESOLU">Résolu</option>
+              <option *ngFor="let s of statuts" [value]="s.value">{{ s.label }}</option>
             </select>
             <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
           </div>
@@ -75,9 +79,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
             <select [(ngModel)]="filters.urgence" (change)="applyFilters()"
                     class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#022c16] appearance-none bg-white">
               <option value="">Toutes urgences</option>
-              <option value="HAUTE">🔴 Haute</option>
-              <option value="MOYENNE">🟡 Moyenne</option>
-              <option value="BASSE">🟢 Basse</option>
+              <option *ngFor="let u of urgences" [value]="u.value">{{ u.label }}</option>
             </select>
             <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
           </div>
@@ -271,7 +273,52 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       </div>
     </div>
 
-  </div>
+    <!-- Modal Création -->
+    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <h3 class="font-black text-gray-900 text-lg">Nouveau Besoin</h3>
+          <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-6">
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Quartier</label>
+            <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Médina...">
+          </div>
+          <div class="mb-4 flex gap-4">
+            <div class="flex-1">
+              <label class="block text-sm font-bold text-gray-700 mb-1">Catégorie</label>
+              <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Environnement">Environnement</option>
+                <option value="Santé">Santé</option>
+                <option value="Sécurité">Sécurité</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label class="block text-sm font-bold text-gray-700 mb-1">Urgence</label>
+              <select [(ngModel)]="formData.urgence" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <option value="BASSE">Basse</option>
+                <option value="MOYENNE">Moyenne</option>
+                <option value="HAUTE">Haute</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Contact (Optionnel)</label>
+            <input type="text" [(ngModel)]="formData.contact" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: 77 123 45 67">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
+            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Description du besoin..."></textarea>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
+            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Déclarer</button>
+          </div>
+        </div>
+      </div>
+    </div>
   `
 })
 export class AdminbesoinsComponent implements OnInit, OnDestroy {
@@ -282,6 +329,15 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   besoins: any[] = [];
   filteredBesoins: any[] = [];
   total = 0;
+
+  showModal = false;
+  formData = {
+    quartier: '',
+    description: '',
+    categorie: 'Infrastructure',
+    urgence: 'MOYENNE',
+    contact: ''
+  };
   vocalCount = 0;
   textCount = 0;
   isLoading = true;
@@ -291,7 +347,9 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   filters = { statut: '', urgence: '', quartier: '' };
 
-  readonly quartiers = ['Nguinth', 'Grand Thiès', 'Keur Mame El Hadj', 'Médina Fall', 'Som'];
+  quartiers: any[] = [];
+  statuts: any[] = [];
+  urgences: any[] = [];
 
   readonly typeFilters = [
     { value: 'ALL' as BesoinType,   label: 'Tous',  icon: 'fa-solid fa-list',       activeClass: 'bg-gray-800 text-white' },
@@ -314,7 +372,20 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     // Debounce recherche texte : 400ms
     this.searchSubject.pipe(debounceTime(400), takeUntil(this.destroy$))
       .subscribe(() => this.applyClientFilters());
+    this.loadOptions();
     this.loadBesoins();
+  }
+
+  private loadOptions() {
+    this.adminData.getOptions('statut_besoin').pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => { if (res.success) { this.statuts = res.data; this.cdr.markForCheck(); } }
+    });
+    this.adminData.getOptions('urgence').pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => { if (res.success) { this.urgences = res.data; this.cdr.markForCheck(); } }
+    });
+    this.adminData.getOptions('quartier').pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => { if (res.success) { this.quartiers = res.data; this.cdr.markForCheck(); } }
+    });
   }
 
   /**
@@ -432,6 +503,31 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   getStatutClass(s: string): string {
     const map: any = { 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'EN_COURS': 'bg-blue-100 text-blue-700', 'RESOLU': 'bg-green-100 text-green-700' };
     return map[s] || 'bg-gray-100 text-gray-500';
+  }
+
+  openModal() {
+    this.formData = { quartier: '', description: '', categorie: 'Infrastructure', urgence: 'MOYENNE', contact: '' };
+    this.showModal = true;
+  }
+
+  submitForm() {
+    if (!this.formData.quartier || !this.formData.description) {
+      alert('Veuillez remplir le quartier et la description');
+      return;
+    }
+    this.isLoading = true;
+    this.showModal = false;
+    this.adminData.createEntity('besoins', {
+      quartier: this.formData.quartier,
+      description: this.formData.description,
+      categorie: this.formData.categorie,
+      urgence: this.formData.urgence,
+      contact: this.formData.contact,
+      statut: 'EN_ATTENTE',
+      createdAt: new Date().toISOString()
+    }).subscribe(() => {
+      this.loadBesoins();
+    });
   }
 
   ngOnDestroy() {

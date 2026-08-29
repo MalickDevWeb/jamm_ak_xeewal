@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { AdminDataService, Option } from '../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-admin-activites',
@@ -13,11 +13,11 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-black text-gray-900">Activités & Visites</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ total }} événements partagés avec le public.</p>
+        <h2 class="text-2xl font-black text-gray-900">Activités</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ total }} activités enregistrées.</p>
       </div>
-      <button (click)="action('Nouvelle activité')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
-        <i class="fa-solid fa-plus"></i> Nouvelle activité
+      <button (click)="action('Créer une activité')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
+        <i class="fa-solid fa-plus"></i> Créer une activité
       </button>
     </div>
 
@@ -28,65 +28,52 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let a of activites" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
-        <div class="h-40 relative">
-          <img [src]="a.mediaUrl || 'https://picsum.photos/seed/default/600/400'" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-          <div class="absolute top-3 right-3">
-            <span [class]="a.statut === 'PUBLIE' ? 'bg-green-500' : 'bg-gray-500'" class="text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-              {{ a.statut }}
-            </span>
+    <div *ngIf="!isLoading" class="space-y-6">
+      <div *ngFor="let a of activites; trackBy: trackById" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">{{ a.categorie }}</span>
+              <span class="text-xs text-gray-400">{{ a.date | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900">{{ a.titre }}</h3>
           </div>
-          <div class="absolute bottom-3 left-3 flex gap-2">
-            <span class="bg-[#022c16] text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wide">
-              {{ a.categorie }}
-            </span>
-            <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wide flex items-center gap-1 border border-white/20">
-              <i [class]="a.typeMedia === 'VIDEO' ? 'fa-solid fa-play' : 'fa-regular fa-images'"></i> {{ a.typeMedia }}
-            </span>
-          </div>
-        </div>
-        <div class="p-5 flex-1 flex flex-col">
-          <p class="text-xs text-gray-400 mb-2 font-semibold"><i class="fa-regular fa-calendar mr-1"></i> {{ a.date | date:'dd/MM/yyyy' }}</p>
-          <h3 class="text-base font-bold text-gray-900 leading-snug mb-4 flex-1">{{ a.titre }}</h3>
-          <div class="pt-4 border-t border-gray-50 flex gap-2 mt-auto">
-            <button (click)="action('Édition', a.id)" class="flex-[2] py-1.5 px-2 text-xs font-bold text-[#022c16] bg-[#022c16]/10 hover:bg-[#022c16]/20 rounded-lg transition-colors flex items-center justify-center gap-1.5"><i class="fa-solid fa-images"></i> Éditer & Médias</button>
-            <button (click)="action('Masqué', a.id)" class="flex-1 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors" *ngIf="a.statut === 'PUBLIE'">Masquer</button>
-            <button (click)="action('Supprimé', a.id)" class="w-8 py-1.5 text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center shrink-0"><i class="fa-solid fa-trash"></i></button>
+          <div class="flex gap-2">
+            <button (click)="action('Supprimer', a.id)" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       </div>
     </div>
-
+    
     <!-- Modal Création -->
     <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="font-black text-gray-900 text-lg">Nouvelle Activité</h3>
+          <h3 class="font-black text-gray-900 text-lg">Nouvelle activité</h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         <div class="p-6">
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Titre de l'activité</label>
-            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Grand rassemblement...">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Titre</label>
+            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
           </div>
           <div class="mb-4">
             <label class="block text-sm font-bold text-gray-700 mb-1">Catégorie</label>
             <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-              <option value="PROJET">Projet</option>
-              <option value="MEETING">Meeting</option>
-              <option value="TERRAIN">Terrain</option>
+              <option *ngFor="let c of categories; trackBy: trackByOption" [value]="c.value">{{ c.label }}</option>
             </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Date</label>
+            <input type="date" [(ngModel)]="formData.date" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
-            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Créer</button>
+            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Enregistrer</button>
           </div>
         </div>
       </div>
     </div>
-
   </div>
   `
 })
@@ -96,36 +83,78 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   total = 0;
   isLoading = true;
 
+  // Options dynamiques depuis la base de données
+  categories: Option[] = [];
+
   showModal = false;
   formData = {
     titre: '',
-    categorie: 'PROJET'
+    categorie: '',
+    date: ''
   };
 
-  constructor(private adminData: AdminDataService,
-    private cdr: ChangeDetectorRef) {}
+  constructor(
+    private adminData: AdminDataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.adminData.getActivites().subscribe({
-      next: (res: any) => { this.activites = res.data; this.total = res.total; this.isLoading = false; },
-      error: () => { this.isLoading = false; }
+    this.loadOptions();
+    this.loadActivites();
+  }
+
+  private loadOptions() {
+    this.adminData.getOptions('categorie_activite').pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.categories = res.data;
+          if (this.categories.length > 0 && !this.formData.categorie) {
+            this.formData.categorie = this.categories[0].value;
+          }
+          this.cdr.markForCheck();
+        }
+      }
+    });
+  }
+
+  trackById(index: number, item: any): string {
+    return item.id;
+  }
+
+  trackByOption(index: number, item: Option): string {
+    return item.id;
+  }
+
+  loadActivites() {
+    this.isLoading = true;
+    this.adminData.getActivites().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        this.activites = res.data;
+        this.total = res.total;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
   action(type: string, id?: string) {
-    if (type === 'Nouvelle activité') {
-      this.formData = { titre: '', categorie: 'PROJET' };
+    if (type === 'Créer une activité') {
+      this.formData = { titre: '', categorie: this.categories[0]?.value || '', date: '' };
       this.showModal = true;
-    } else if (type === 'Supprimé' && id) {
-      if (confirm('Voulez-vous vraiment supprimer cette activité ?')) {
-        this.isLoading = true;
-        this.adminData.deleteEntity('activites', id).subscribe(() => this.ngOnInit());
+    } else if (type === 'Supprimer' && id) {
+      if (confirm('Supprimer cette activité ?')) {
+        this.adminData.deleteEntity('activites', id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe(() => this.loadActivites());
       }
-    } else if (type === 'Masqué' && id) {
-      this.isLoading = true;
-      this.adminData.updateEntity('activites', id, { statut: 'BROUILLON' }).subscribe(() => this.ngOnInit());
-    } else {
-      alert(type + ' : Formulaire en cours de développement.');
     }
   }
 
@@ -136,7 +165,13 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
-    this.adminData.createEntity('activites', { titre: this.formData.titre, categorie: this.formData.categorie, date: new Date().toISOString() }).subscribe(() => this.ngOnInit());
+    this.adminData.createEntity('activites', { 
+      titre: this.formData.titre, 
+      categorie: this.formData.categorie,
+      date: this.formData.date ? new Date(this.formData.date).toISOString() : new Date().toISOString()
+    }).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.loadActivites());
   }
 
   ngOnDestroy() {

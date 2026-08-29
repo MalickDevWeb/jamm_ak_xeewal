@@ -14,11 +14,7 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Axe concerné</label>
                     <select name="axe_concerne" [(ngModel)]="formData.axe_concerne" required class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-brand-green focus:border-brand-green">
-                        <option value="Éducation et formation">Éducation et formation</option>
-                        <option value="Emploi et entrepreneuriat">Emploi et entrepreneuriat</option>
-                        <option value="Jeunesse, sport et culture">Jeunesse, sport et culture</option>
-                        <option value="Environnement et cadre de vie">Environnement et cadre de vie</option>
-                        <option value="Autre">Autre</option>
+                        <option *ngFor="let a of axes; trackBy: trackByOption" [value]="a.value">{{ a.label }}</option>
                     </select>
                 </div>
                 <div class="mb-6">

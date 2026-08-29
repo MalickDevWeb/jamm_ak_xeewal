@@ -1,12 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { PublicDataService } from '../../../../core/services/public-data.service';
+import { Subject, takeUntil } from 'rxjs';
+import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 import { environment } from '../../../../../environments/environment';
 
-// RecordRTC import dynamique (meilleure compatibilité cross-browser)
 declare const RecordRTC: any;
 
 type RecordingState = 'idle' | 'recording' | 'paused' | 'done';
@@ -15,21 +15,25 @@ type RecordingState = 'idle' | 'recording' | 'paused' | 'done';
   selector: 'app-declarer-besoin',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  providers: [PublicDataService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './declarer-besoin.component.html',
   styleUrl: './declarer-besoin.component.css'
 })
 export class DeclarerBesoinComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   formData = {
     titre: '',
     description: '',
     quartier: '',
-    urgence: 'Moyenne',
-    localite: '',
+    urgence: 'MOYENNE',
     nom_citoyen: '',
     telephone_citoyen: ''
   };
+
+  // Options dynamiques depuis la base de données
+  quartiers: Option[] = [];
+  urgences: Option[] = [];
 
   // === VOCAL ===
   recordingState: RecordingState = 'idle';
@@ -37,7 +41,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   MAX_RECORDING_SECONDS = 120;
   settingsLoaded = false;
   recordingTimerRef: any = null;
-  private recorder: any = null;         // RecordRTC instance
+  private recorder: any = null;
   private stream: MediaStream | null = null;
   audioBlob: Blob | null = null;
   audioUrl: string | null = null;
@@ -45,28 +49,70 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   isUploadingVocal = false;
   vocalError = '';
   vocalDuration: number = 0;
-  audioFormat = 'webm';                // format final détecté
+  audioFormat = 'webm';
 
   // === FORM ===
   isSubmitting = false;
   success = false;
   errorMsg = '';
 
-  constructor(private publicData: PublicDataService, private http: HttpClient) {}
+  constructor(
+    private publicData: PublicDataService, 
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
+    // Charger les options dynamiques
+    this.loadOptions();
+    
     // Charger la durée max depuis les paramètres admin
-    this.http.get<{ success: boolean; data: any }>('/api/v1/settings').subscribe({
+    this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/settings`).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (res) => {
         if (res.success && res.data?.vocal_max_seconds) {
           this.MAX_RECORDING_SECONDS = +res.data.vocal_max_seconds;
         }
         this.settingsLoaded = true;
+        this.cdr.markForCheck();
       },
       error: () => {
-        this.settingsLoaded = true; // Utiliser la valeur par défaut
+        this.settingsLoaded = true;
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  private loadOptions() {
+    // Charger les quartiers
+    this.publicData.getOptions('quartier').pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.quartiers = res.data;
+          this.cdr.markForCheck();
+        }
+      }
+    });
+
+    // Charger les urgences
+    this.publicData.getOptions('urgence').pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.urgences = res.data;
+          this.cdr.markForCheck();
+        }
+      }
+    });
+  }
+
+  // TrackBy pour les options
+  trackByOption(index: number, item: Option): string {
+    return item.id;
   }
 
   // =====================
@@ -79,7 +125,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     return `${m}:${s}`;
   }
 
-  // Temps restant (ce que voit l'utilisateur)
   get remainingTime(): number {
     return Math.max(0, this.MAX_RECORDING_SECONDS - this.recordingTime);
   }
@@ -97,12 +142,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     return `${m}:${s}`;
   }
 
-  // Pourcentage du temps restant (bar se vide)
   get remainingProgress(): number {
     return (this.remainingTime / this.MAX_RECORDING_SECONDS) * 100;
   }
 
-  // Couleur d'alerte selon le temps restant
   get timerUrgencyClass(): string {
     if (this.remainingTime <= 10) return 'text-red-600 animate-pulse';
     if (this.remainingTime <= 30) return 'text-orange-500';
@@ -118,7 +161,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   async startRecording() {
     this.vocalError = '';
     try {
-      // Contraintes audio PRO
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -134,11 +176,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       if (this.audioUrl) { URL.revokeObjectURL(this.audioUrl); this.audioUrl = null; }
 
       try {
-        // RecordRTC : meilleure qualité cross-browser
         const { default: RTC } = await import('recordrtc');
         this.recorder = new RTC(this.stream, {
           type: 'audio',
-          mimeType: 'audio/webm;codecs=opus' as any,  // @types/recordrtc incomplet
+          mimeType: 'audio/webm;codecs=opus' as any,
           audioBitsPerSecond: 128000,
           numberOfAudioChannels: 1,
           desiredSampRate: 48000,
@@ -148,7 +189,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         this.audioFormat = 'webm';
         this.recordingState = 'recording';
       } catch {
-        // Fallback : MediaRecorder natif
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
           ? 'audio/webm;codecs=opus'
           : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
@@ -161,14 +201,13 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
           if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
           this.audioUrl = URL.createObjectURL(this.audioBlob);
           this.stream?.getTracks().forEach(t => t.stop());
-          // ⚠️ PAS d'upload ici — l'upload se fait au moment du submit
+          this.uploadVocalToCloudinary();
         };
         mr.start(250);
         (this.recorder as any) = { _native: mr };
         this.recordingState = 'recording';
       }
 
-      // Timer
       this.recordingTimerRef = setInterval(() => {
         this.recordingTime++;
         if (this.recordingTime >= this.MAX_RECORDING_SECONDS) this.stopRecording();
@@ -224,7 +263,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         this.audioUrl = URL.createObjectURL(this.audioBlob!);
         this.stream?.getTracks().forEach(t => t.stop());
         this.recordingState = 'done';
-        // ⚠️ PAS d'upload ici — l'upload se fait au moment du submit
       });
     }
   }
@@ -249,35 +287,29 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.isUploadingVocal = false;
   }
 
-  // Upload vers Cloudinary — appelé uniquement au moment du submit
-  uploadVocalToCloudinary(): Promise<string | null> {
-    if (!this.audioBlob) return Promise.resolve(null);
+  uploadVocalToCloudinary() {
+    if (!this.audioBlob) return;
     this.isUploadingVocal = true;
     this.vocalError = '';
 
     const fd = new FormData();
-    fd.append('audio', this.audioBlob, `vocal-${Date.now()}.${this.audioFormat}`);
+    fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
 
-    return new Promise((resolve) => {
-      this.http.post<{ success: boolean; url: string }>(
-        `${environment.apiUrl}/upload-audio`, fd
-      ).subscribe({
-        next: (res) => {
-          this.isUploadingVocal = false;
-          if (res.success) {
-            this.cloudinaryVocalUrl = res.url;
-            resolve(res.url);
-          } else {
-            this.vocalError = "Échec de l'envoi du message vocal. Réessayez.";
-            resolve(null);
-          }
-        },
-        error: () => {
-          this.isUploadingVocal = false;
-          this.vocalError = "Erreur réseau : impossible d'envoyer le message vocal. Vérifiez votre connexion.";
-          resolve(null);
+    this.http.post<{ success: boolean; url: string }>(`${environment.apiUrl}/upload-audio`, fd).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res) => {
+        this.isUploadingVocal = false;
+        if (res.success) {
+          this.cloudinaryVocalUrl = res.url;
+        } else {
+          this.vocalError = "Échec de l'envoi du message vocal. Réessayez.";
         }
-      });
+      },
+      error: () => {
+        this.isUploadingVocal = false;
+        this.vocalError = "Erreur réseau lors de l'envoi du message vocal.";
+      }
     });
   }
 
@@ -290,38 +322,56 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     setTimeout(() => this.errorMsg = '', 5000);
   }
 
-  async onSubmit() {
-    // === Validations ===
+  onSubmit() {
     if (!this.formData.quartier || !this.formData.telephone_citoyen) {
       this.showError("Veuillez remplir les champs obligatoires (Quartier et Téléphone).");
       return;
     }
-    if (!this.formData.description && !this.audioBlob) {
+
+    if (!this.formData.description && !this.audioBlob && !this.cloudinaryVocalUrl) {
       this.showError("Veuillez décrire le problème par écrit ou en message vocal.");
       return;
     }
-    if (this.recordingState === 'recording' || this.recordingState === 'paused') {
-      this.showError("Veuillez terminer l'enregistrement avant d'envoyer.");
+
+    if (this.isUploadingVocal) {
+      this.showError("Veuillez patienter, le message vocal est en cours d'envoi...");
       return;
     }
 
     this.isSubmitting = true;
     this.errorMsg = '';
 
-    // === Upload vocal AU MOMENT DU SUBMIT ===
-    let vocalUrl: string | null = null;
     if (this.audioBlob && !this.cloudinaryVocalUrl) {
-      vocalUrl = await this.uploadVocalToCloudinary();
-      if (!vocalUrl) {
-        // Erreur d'upload — arrêter la soumission
-        this.isSubmitting = false;
-        return;
-      }
+      this.isUploadingVocal = true;
+      const fd = new FormData();
+      fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
+      this.http.post<{ success: boolean; url: string }>(`${environment.apiUrl}/upload-audio`, fd).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (res) => {
+          this.isUploadingVocal = false;
+          if (res.success) {
+            this.cloudinaryVocalUrl = res.url;
+            this.submitFinalPayload();
+          } else {
+            this.isSubmitting = false;
+            this.showError("Échec de l'envoi du message vocal. Réessayez.");
+            this.cdr.markForCheck();
+          }
+        },
+        error: () => {
+          this.isUploadingVocal = false;
+          this.isSubmitting = false;
+          this.showError("Erreur réseau lors de l'envoi du message vocal.");
+          this.cdr.markForCheck();
+        }
+      });
     } else {
-      vocalUrl = this.cloudinaryVocalUrl;
+      this.submitFinalPayload();
     }
+  }
 
-    // === Construction du payload ===
+  private submitFinalPayload() {
     const contactInfo = this.formData.nom_citoyen
       ? `${this.formData.nom_citoyen} - ${this.formData.telephone_citoyen}`
       : this.formData.telephone_citoyen;
@@ -330,21 +380,27 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       description: this.formData.description || '(Message vocal joint)',
       quartier: this.formData.quartier,
       contact: contactInfo,
-      urgence: this.formData.urgence.toUpperCase()
+      urgence: this.formData.urgence,
+      telephone: this.formData.telephone_citoyen,
+      nom: this.formData.nom_citoyen
     };
 
-    if (vocalUrl) payload.vocalUrl = vocalUrl;
-    if (this.formData.localite) payload.localite = this.formData.localite;
+    if (this.cloudinaryVocalUrl) {
+      payload.vocalUrl = this.cloudinaryVocalUrl;
+    }
 
-    // === Envoi du signalement ===
-    this.publicData.postBesoin(payload).subscribe({
+    this.publicData.postBesoin(payload).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.success = true;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isSubmitting = false;
         this.showError("Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer.");
+        this.cdr.markForCheck();
       }
     });
   }
@@ -352,12 +408,14 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   resetForm() {
     this.success = false;
     this.errorMsg = '';
-    this.formData = { titre: '', description: '', quartier: '', urgence: 'Moyenne', localite: '', nom_citoyen: '', telephone_citoyen: '' };
+    this.formData = { titre: '', description: '', quartier: '', urgence: 'MOYENNE', nom_citoyen: '', telephone_citoyen: '' };
     this.resetVocal();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.resetVocal();
   }
 }
