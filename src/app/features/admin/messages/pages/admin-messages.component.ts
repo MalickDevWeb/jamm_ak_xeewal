@@ -59,13 +59,6 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     </div>
   
     <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
   </div>
   `
 })

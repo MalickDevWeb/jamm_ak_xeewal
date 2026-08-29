@@ -3,13 +3,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-sondages',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -99,14 +98,6 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
       </div>
     </div>
   
-    <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
   </div>
   `
 })

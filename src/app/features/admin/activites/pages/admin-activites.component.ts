@@ -3,7 +3,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService, Option } from '../../../../core/services/admin-data.service';
-import { ConfirmDialogComponent } from "../../../../shared/components/confirm-dialog/confirm-dialog.component";
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -149,7 +149,7 @@ import { environment } from '../../../../../environments/environment';
         <div class="px-8 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl">
           <div class="flex items-center justify-between">
             <h3 class="font-black text-2xl text-gray-900 flex items-center gap-3">
-              <i class="fa-solid text-[#022c16]" [class.fa-plus-circle]="isCreating" [class.fa-edit]="!isCreating"></i>
+              <i class="fa-solid" [class.fa-plus-circle]="isCreating" [class.fa-edit]="!isCreating" class="text-[#022c16]"></i>
               {{ isCreating ? 'Nouvelle activité' : 'Modifier l\'activité' }}
             </h3>
             <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-all">
@@ -282,6 +282,15 @@ import { environment } from '../../../../../environments/environment';
         </div>
       </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `,
   styles: [`
@@ -436,9 +445,6 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
   closeModal() {
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.mediaError = '';
   }
 
@@ -466,7 +472,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
           ctx.drawImage(img, 0, 0, width, height);
           canvas.toBlob((blob) => {
             if (blob) {
-              const compressedFile = new File([blob], file.name.replace(/\\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
               resolve(compressedFile);
             } else reject(new Error('Compression failed'));
           }, 'image/jpeg', 0.7);
@@ -574,9 +580,6 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
           next: () => {
             this.isSubmitting = false;
             this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
             this.refreshData();
           },
           error: () => {
@@ -590,9 +593,6 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
           next: () => {
             this.isSubmitting = false;
             this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
             this.refreshData();
           },
           error: () => {
@@ -610,10 +610,26 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     }
   }
 
-      this.adminData.deleteEntity('activites', id).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => this.refreshData(),
-        error: () => { this.mediaError = 'Erreur lors de la suppression.'; this.cdr.markForCheck(); }
-      });
+  deleteActivite(id: string) {
+    this.itemToDelete = id;
+    this.confirmTitle = 'Supprimer cette activité ?';
+    this.showConfirmDialog = true;
+  }
+
+  deleteItem = (id: string) => {
+    this.adminData.deleteEntity('activites', id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => this.refreshData(),
+      error: () => { this.mediaError = 'Erreur lors de la suppression.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  confirmDelete() {
+    if (this.itemToDelete) {
+      this.deleteItem(this.itemToDelete);
+      this.itemToDelete = null;
+      this.showConfirmDialog = false;
     }
   }
 

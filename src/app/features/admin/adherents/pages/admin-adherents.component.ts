@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-adherents',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -114,13 +114,6 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
   
     <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
   </div>
   `
 })
@@ -185,20 +178,6 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.showModal = false;
     this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
   }
-
-  
-  deleteItem = (id: string) => {
-    this.deleteAdherent(id);
-  };
-    confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
-    }
-  }
-
-    }
 
   ngOnDestroy() {
     this.destroy$.next();

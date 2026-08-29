@@ -8,7 +8,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-commissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
@@ -95,13 +95,6 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
   
     <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
   </div>
   `
 })

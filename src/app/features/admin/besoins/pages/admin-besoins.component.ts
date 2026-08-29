@@ -13,7 +13,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   selector: 'app-admin-besoins',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule],
   template: `
   <div class="animate-fade-in-up">
 
@@ -320,13 +320,6 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       </div>
     
     <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
   </div>
   `
 })
@@ -340,9 +333,6 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   total = 0;
 
   showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
   formData = {
     quartier: '',
     description: '',
@@ -546,16 +536,6 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
       this.loadBesoins();
     });
   }
-
-  
-    confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
-    }
-  }
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
