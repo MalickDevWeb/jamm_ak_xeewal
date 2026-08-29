@@ -1,0 +1,156 @@
+--- declarer-besoin.component.ts
++++ declarer-besoin.component.ts
+@@ -10,7 +10,7 @@
+ 
+ declare const RecordRTC: any;
+ 
+-type RecordingState = 'idle' | 'recording' | 'paused' | 'done';
++type RecordingState = 'idle' | 'recording' | 'recording_locked' | 'paused' | 'done';
+ 
+ @Component({
+   selector: 'app-declarer-besoin',
+@@ -32,6 +32,9 @@
+     telephone_citoyen: ''
+   };
+ 
++  // Mode de saisie : vocal ou texte
++  inputMode: 'vocal' | 'text' = 'vocal';
++
+   // Options dynamiques depuis la base de données
+   quartiers: Option[] = [];
+   urgences: Option[] = [];
+@@ -52,6 +55,14 @@
+   vocalDuration: number = 0;
+   audioFormat = 'webm';
+ 
++  // === PUSH TO TALK ===
++  private touchStartY = 0;
++  private readonly LOCK_THRESHOLD = 50; // pixels to slide up to lock
++
++  // === PHOTO UPLOAD ===
++  imageBlob: Blob | null = null;
++  cloudinaryImageUrl: string | null = null;
++
+   // === FORM ===
+   isSubmitting = false;
+   success = false;
+@@ -160,7 +171,13 @@
+ 
+   async startRecording() {
++    if (this.recordingState === 'recording' || this.recordingState === 'recording_locked') return;
+     this.vocalError = '';
++
+     try {
+       this.stream = await navigator.mediaDevices.getUserMedia({
+         audio: {
+@@ -226,6 +243,30 @@
+     }
+   }
+ 
++  // Push to talk events
++  onTouchStart(event: TouchEvent | MouseEvent) {
++    if (this.recordingState !== 'idle' && this.recordingState !== 'done') return;
++    event.preventDefault();
++    this.touchStartY = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
++    this.startRecording();
++  }
++
++  onTouchMove(event: TouchEvent | MouseEvent) {
++    if (this.recordingState !== 'recording') return;
++    const currentY = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
++    if (this.touchStartY - currentY > this.LOCK_THRESHOLD) {
++      this.recordingState = 'recording_locked';
++      this.cdr.markForCheck();
++    }
++  }
++
++  onTouchEnd(event: TouchEvent | MouseEvent) {
++    if (this.recordingState === 'recording') {
++      // If we didn't lock, stop recording on release
++      this.stopRecording();
++    }
++  }
++
+   pauseRecording() {
+     if (!this.recorder) return;
+@@ -254,7 +295,7 @@
+   stopRecording() {
+     clearInterval(this.recordingTimerRef);
+     this.vocalDuration = this.recordingTime;
+-    if (!this.recorder) { this.recordingState = 'done'; return; }
++    if (!this.recorder) { this.recordingState = 'done'; this.cdr.markForCheck(); return; }
+     if ((this.recorder as any)._native) {
+       (this.recorder as any)._native.stop();
+       this.recordingState = 'done';
+@@ -265,6 +306,7 @@
+         this.audioUrl = URL.createObjectURL(this.audioBlob!);
+         this.stream?.getTracks().forEach(t => t.stop());
+         this.recordingState = 'done';
++        this.cdr.markForCheck();
+       });
+     }
++    this.cdr.markForCheck();
+   }
+@@ -315,6 +357,36 @@
+     });
+   }
+ 
++  // =====================
++  //  IMAGE RECORDING
++  // =====================
++
++  onImageSelected(event: any) {
++    const file = event.target.files[0];
++    if (file) {
++      this.imageBlob = file;
++      this.uploadImageToCloudinary();
++    }
++  }
++
++  uploadImageToCloudinary() {
++    if (!this.imageBlob) return;
++    const fd = new FormData();
++    fd.append('file', this.imageBlob);
++
++    this.http.post<{ success: boolean; url: string }>(`${environment.apiUrl}/upload-public`, fd).pipe(
++      takeUntil(this.destroy$)
++    ).subscribe({
++      next: (res) => {
++        if (res.success) {
++          this.cloudinaryImageUrl = res.url;
++          this.cdr.markForCheck();
++        }
++      },
++      error: (err) => console.error('Image upload failed', err)
++    });
++  }
++
+   // =====================
+   //  FORM SUBMIT
+   // =====================
+@@ -335,8 +407,8 @@
+     }
+ 
+-    if (!this.formData.description && !this.audioBlob && !this.cloudinaryVocalUrl) {
+-      this.showError("Veuillez décrire le problème par écrit ou en message vocal.");
+-      return;
+-    }
++    // If input mode is vocal and no audio, or text and no description
++    if (this.inputMode === 'vocal' && !this.audioBlob && !this.cloudinaryVocalUrl) {
++        this.showError("Veuillez enregistrer un message vocal.");
++        return;
++    } else if (this.inputMode === 'text' && !this.formData.description) {
++        this.showError("Veuillez décrire le problème par écrit.");
++        return;
++    }
+ 
+     if (this.isUploadingVocal) {
+@@ -387,6 +459,10 @@
+       payload.vocalUrl = this.cloudinaryVocalUrl;
+     }
+ 
++    if (this.cloudinaryImageUrl) {
++      payload.photoUrl = this.cloudinaryImageUrl;
++    }
++
+     this.publicData.postBesoin(payload).pipe(

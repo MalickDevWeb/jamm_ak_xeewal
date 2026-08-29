@@ -9,8 +9,7 @@ import { environment } from '../../../../../environments/environment';
 
 declare const RecordRTC: any;
 
-type RecordingState = 'idle' | 'recording' | 'paused' | 'done';
-
+type RecordingState = 'idle' | 'recording' | 'recording_locked' | 'paused' | 'done';
 @Component({
   selector: 'app-declarer-besoin',
   standalone: true,
@@ -31,9 +30,36 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     telephone_citoyen: ''
   };
 
+  // Mode de saisie : vocal ou texte
+  inputMode: 'vocal' | 'text' = 'vocal';
+
+  // === PUSH TO TALK ===
+  touchStartY = 0;
+  readonly LOCK_THRESHOLD = 50; // pixels to slide up to lock
+
+  // === PHOTO UPLOAD ===
+  imageBlob: File | null = null;
+  cloudinaryImageUrl: string | null = null;
+  isUploadingImage = false;
+  imageError = '';
+
   // Options dynamiques depuis la base de données
   quartiers: Option[] = [];
   urgences: Option[] = [];
+  
+  // Custom Dropdown State
+  isQuartierDropdownOpen = false;
+
+  get selectedQuartierLabel(): string {
+    if (!this.formData.quartier) return 'Sélectionnez votre quartier...';
+    const q = this.quartiers.find(q => q.id === this.formData.quartier);
+    return q ? q.label : 'Sélectionnez votre quartier...';
+  }
+
+  selectQuartier(id: string) {
+    this.formData.quartier = id;
+    this.isQuartierDropdownOpen = false;
+  }
 
   // === VOCAL ===
   recordingState: RecordingState = 'idle';
@@ -160,6 +186,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   }
 
   async startRecording() {
+    if (this.recordingState === 'recording' || this.recordingState === 'recording_locked') return;
     this.vocalError = '';
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
@@ -225,6 +252,29 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     }
   }
 
+  // === PUSH TO TALK EVENTS ===
+  onTouchStart(event: TouchEvent | MouseEvent) {
+    if (this.recordingState !== 'idle' && this.recordingState !== 'done') return;
+    this.touchStartY = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
+    this.startRecording();
+  }
+
+  onTouchMove(event: TouchEvent | MouseEvent) {
+    if (this.recordingState !== 'recording') return;
+    const currentY = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
+    
+    if (this.touchStartY - currentY > this.LOCK_THRESHOLD) {
+      this.recordingState = 'recording_locked';
+      this.cdr.markForCheck();
+    }
+  }
+
+  onTouchEnd(event: TouchEvent | MouseEvent) {
+    if (this.recordingState === 'recording') {
+      this.stopRecording();
+    }
+  }
+
   pauseRecording() {
     if (!this.recorder) return;
     if ((this.recorder as any)._native) {
@@ -253,7 +303,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   stopRecording() {
     clearInterval(this.recordingTimerRef);
     this.vocalDuration = this.recordingTime;
-    if (!this.recorder) { this.recordingState = 'done'; return; }
+    if (!this.recorder) { this.recordingState = 'done'; this.cdr.markForCheck(); return; }
     if ((this.recorder as any)._native) {
       (this.recorder as any)._native.stop();
       this.recordingState = 'done';
@@ -264,8 +314,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         this.audioUrl = URL.createObjectURL(this.audioBlob!);
         this.stream?.getTracks().forEach(t => t.stop());
         this.recordingState = 'done';
+        this.cdr.markForCheck();
       });
     }
+    this.cdr.markForCheck();
   }
 
   resetVocal() {
@@ -315,6 +367,45 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   }
 
   // =====================
+  //  IMAGE UPLOAD
+  // =====================
+
+  onImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.imageBlob = file;
+      this.uploadImageToCloudinary();
+    }
+  }
+
+  uploadImageToCloudinary() {
+    if (!this.imageBlob) return;
+    this.isUploadingImage = true;
+    this.imageError = '';
+    const fd = new FormData();
+    fd.append('file', this.imageBlob);
+
+    this.http.post<{ success: boolean; url: string; message?: string }>(`${environment.apiUrl}/upload-public`, fd).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res) => {
+        this.isUploadingImage = false;
+        if (res.success) {
+          this.cloudinaryImageUrl = res.url;
+        } else {
+          this.imageError = res.message || "Erreur d'upload.";
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.isUploadingImage = false;
+        this.imageError = "Erreur réseau lors de l'envoi de l'image.";
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // =====================
   //  FORM SUBMIT
   // =====================
 
@@ -334,13 +425,16 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.formData.description && !this.audioBlob && !this.cloudinaryVocalUrl) {
-      this.showError("Veuillez décrire le problème par écrit ou en message vocal.");
+    if (this.inputMode === 'vocal' && !this.audioBlob && !this.cloudinaryVocalUrl) {
+      this.showError("Veuillez enregistrer un message vocal ou écrire votre problème.");
+      return;
+    } else if (this.inputMode === 'text' && !this.formData.description) {
+      this.showError("Veuillez décrire le problème par écrit.");
       return;
     }
 
-    if (this.isUploadingVocal) {
-      this.showError("Veuillez patienter, le message vocal est en cours d'envoi...");
+    if (this.isUploadingVocal || this.isUploadingImage) {
+      this.showError("Veuillez patienter, les fichiers sont en cours d'envoi...");
       return;
     }
 
@@ -395,6 +489,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       payload.vocalUrl = this.cloudinaryVocalUrl;
     }
 
+    if (this.cloudinaryImageUrl) {
+      payload.photoUrl = this.cloudinaryImageUrl; // or adapt depending on how backend expects it
+    }
+
     this.publicData.postBesoin(payload).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -416,6 +514,9 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.errorMsg = '';
     this.formData = { titre: '', description: '', quartier: '', urgence: 'MOYENNE', nom_citoyen: '', telephone_citoyen: '' };
     this.resetVocal();
+    this.imageBlob = null;
+    this.cloudinaryImageUrl = null;
+    this.imageError = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
