@@ -172,7 +172,7 @@
                  [class.opacity-60]="isUploadingImage"
                  onclick="document.getElementById('photoUpload').click()">
               
-              <div *ngIf="!cloudinaryImageUrl && !isUploadingImage" class="py-4 flex items-center justify-center gap-2 text-gray-500 font-semibold text-sm">
+              <div *ngIf="!imagePreviewUrl && !isUploadingImage" class="py-4 flex items-center justify-center gap-2 text-gray-500 font-semibold text-sm">
                 <i class="fa-solid fa-camera text-gray-400 text-lg"></i>
                 <span>Joindre photo</span>
               </div>
@@ -182,9 +182,9 @@
                 <span>Envoi...</span>
               </div>
 
-              <div *ngIf="cloudinaryImageUrl" class="relative w-full h-32">
-                <img [src]="cloudinaryImageUrl" alt="Photo jointe" class="w-full h-full object-cover">
-                <button (click)="cloudinaryImageUrl = null; imageBlob = null; $event.stopPropagation();" 
+              <div *ngIf="imagePreviewUrl" class="relative w-full h-32">
+                <img [src]="imagePreviewUrl" alt="Photo jointe" class="w-full h-full object-cover">
+                <button (click)="imagePreviewUrl = null; imageBlob = null; cloudinaryImageUrl = null; $event.stopPropagation();" 
                         class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center shadow-md">
                   <i class="fa-solid fa-times text-sm"></i>
                 </button>
