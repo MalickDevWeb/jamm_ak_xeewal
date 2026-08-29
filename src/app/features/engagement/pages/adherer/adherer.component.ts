@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs/operators';
+import { environment } from '../../../../../environments/environment';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 
 @Component({
@@ -26,7 +29,9 @@ export class AdhererComponent implements OnInit, OnDestroy {
     quartier: '',
     profession: '',
     pole: '',
-    motivation: ''
+    motivation: '',
+    carteRectoUrl: '',
+    carteVersoUrl: ''
   };
 
   // Options dynamiques depuis la base de données
@@ -47,6 +52,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   constructor(
     private publicData: PublicDataService,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -121,13 +127,13 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   resetForm() {
     this.success = false;
-    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '' };
+    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '', carteRectoUrl: '', carteVersoUrl: '' };
     this.removeRecto();
     this.removeVerso();
   }
 
   // --- Gestion des fichiers ---
-  onRectoSelected(event: any) {
+  async onRectoSelected(event: any) {
     this.rectoError = '';
     const file = event.target.files[0];
     if (!file) return;
@@ -142,15 +148,34 @@ export class AdhererComponent implements OnInit, OnDestroy {
     }
 
     this.carteRectoName = file.name;
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.carteRectoBase64 = e.target.result;
+    this.cdr.markForCheck();
+
+    // Upload vers Cloudinary
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+      if (res.success) {
+        this.formData.carteRectoUrl = res.url;
+        // Also show preview
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.carteRectoBase64 = e.target.result;
+          this.cdr.markForCheck();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.rectoError = res.message || "Erreur lors de l'envoi de l'image.";
+        this.cdr.markForCheck();
+      }
+    } catch (err: any) {
+      this.rectoError = "Erreur réseau lors de l'envoi de l'image. Veuillez réessayer.";
+      console.error('Upload recto error:', err);
       this.cdr.markForCheck();
-    };
-    reader.readAsDataURL(file);
+    }
   }
 
-  onVersoSelected(event: any) {
+  async onVersoSelected(event: any) {
     this.versoError = '';
     const file = event.target.files[0];
     if (!file) return;
@@ -165,12 +190,31 @@ export class AdhererComponent implements OnInit, OnDestroy {
     }
 
     this.carteVersoName = file.name;
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.carteVersoBase64 = e.target.result;
+    this.cdr.markForCheck();
+
+    // Upload vers Cloudinary
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+      if (res.success) {
+        this.formData.carteVersoUrl = res.url;
+        // Also show preview
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.carteVersoBase64 = e.target.result;
+          this.cdr.markForCheck();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.versoError = res.message || "Erreur lors de l'envoi de l'image.";
+        this.cdr.markForCheck();
+      }
+    } catch (err: any) {
+      this.versoError = "Erreur réseau lors de l'envoi de l'image. Veuillez réessayer.";
+      console.error('Upload verso error:', err);
       this.cdr.markForCheck();
-    };
-    reader.readAsDataURL(file);
+    }
   }
 
   removeRecto() {

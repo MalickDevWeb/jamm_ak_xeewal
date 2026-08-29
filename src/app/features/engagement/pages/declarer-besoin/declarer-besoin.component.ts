@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 import { environment } from '../../../../../environments/environment';
 
@@ -39,6 +39,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
 
   // === PHOTO UPLOAD ===
   imageBlob: File | null = null;
+  imagePreviewUrl: string | null = null;
   cloudinaryImageUrl: string | null = null;
   isUploadingImage = false;
   imageError = '';
@@ -338,6 +339,11 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.recordingTime = 0;
     this.vocalError = '';
     this.isUploadingVocal = false;
+    this.imageBlob = null;
+    this.imagePreviewUrl = null;
+    this.cloudinaryImageUrl = null;
+    this.imageError = '';
+    this.cdr.markForCheck();
   }
 
   uploadVocalToCloudinary() {
@@ -374,7 +380,12 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     const file = event.target.files[0];
     if (file) {
       this.imageBlob = file;
-      this.uploadImageToCloudinary();
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreviewUrl = e.target.result;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -414,7 +425,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     setTimeout(() => this.errorMsg = '', 5000);
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.formData.quartier) {
       this.showError("Veuillez sélectionner votre quartier.");
       return;
@@ -433,41 +444,49 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.isUploadingVocal || this.isUploadingImage) {
-      this.showError("Veuillez patienter, les fichiers sont en cours d'envoi...");
-      return;
-    }
-
     this.isSubmitting = true;
     this.errorMsg = '';
 
-    if (this.audioBlob && !this.cloudinaryVocalUrl) {
-      this.isUploadingVocal = true;
-      const fd = new FormData();
-      fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
-      this.http.post<{ success: boolean; url: string }>(`${environment.apiUrl}/upload-audio`, fd).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (res) => {
-          this.isUploadingVocal = false;
-          if (res.success) {
-            this.cloudinaryVocalUrl = res.url;
-            this.submitFinalPayload();
-          } else {
-            this.isSubmitting = false;
-            this.showError("Échec de l'envoi du message vocal. Réessayez.");
-            this.cdr.markForCheck();
-          }
-        },
-        error: () => {
-          this.isUploadingVocal = false;
-          this.isSubmitting = false;
-          this.showError("Erreur réseau lors de l'envoi du message vocal.");
-          this.cdr.markForCheck();
+    try {
+      // 1. Upload audio if needed
+      if (this.audioBlob && !this.cloudinaryVocalUrl) {
+        this.isUploadingVocal = true;
+        this.cdr.markForCheck();
+        const fd = new FormData();
+        fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
+        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-audio`, fd));
+        if (res.success) {
+          this.cloudinaryVocalUrl = res.url;
+        } else {
+          throw new Error("Échec de l'envoi du message vocal.");
         }
-      });
-    } else {
+        this.isUploadingVocal = false;
+      }
+
+      // 2. Upload image if needed
+      if (this.imageBlob && !this.cloudinaryImageUrl) {
+        this.isUploadingImage = true;
+        this.cdr.markForCheck();
+        const fd = new FormData();
+        fd.append('file', this.imageBlob);
+        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+        if (res.success) {
+          this.cloudinaryImageUrl = res.url;
+        } else {
+          throw new Error("Échec de l'envoi de l'image.");
+        }
+        this.isUploadingImage = false;
+      }
+
+      // 3. Submit payload
       this.submitFinalPayload();
+
+    } catch (err: any) {
+      this.isUploadingVocal = false;
+      this.isUploadingImage = false;
+      this.isSubmitting = false;
+      this.showError(err.message || "Erreur réseau lors de l'envoi des fichiers.");
+      this.cdr.markForCheck();
     }
   }
 
@@ -514,9 +533,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.errorMsg = '';
     this.formData = { titre: '', description: '', quartier: '', urgence: 'MOYENNE', nom_citoyen: '', telephone_citoyen: '' };
     this.resetVocal();
-    this.imageBlob = null;
-    this.cloudinaryImageUrl = null;
-    this.imageError = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

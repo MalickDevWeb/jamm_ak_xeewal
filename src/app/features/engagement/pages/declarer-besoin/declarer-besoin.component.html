@@ -11,7 +11,7 @@
       <span class="text-white font-bold">Déclarer un besoin</span>
     </div>
 
-    <h1 class="text-[32px] leading-tight font-black mb-4 flex items-center justify-center gap-3">
+    <h1 class="text-[26px] sm:text-[32px] leading-tight font-black mb-4 flex items-center justify-center gap-2 sm:gap-3 whitespace-nowrap">
       <i class="fa-solid fa-bullhorn text-[#ffb000]"></i>
       <span class="text-white">Signaler un <span class="text-[#ffb000]">Problème</span></span>
     </h1>
@@ -107,15 +107,21 @@
 
               <!-- MODE TEXTE -->
               <ng-container *ngIf="inputMode === 'text'">
-                <div class="border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col relative overflow-hidden focus-within:border-[#022c16]">
-                  <textarea [(ngModel)]="formData.description" name="description" rows="3" placeholder="Décrivez le problème ici..." 
-                            class="w-full bg-transparent border-none focus:ring-0 resize-none text-base font-medium p-4 text-gray-800 placeholder-gray-400"></textarea>
-                  <!-- Toggle vers Vocal -->
-                  <div class="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
-                    <button (click)="inputMode = 'vocal'" type="button" class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-red-500 shadow-sm border border-gray-200">
-                      <i class="fa-solid fa-microphone text-sm"></i>
+                <div class="border border-gray-200 rounded-2xl p-3 bg-white shadow-sm flex flex-col relative transition-all focus-within:border-[#022c16] focus-within:ring-4 focus-within:ring-[#022c16]/5">
+                  
+                  <textarea [(ngModel)]="formData.description" name="description" rows="3" 
+                            placeholder="Décrivez la situation en détail..." 
+                            class="w-full bg-transparent border-none focus:ring-0 resize-none text-[15px] font-medium text-gray-800 placeholder-gray-400 p-2"></textarea>
+                  
+                  <div class="flex justify-between items-center mt-1 border-t border-gray-50 pt-3">
+                    <span class="text-[11px] text-gray-400 font-medium px-2"><i class="fa-solid fa-pen-nib mr-1"></i> Soyez le plus précis possible.</span>
+                    <!-- Toggle vers Vocal -->
+                    <button (click)="inputMode = 'vocal'" type="button" 
+                            class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors border border-red-100 shadow-sm shrink-0">
+                      <i class="fa-solid fa-microphone text-lg"></i>
                     </button>
                   </div>
+                  
                 </div>
               </ng-container>
 
