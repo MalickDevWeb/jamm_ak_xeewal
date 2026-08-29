@@ -376,6 +376,11 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     this.loadBesoins();
   }
 
+  /** Refresh data only (no options reload) - used after actions */
+  refreshData() {
+    this.loadBesoins();
+  }
+
   private loadOptions() {
     this.adminData.getOptions('statut_besoin').pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => { if (res.success) { this.statuts = res.data; this.cdr.markForCheck(); } }

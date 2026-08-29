@@ -117,7 +117,9 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getSondages().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -154,13 +156,13 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.adminData.updateEntity('sondages', id, { statut: 'CLOTURE' }).pipe(
         takeUntil(this.destroy$)
-      ).subscribe(() => this.ngOnInit());
+      ).subscribe(() => this.refreshData());
     } else if (type === 'Supprimer' && id) {
       if (confirm('Supprimer ce sondage ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('sondages', id).pipe(
           takeUntil(this.destroy$)
-        ).subscribe(() => this.ngOnInit());
+        ).subscribe(() => this.refreshData());
       }
     }
   }
@@ -175,7 +177,7 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
     this.showModal = false;
     this.adminData.createEntity('sondages', { question: this.formData.question, options }).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(() => this.ngOnInit());
+    ).subscribe(() => this.refreshData());
   }
 
   ngOnDestroy() {

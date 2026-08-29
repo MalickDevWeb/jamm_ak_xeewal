@@ -96,7 +96,9 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getComptesRendus().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -135,7 +137,7 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         this.adminData.deleteEntity('comptes-rendus', id).pipe(
           takeUntil(this.destroy$)
-        ).subscribe(() => this.ngOnInit());
+        ).subscribe(() => this.refreshData());
       }
     }
   }
@@ -155,7 +157,7 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
       date: new Date().toISOString() 
     }).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(() => this.ngOnInit());
+    ).subscribe(() => this.refreshData());
   }
 
   ngOnDestroy() {

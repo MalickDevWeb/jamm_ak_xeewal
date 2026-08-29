@@ -110,7 +110,9 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
   constructor(private adminData: AdminDataService,
     private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getCommissions().subscribe({
       next: (res: any) => { this.commissions = res.data; this.total = res.total; this.isLoading = false; },
       error: () => { this.isLoading = false; }
@@ -124,13 +126,13 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
     } else if (type === 'Supprimer' && id) {
       if (confirm('Voulez-vous vraiment supprimer cette commission ?')) {
         this.isLoading = true;
-        this.adminData.deleteEntity('commissions', id).subscribe(() => this.ngOnInit());
+        this.adminData.deleteEntity('commissions', id).subscribe(() => this.refreshData());
       }
     } else if (type === 'Éditer' && id) {
       const nouveauNom = prompt('Nouveau nom ?');
       if (nouveauNom) {
         this.isLoading = true;
-        this.adminData.updateEntity('commissions', id, { nom: nouveauNom }).subscribe(() => this.ngOnInit());
+        this.adminData.updateEntity('commissions', id, { nom: nouveauNom }).subscribe(() => this.refreshData());
       }
     } else {
       alert(type + ' : Formulaire en cours de développement.');
@@ -144,7 +146,7 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
-    this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.ngOnInit());
+    this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.refreshData());
   }
 
   ngOnDestroy() {

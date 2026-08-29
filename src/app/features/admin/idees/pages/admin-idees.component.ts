@@ -107,7 +107,9 @@ export class AdminideesComponent implements OnInit, OnDestroy {
   constructor(private adminData: AdminDataService,
     private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getIdees().subscribe({
       next: (res: any) => { this.idees = res.data; this.total = res.total; this.isLoading = false; },
       error: () => { this.isLoading = false; }
@@ -125,14 +127,14 @@ export class AdminideesComponent implements OnInit, OnDestroy {
       this.showModal = true;
     } else if (id && type === 'Approuver') {
       this.isLoading = true;
-      this.adminData.updateEntity('idees', id, { statut: 'VALIDEE' }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('idees', id, { statut: 'VALIDEE' }).subscribe(() => this.refreshData());
     } else if (id && type === 'Rejeter') {
       this.isLoading = true;
-      this.adminData.updateEntity('idees', id, { statut: 'REJETEE' }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('idees', id, { statut: 'REJETEE' }).subscribe(() => this.refreshData());
     } else if (id && type === 'Supprimer') {
       if (confirm('Voulez-vous vraiment supprimer cette idée ?')) {
         this.isLoading = true;
-        this.adminData.deleteEntity('idees', id).subscribe(() => this.ngOnInit());
+        this.adminData.deleteEntity('idees', id).subscribe(() => this.refreshData());
       }
     }
   }
@@ -151,7 +153,7 @@ export class AdminideesComponent implements OnInit, OnDestroy {
       statut: 'NOUVELLE',
       votes: 0,
       createdAt: new Date().toISOString()
-    }).subscribe(() => this.ngOnInit());
+    }).subscribe(() => this.refreshData());
   }
 
   ngOnDestroy() {

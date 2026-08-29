@@ -132,7 +132,9 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   constructor(private adminData: AdminDataService,
     private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getAdherents().subscribe({
       next: (res: any) => { this.adherents = res.data; this.total = res.total; this.isLoading = false; },
       error: () => { this.isLoading = false; }
@@ -155,11 +157,11 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     } else if (type === 'Supprimer' && id) {
       if (confirm('Voulez-vous vraiment supprimer cet adhérent ?')) {
         this.isLoading = true;
-        this.adminData.deleteEntity('adherents', id).subscribe(() => this.ngOnInit());
+        this.adminData.deleteEntity('adherents', id).subscribe(() => this.refreshData());
       }
     } else if (type === 'Valider' && id) {
       this.isLoading = true;
-      this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe(() => this.ngOnInit());
+      this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe(() => this.refreshData());
     } else {
       alert(type + ' : Formulaire en cours de développement.');
     }
@@ -172,7 +174,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
-    this.adminData.createEntity('adherents', this.formData).subscribe(() => this.ngOnInit());
+    this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
   }
 
   ngOnDestroy() {

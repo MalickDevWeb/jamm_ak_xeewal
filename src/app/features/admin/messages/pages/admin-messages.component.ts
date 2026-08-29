@@ -72,7 +72,9 @@ export class AdminmessagesComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit() { this.refreshData(); }
+
+  refreshData() {
     this.adminData.getMessages().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -99,13 +101,13 @@ export class AdminmessagesComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.adminData.updateEntity('messages', id, { lu: true }).pipe(
         takeUntil(this.destroy$)
-      ).subscribe(() => this.ngOnInit());
+      ).subscribe(() => this.refreshData());
     } else if (type === 'Supprimer') {
       if (confirm('Supprimer ce message ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('messages', id).pipe(
           takeUntil(this.destroy$)
-        ).subscribe(() => this.ngOnInit());
+        ).subscribe(() => this.refreshData());
       }
     } else if (type === 'Répondre') {
       alert('La fonctionnalité d\'envoi d\'email (Répondre) est en cours d\'intégration.');
