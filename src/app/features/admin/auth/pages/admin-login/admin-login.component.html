@@ -1,81 +1,86 @@
-<div class="min-h-screen bg-[#022c16] flex items-center justify-center relative overflow-hidden">
-    <!-- Image de fond en plein écran -->
-    <div class="absolute inset-0 bg-[url('assets/image.png')] bg-cover bg-center md:bg-right bg-no-repeat"></div>
-    
-    <!-- Overlay léger pour mobile afin de s'assurer que le formulaire soit lisible si l'image est zoomée -->
-    <div class="absolute inset-0 bg-black/30 md:bg-transparent"></div>
-
-    <!-- Conteneur du formulaire aligné sur la droite et décalé de 95px vers la droite, 30px vers le bas -->
-    <div class="relative z-10 w-full max-w-[465px] px-6 md:ml-auto md:mr-[8%] lg:mr-[10%] translate-x-[95px] translate-y-[30px]">
-
-        <!-- Wrapper de l'animation Serpent Magnifique (Glow Edition) -->
-        <div class="relative rounded-[2.5rem] overflow-hidden p-[5px] shadow-[0_20px_50px_rgba(2,44,22,0.4)]">
-            
-            <!-- Fond statique de la bordure (gris clair subtil) -->
-            <div class="absolute inset-0 bg-gray-100"></div>
-
-            <!-- Serpent 1 (Queue d'Or avec effet néon) -->
-            <div class="absolute -inset-[100%] bg-[conic-gradient(from_0deg,transparent_60%,#facc15_95%,#fef08a_100%)] animate-[spin_3s_linear_infinite] blur-[2px]"></div>
-            
-            <!-- Serpent 2 (Vert Profond) -->
-            <div class="absolute -inset-[100%] bg-[conic-gradient(from_180deg,transparent_60%,#022c16_95%,#22c55e_100%)] animate-[spin_3s_linear_infinite] blur-[2px]"></div>
-
-            <!-- Carte Formulaire -->
-            <div class="relative z-10 bg-white p-8 sm:p-10 rounded-[2.4rem] w-full min-h-[525px] flex flex-col justify-center">
-
-                <!-- Icône d'utilisateur (similaire à celle sur l'image) -->
-                <div class="flex justify-center mb-8 relative group">
-                    <div class="w-16 h-16 bg-[#e6f4ea] rounded-3xl flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-110">
-                        <i class="fa-solid fa-user text-[#022c16] text-2xl"></i>
-                    </div>
-                </div>
-
-                <!-- Affichage des erreurs -->
-                <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 animate-fade-in">
-                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
-                    <p class="text-sm text-red-600 font-medium">{{ errorMessage }}</p>
-                </div>
-
-                <form class="space-y-6" (submit)="onSubmit($event)">
-                    
-                    <!-- Email -->
-                    <div>
-                        <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#022c16] transition-colors">
-                                <i class="fa-solid fa-envelope"></i>
-                            </div>
-                            <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="Email"
-                                   class="block w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#facc15] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
-                        </div>
-                    </div>
-
-                    <!-- Mot de passe -->
-                    <div>
-                        <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#022c16] transition-colors">
-                                <i class="fa-solid fa-lock"></i>
-                            </div>
-                            
-                            <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" required placeholder="Mot de passe"
-                                   class="block w-full pl-12 pr-12 py-4 border-2 border-gray-100 rounded-2xl focus:ring-0 focus:border-[#facc15] text-base font-medium transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder-gray-400">
-                            
-                            <!-- Bouton Afficher/Masquer -->
-                            <button type="button" (click)="togglePassword()" tabindex="-1"
-                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#022c16] transition-colors outline-none">
-                                <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Bouton de connexion -->
-                    <button type="submit" [disabled]="isLoading"
-                            class="w-full py-4 px-6 rounded-2xl shadow-lg shadow-[#022c16]/30 text-white bg-[#022c16] hover:bg-[#034423] focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-[#022c16]/50 font-black text-lg transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed mt-8 uppercase tracking-wide group overflow-hidden relative">
-                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
-                        <span *ngIf="!isLoading" class="relative z-10 flex items-center gap-2">Se connecter <i class="fa-solid fa-arrow-right-to-bracket text-sm opacity-80"></i></span>
-                        <i *ngIf="isLoading" class="fa-solid fa-circle-notch fa-spin relative z-10"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 flex items-center justify-center p-4">
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  </div>
+  
+  <div class="relative w-full max-w-md">
+    <!-- Logo & Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/30 mb-4">
+        <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-white mb-1">JÀMM AK XÉEWAL</h1>
+      <p class="text-slate-400 text-sm">Panneau d'administration</p>
     </div>
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
+      <form (submit)="onSubmit($event)" class="space-y-5">
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fa-regular fa-envelope text-slate-400"></i>
+            </div>
+            <input 
+              type="email" 
+              [(ngModel)]="email" 
+              name="email"
+              required
+              placeholder="admin@jammakxeewal.org"
+              class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fa-solid fa-lock text-slate-400"></i>
+            </div>
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              [(ngModel)]="password" 
+              name="password"
+              required
+              placeholder="••••••••"
+              class="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+            <button 
+              type="button"
+              (click)="togglePassword()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <i [class]="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl">
+          <i class="fa-solid fa-circle-exclamation text-red-500 text-sm"></i>
+          <span class="text-sm text-red-600">{{ errorMessage }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          [disabled]="isLoading"
+          class="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25"
+        >
+          <i *ngIf="isLoading" class="fa-solid fa-circle-notch fa-spin"></i>
+          <span>{{ isLoading ? 'Connexion...' : 'Se connecter' }}</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-slate-500 text-xs mt-6">
+      © 2026 JÀMM AK XÉEWAL — Tous droits réservés
+    </p>
+  </div>
 </div>
