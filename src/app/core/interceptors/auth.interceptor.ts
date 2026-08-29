@@ -1,15 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Try to get token from localStorage (AuthService sets it as 'token')
-  let token = null;
-  if (typeof window !== 'undefined') {
-    // Basic check for browser context
-    token = localStorage.getItem('admin_token');
-  }
+  // Only add auth token for /api/v1/admin/* and /admin/* routes
+  // NOT for public endpoints (besoins, adherents, options, etc.)
+  const isAdminRoute = req.url.includes('/admin/') || 
+                       req.url.includes('/api/v1/admin/') ||
+                       req.url.includes('dashboard');
 
-  // If token exists, clone request and add authorization header
-  if (token) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+
+  if (token && isAdminRoute) {
     const authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
@@ -18,6 +18,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(authReq);
   }
 
-  // Otherwise, pass original request
   return next(req);
 };
