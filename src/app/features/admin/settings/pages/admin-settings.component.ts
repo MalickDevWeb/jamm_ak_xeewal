@@ -150,6 +150,100 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
         </div>
 
+        <!-- ═══════════════════════════════════════════
+             DURÉE DES MESSAGES VOCAUX
+        ═══════════════════════════════════════════ -->
+        <div class="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-6 relative overflow-hidden">
+          <!-- Badge -->
+          <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-purple-200">
+            Signalements
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs"><i class="fa-solid fa-microphone"></i></div>
+            Durée Max des Messages Vocaux
+          </h3>
+          <p class="text-xs text-gray-400 mb-5 ml-9">
+            Définissez le nombre de secondes maximum qu'un citoyen peut enregistrer lors d'un signalement vocal.
+            Cette limite s'applique en temps réel sur le formulaire public.
+          </p>
+
+          <!-- Valeur affichée en grand -->
+          <div class="flex items-center justify-center mb-5">
+            <div class="bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl px-8 py-4 text-center shadow-lg shadow-purple-200">
+              <p class="text-4xl font-black font-mono tracking-widest">{{ vocalMaxFormatted }}</p>
+              <p class="text-purple-200 text-xs mt-1 font-medium">{{ settings.vocal_max_seconds }} secondes</p>
+            </div>
+          </div>
+
+          <!-- Slider -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center justify-between">
+              <span><i class="fa-solid fa-sliders mr-1 text-purple-500"></i> Glissez pour ajuster</span>
+              <span class="font-mono text-purple-600 font-black text-base">{{ settings.vocal_max_seconds }}s</span>
+            </label>
+            <input
+              type="range"
+              [(ngModel)]="settings.vocal_max_seconds"
+              min="15"
+              max="300"
+              step="5"
+              id="vocal-duration-slider"
+              class="w-full h-3 rounded-full appearance-none cursor-pointer"
+              style="accent-color: #7c3aed;"
+            >
+            <div class="flex justify-between text-[10px] text-gray-400 mt-1 font-mono">
+              <span>15s</span>
+              <span>1min</span>
+              <span>2min</span>
+              <span>3min</span>
+              <span>5min</span>
+            </div>
+          </div>
+
+          <!-- Input numérique direct -->
+          <div class="flex items-center gap-3 mb-5">
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Ou saisissez directement (en secondes)</label>
+              <div class="flex items-center border-2 border-purple-200 rounded-xl overflow-hidden focus-within:border-purple-500 transition-all">
+                <button type="button"
+                        (click)="settings.vocal_max_seconds = Math.max(15, +settings.vocal_max_seconds - 5)"
+                        class="px-3 py-2.5 bg-purple-50 text-purple-600 font-black hover:bg-purple-100 transition-colors text-lg">−</button>
+                <input
+                  type="number"
+                  [(ngModel)]="settings.vocal_max_seconds"
+                  min="15" max="300"
+                  id="vocal-duration-input"
+                  class="flex-1 px-3 py-2.5 text-center font-black text-gray-800 text-base focus:outline-none bg-white">
+                <button type="button"
+                        (click)="settings.vocal_max_seconds = Math.min(300, +settings.vocal_max_seconds + 5)"
+                        class="px-3 py-2.5 bg-purple-50 text-purple-600 font-black hover:bg-purple-100 transition-colors text-lg">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Presets rapides -->
+          <div>
+            <p class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Durées prédéfinies</p>
+            <div class="grid grid-cols-4 gap-2">
+              <button type="button"
+                      *ngFor="let preset of [{label:'30s', val:30},{label:'1 min', val:60},{label:'2 min', val:120},{label:'3 min', val:180}]"
+                      (click)="settings.vocal_max_seconds = preset.val"
+                      class="py-2 rounded-xl text-xs font-black border-2 transition-all"
+                      [ngClass]="settings.vocal_max_seconds == preset.val
+                        ? 'bg-purple-600 border-purple-600 text-white shadow-md'
+                        : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'">
+                {{ preset.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <p class="text-[11px] text-gray-400 mt-4 flex items-start gap-1.5">
+            <i class="fa-solid fa-circle-info text-purple-400 shrink-0 mt-0.5"></i>
+            Les citoyens verront un décompte en temps réel lors de l'enregistrement. L'enregistrement s'arrête automatiquement à la limite fixée.
+          </p>
+        </div>
+
         <!-- Sécurité -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
@@ -233,6 +327,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   `
 })
 export class AdminSettingsComponent implements OnInit {
+  readonly Math = Math;
   saved = false;
   isLoading = true;
   isSaving = false;
@@ -247,10 +342,18 @@ export class AdminSettingsComponent implements OnInit {
     facebook: '#',
     tiktok: '#',
     qr_code_url: '',
+    vocal_max_seconds: 120,
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   };
+
+  get vocalMaxFormatted(): string {
+    const secs = +this.settings.vocal_max_seconds || 120;
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
 
   constructor(private adminData: AdminDataService) {}
 
@@ -259,9 +362,12 @@ export class AdminSettingsComponent implements OnInit {
       next: (res: any) => {
         if (res.data && Object.keys(res.data).length > 0) {
           this.settings = { ...this.settings, ...res.data };
+          // S'assurer que vocal_max_seconds est un nombre
+          if (this.settings.vocal_max_seconds) {
+            this.settings.vocal_max_seconds = +this.settings.vocal_max_seconds;
+          }
         }
         this.isLoading = false;
-        // Générer l'aperçu QR si une URL est déjà enregistrée
         if (this.settings.qr_code_url) {
           this.buildPreviewQr(this.settings.qr_code_url);
         }

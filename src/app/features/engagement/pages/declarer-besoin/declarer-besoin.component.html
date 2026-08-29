@@ -1,5 +1,4 @@
 
-        
     <!-- Premium Internal Hero -->
     <div class="relative bg-brand-dark overflow-hidden pt-8 pb-14 md:pt-10 md:pb-20 border-b border-brand-green/20">
         <!-- Background effects -->
@@ -42,7 +41,6 @@
             
             <!-- Ligne Verticale (Timeline) -->
             <div class="absolute left-6 md:left-8 top-12 bottom-32 w-1.5 bg-gray-200 rounded-full z-0 hidden md:block"></div>
-            <!-- Ligne de complétion (décorative) -->
             <div class="absolute left-6 md:left-8 top-12 h-[50%] w-1.5 bg-gradient-to-b from-brand-yellow to-brand-green rounded-full z-0 hidden md:block opacity-50"></div>
 
             <!-- Étape 1 : Le Besoin -->
@@ -58,16 +56,169 @@
                     </h3>
                     
                     <div class="space-y-6">
+                        <!-- === SECTION VOCALE === -->
                         <div>
-                            <label class="block text-gray-800 font-extrabold mb-3 text-sm uppercase tracking-wide">Expliquez-nous le problème <span class="text-red-500">*</span></label>
-                            
-                            <!-- Text Input Container (Hidden by default) -->
-                            <div class="w-full transition-all relative">
-                                <textarea name="description" [(ngModel)]="formData.description" required rows="2" class="w-full border border-gray-200 rounded-xl p-3 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green text-sm transition-all resize-none placeholder-gray-400" placeholder="Décrivez la situation en détail..."></textarea>
+                            <label class="block text-gray-800 font-extrabold mb-3 text-sm uppercase tracking-wide">
+                                Expliquez-nous le problème <span class="text-red-500">*</span>
+                                <span class="ml-2 text-gray-400 font-normal normal-case text-xs">(vocal ou écrit)</span>
+                            </label>
+
+                            <!-- ÉTAT : IDLE - Bouton démarrer -->
+                            <div *ngIf="recordingState === 'idle' && !audioUrl"
+                                 class="border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 overflow-hidden">
+                                
+                                <!-- Zone microphone principale -->
+                                <button type="button" id="btn-start-recording"
+                                        (click)="startRecording()"
+                                        class="w-full flex items-center gap-4 p-4 hover:bg-brand-green/5 transition-all group/mic">
+                                    <div class="w-14 h-14 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center text-red-500 text-2xl group-hover/mic:bg-red-500 group-hover/mic:text-white group-hover/mic:border-red-500 group-hover/mic:scale-110 transition-all shadow-sm">
+                                        <i class="fa-solid fa-microphone"></i>
+                                    </div>
+                                    <div class="text-left flex-1">
+                                        <p class="font-black text-gray-800 text-base group-hover/mic:text-brand-green transition-colors">Appuyez pour parler</p>
+                                        <p class="text-gray-400 text-xs mt-0.5">Wolof ou Français · max 2 minutes</p>
+                                    </div>
+                                    <span class="shrink-0 bg-gray-100 text-gray-500 font-bold text-xs px-3 py-1.5 rounded-full group-hover/mic:bg-brand-green group-hover/mic:text-white transition-all">
+                                        <i class="fa-solid fa-microphone mr-1"></i>Enregistrer
+                                    </span>
+                                </button>
+
+                                <!-- Séparateur -->
+                                <div class="relative flex items-center gap-3 px-4 py-2">
+                                    <div class="flex-1 h-px bg-gray-200"></div>
+                                    <span class="text-xs text-gray-400 font-bold">OU</span>
+                                    <div class="flex-1 h-px bg-gray-200"></div>
+                                </div>
+
+                                <!-- Zone texte -->
+                                <div class="px-4 pb-4">
+                                    <textarea id="description-textarea" name="description"
+                                              [(ngModel)]="formData.description"
+                                              rows="3"
+                                              class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:outline-none focus:border-brand-green text-sm transition-all resize-none placeholder-gray-400"
+                                              placeholder="Écrivez votre problème ici..."></textarea>
+                                </div>
                             </div>
+
+                            <!-- ÉTAT : EN COURS D'ENREGISTREMENT (Style WhatsApp) -->
+                            <div *ngIf="recordingState === 'recording' || recordingState === 'paused'"
+                                 class="flex items-center justify-between bg-white border-2 border-brand-green/30 shadow-[0_0_15px_rgba(0,141,54,0.1)] rounded-full px-4 py-3 transition-all animate-fade-in-up">
+                                
+                                <!-- Bouton Annuler (Corbeille) -->
+                                <button type="button" (click)="resetVocal()"
+                                        title="Annuler l'enregistrement"
+                                        class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0">
+                                    <i class="fa-solid fa-trash-can text-lg"></i>
+                                </button>
+
+                                <!-- Zone Centrale : Temps et Animation -->
+                                <div class="flex items-center gap-3 flex-1 justify-center overflow-hidden">
+                                    <!-- Point rouge pulsant si recording -->
+                                    <div class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                                         [ngClass]="recordingState === 'recording' ? 'animate-pulse' : 'opacity-30'">
+                                    </div>
+                                    
+                                    <!-- Temps écoulé -->
+                                    <span class="font-mono text-xl font-black text-gray-800 text-center tracking-wider"
+                                          [ngClass]="remainingTime <= 10 ? 'text-red-500 animate-pulse' : ''">
+                                        {{ recordingTimeFormatted }}
+                                    </span>
+                                    
+                                    <!-- Onde animée (simulée avec CSS) -->
+                                    <div class="flex items-center gap-1 h-8" *ngIf="recordingState === 'recording'">
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_0.8s_ease-in-out_infinite]" style="height: 40%"></div>
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_1s_ease-in-out_infinite_0.2s]" style="height: 80%"></div>
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_0.9s_ease-in-out_infinite_0.4s]" style="height: 60%"></div>
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_1.2s_ease-in-out_infinite_0.1s]" style="height: 100%"></div>
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_0.8s_ease-in-out_infinite_0.5s]" style="height: 50%"></div>
+                                        <div class="w-1 bg-brand-green rounded-full animate-[pulse_1.1s_ease-in-out_infinite_0.3s]" style="height: 70%"></div>
+                                    </div>
+                                    <!-- Barre fixe si en pause -->
+                                    <div class="flex items-center gap-1 h-8" *ngIf="recordingState === 'paused'">
+                                        <div class="w-1 bg-gray-300 rounded-full h-2"></div>
+                                        <div class="w-1 bg-gray-300 rounded-full h-2"></div>
+                                        <div class="w-1 bg-gray-300 rounded-full h-2"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Actions : Pause / Confirmer -->
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button type="button" (click)="recordingState === 'recording' ? pauseRecording() : resumeRecording()"
+                                            [title]="recordingState === 'recording' ? 'Mettre en pause' : 'Reprendre'"
+                                            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-green hover:bg-brand-green/10 rounded-full transition-colors">
+                                        <i [class]="recordingState === 'recording' ? 'fa-solid fa-pause text-lg' : 'fa-solid fa-play text-lg'"></i>
+                                    </button>
+                                    
+                                    <!-- Bouton Terminer (Confirmer) -->
+                                    <button type="button" (click)="stopRecording()"
+                                            title="Terminer l'enregistrement"
+                                            class="w-10 h-10 flex items-center justify-center bg-brand-green text-white rounded-full hover:bg-green-600 transition-transform hover:scale-110 shadow-md">
+                                        <i class="fa-solid fa-check text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+                            <!-- ÉTAT : TERMINÉ - Aperçu + Upload -->
+                            <div *ngIf="recordingState === 'done' && audioUrl"
+                                 class="border-2 rounded-2xl overflow-hidden"
+                                 [ngClass]="cloudinaryVocalUrl ? 'border-brand-green bg-green-50/30' : 'border-gray-200 bg-gray-50'">
+
+                                <!-- En-tête statut -->
+                                <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm shadow shrink-0"
+                                         [ngClass]="isUploadingVocal ? 'bg-brand-yellow animate-pulse' : cloudinaryVocalUrl ? 'bg-brand-green' : 'bg-gray-400'">
+                                        <i *ngIf="!isUploadingVocal && !cloudinaryVocalUrl" class="fa-solid fa-microphone-slash"></i>
+                                        <i *ngIf="isUploadingVocal" class="fa-solid fa-circle-notch fa-spin"></i>
+                                        <i *ngIf="!isUploadingVocal && cloudinaryVocalUrl" class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-black text-sm text-gray-800">
+                                            Message vocal enregistré
+                                            <span class="font-mono text-xs text-gray-400 ml-1">({{ recordingTimeFormatted }})</span>
+                                        </p>
+                                        <p class="text-xs mt-0.5"
+                                           [ngClass]="isUploadingVocal ? 'text-brand-yellow' : cloudinaryVocalUrl ? 'text-brand-green font-semibold' : 'text-gray-400'">
+                                            <span *ngIf="isUploadingVocal"><i class="fa-solid fa-cloud-arrow-up mr-1"></i>Envoi vers Cloudinary...</span>
+                                            <span *ngIf="!isUploadingVocal && cloudinaryVocalUrl"><i class="fa-solid fa-cloud-check mr-1"></i>Sauvegardé sur Cloudinary ✓</span>
+                                            <span *ngIf="!isUploadingVocal && !cloudinaryVocalUrl && !vocalError">Prêt à être joint au signalement</span>
+                                        </p>
+                                    </div>
+                                    <button type="button" (click)="resetVocal()" title="Recommencer"
+                                            class="shrink-0 w-8 h-8 rounded-full bg-red-100 hover:bg-red-500 text-red-400 hover:text-white flex items-center justify-center transition-all">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Lecteur audio natif -->
+                                <div class="px-4 py-3">
+                                    <audio id="vocal-preview-player" [src]="audioUrl" controls class="w-full h-10 rounded-xl" style="accent-color: #008d36;"></audio>
+                                </div>
+
+                                <!-- Option : ajouter du texte en plus -->
+                                <div class="px-4 pb-4 border-t border-gray-100 pt-3">
+                                    <p class="text-xs text-gray-500 font-medium mb-2"><i class="fa-solid fa-pen mr-1"></i> Ajouter une description écrite (optionnel)</p>
+                                    <textarea name="description-vocal"
+                                              [(ngModel)]="formData.description"
+                                              rows="2"
+                                              class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:outline-none focus:border-brand-green text-sm transition-all resize-none placeholder-gray-400"
+                                              placeholder="Complétez si besoin..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Erreur vocale -->
+                            <p *ngIf="vocalError" class="mt-2 text-xs text-red-500 font-medium flex items-start gap-1.5">
+                                <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i> {{ vocalError }}
+                            </p>
                         </div>
                         
                         <div class="grid grid-cols-1 gap-4 pt-3 border-t border-gray-100">
+                            <!-- Localité -->
+                            <div>
+                                <label for="localite" class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Localité / Ville <span class="text-gray-400 font-normal lowercase">(optionnel)</span></label>
+                                <input id="localite" name="localite" type="text" [(ngModel)]="formData.localite" class="w-full border-2 border-gray-100 rounded-xl p-3 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/20 text-base transition-all" placeholder="Thiès, Dakar, etc.">
+                            </div>
                             <div>
                                 <label for="quartier" class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Dans quel quartier ? <span class="text-red-500">*</span></label>
                                 <div class="relative">
@@ -121,16 +272,26 @@
 
             <!-- Bouton -->
             <div class="md:ml-16 mt-2 relative z-10">
-                <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-50">
-                    <span *ngIf="!isSubmitting">Envoyer le signalement <i class="fa-solid fa-paper-plane text-xl"></i></span>
-                    <span *ngIf="isSubmitting"><i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...</span>
+                <button type="submit" id="btn-submit-signalement" [disabled]="isSubmitting || isUploadingVocal" class="w-full bg-gradient-to-r from-brand-yellow to-yellow-400 text-brand-dark text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all transform hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:hover:translate-y-0">
+                    <span *ngIf="!isSubmitting && !isUploadingVocal">Envoyer le signalement <i class="fa-solid fa-paper-plane text-xl"></i></span>
+                    <span *ngIf="isUploadingVocal"><i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Envoi du vocal...</span>
+                    <span *ngIf="isSubmitting && !isUploadingVocal"><i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...</span>
                 </button>
+                <p class="text-center text-xs font-medium text-gray-500 mt-3">
+                    <i class="fa-solid fa-lock text-brand-green mr-1"></i> Données sécurisées. Message vocal stocké sur Cloudinary.
+                </p>
             </div>
         </form>
 
-        <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-6 rounded-2xl text-center" *ngIf="success">
-            <h3 class="text-2xl font-black text-gray-900 mb-2">Signalement Envoyé !</h3>
-            <p class="text-gray-600">Votre besoin a bien été transmis. Nous allons l'étudier rapidement.</p>
+        <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-8 rounded-3xl text-center shadow-lg animate-fade-in-up" *ngIf="success">
+            <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+                <i class="fa-solid fa-bullhorn"></i>
+            </div>
+            <h3 class="text-3xl font-black text-gray-900 mb-3">Signalement Envoyé !</h3>
+            <p class="text-gray-600 text-lg font-medium mb-6">Votre besoin a bien été transmis. Nous allons l'étudier rapidement.</p>
+            <button (click)="resetForm()" type="button" class="px-6 py-3 bg-[#022c16] text-white font-bold rounded-xl shadow-md hover:bg-[#022c16]/90 transition-colors inline-flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Signaler un autre problème
+            </button>
         </div>
 
     </div>

@@ -32,7 +32,7 @@ export class ContactComponent {
   }
 
   onSubmit() {
-    if (!this.formData.nom || !this.formData.message) {
+    if (!this.formData.nom || !this.formData.sujet || !this.formData.message) {
       this.showError("Veuillez remplir votre nom et votre message.");
       return;
     }
@@ -57,5 +57,12 @@ export class ContactComponent {
         this.showError("Erreur d'envoi. Veuillez réessayer.");
       }
     });
+  }
+
+  resetForm() {
+    this.success = false;
+    this.errorMsg = '';
+    this.formData = { nom: '', email: '', telephone: '', sujet: '', message: '' };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

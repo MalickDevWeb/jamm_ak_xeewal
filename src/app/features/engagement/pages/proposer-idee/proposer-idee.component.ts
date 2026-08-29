@@ -58,4 +58,11 @@ export class ProposerIdeeComponent {
       }
     });
   }
+
+  resetForm() {
+    this.success = false;
+    this.errorMsg = '';
+    this.formData = { titre: '', axe_concerne: 'Éducation et formation', description: '', nom_citoyen: 'Anonyme', telephone_citoyen: '' };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }

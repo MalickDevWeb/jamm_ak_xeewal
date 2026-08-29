@@ -39,7 +39,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative -mt-8 md:-mt-12 pb-16">
         
         <!-- Formulaire avec Timeline Verticale -->
-        <form class="relative max-w-3xl mx-auto" id="adhesion-form" (ngSubmit)="onSubmit()">
+        <form class="relative max-w-3xl mx-auto" id="adhesion-form" (ngSubmit)="onSubmit()" *ngIf="!success">
             
             <!-- Ligne Verticale (Timeline) -->
             <div class="absolute left-6 md:left-8 top-8 bottom-24 w-1 bg-gray-200 rounded-full z-0 hidden md:block"></div>
@@ -89,14 +89,134 @@
                 </div>
             </div>
 
-            <!-- Étape 2 : Motivation -->
+            <!-- Étape 2 : Carte d'Identité -->
             <div class="relative mb-6 group" id="step-container-2">
                 <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">2</div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+                    <div class="p-5 md:p-6 flex items-center justify-between">
+                        <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">2</span>
+                            Carte d'Identité
+                            <span class="text-red-500 text-lg leading-none">*</span>
+                        </h3>
+                    </div>
+
+                    <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
+                        <p class="text-sm text-gray-500 font-medium mt-4 mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-brand-green"></i>
+                            Photographiez les deux faces de votre pièce d'identité nationale. Données chiffrées et sécurisées.
+                        </p>
+
+                        <!-- Inputs fichiers cachés -->
+                        <input #rectoInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-file-input" (change)="onRectoSelected($event)">
+                        <input #versoInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-file-input" (change)="onVersoSelected($event)">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <!-- Recto -->
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
+                                    <i class="fa-regular fa-id-card mr-1 text-brand-green"></i> Face Avant (Recto)
+                                </label>
+
+                                <!-- Zone de drop / upload (sans preview) -->
+                                <div *ngIf="!carteRectoBase64"
+                                     (click)="triggerRectoUpload()"
+                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
+                                     [ngClass]="rectoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
+                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
+                                        <i class="fa-regular fa-id-card"></i>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Recto</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Face avant · JPG, PNG · max 5 Mo</p>
+                                    </div>
+                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
+                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
+                                    </span>
+                                </div>
+
+                                <!-- Aperçu après sélection -->
+                                <div *ngIf="carteRectoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md">
+                                    <img [src]="carteRectoBase64" alt="Recto carte d'identité" class="w-full h-44 object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                                            <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
+                                            <span class="text-white text-xs font-bold truncate">{{ carteRectoName }}</span>
+                                        </div>
+                                        <button type="button" (click)="removeRecto()" title="Supprimer"
+                                                class="shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg">
+                                            <i class="fa-solid fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow">✓ Recto</div>
+                                </div>
+
+                                <!-- Erreur Recto -->
+                                <p *ngIf="rectoError" class="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> {{ rectoError }}
+                                </p>
+                            </div>
+
+                            <!-- Verso -->
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
+                                    <i class="fa-solid fa-rotate-180 mr-1 text-brand-green"></i> Face Arrière (Verso)
+                                </label>
+
+                                <!-- Zone de drop / upload (sans preview) -->
+                                <div *ngIf="!carteVersoBase64"
+                                     (click)="triggerVersoUpload()"
+                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
+                                     [ngClass]="versoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
+                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
+                                        <i class="fa-solid fa-id-card-clip"></i>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Verso</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Face arrière · JPG, PNG · max 5 Mo</p>
+                                    </div>
+                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
+                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
+                                    </span>
+                                </div>
+
+                                <!-- Aperçu après sélection -->
+                                <div *ngIf="carteVersoBase64" class="relative rounded-2xl overflow-hidden border-2 border-brand-green shadow-md">
+                                    <img [src]="carteVersoBase64" alt="Verso carte d'identité" class="w-full h-44 object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                                            <i class="fa-solid fa-circle-check text-green-400 text-lg shrink-0"></i>
+                                            <span class="text-white text-xs font-bold truncate">{{ carteVersoName }}</span>
+                                        </div>
+                                        <button type="button" (click)="removeVerso()" title="Supprimer"
+                                                class="shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg">
+                                            <i class="fa-solid fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <div class="absolute top-2 left-2 bg-brand-green text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow">✓ Verso</div>
+                                </div>
+
+                                <!-- Erreur Verso -->
+                                <p *ngIf="versoError" class="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> {{ versoError }}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 3 : Motivation -->
+            <div class="relative mb-6 group" id="step-container-3">
+                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">3</div>
                 
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
                     <div class="p-5 md:p-6 flex items-center justify-between">
                         <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">2</span> 
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">3</span>
                             Votre Motivation <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
                         </h3>
                     </div>
@@ -111,14 +231,14 @@
                 </div>
             </div>
 
-            <!-- Étape 3 : Engagement -->
-            <div class="relative mb-6 group" id="step-container-3">
-                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">3</div>
+            <!-- Étape 4 : Engagement -->
+            <div class="relative mb-6 group" id="step-container-4">
+                <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">4</div>
 
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
                     <div class="p-5 md:p-6 flex items-center justify-between">
                         <h3 class="text-lg md:text-xl font-black text-brand-dark flex items-center gap-3 m-0">
-                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">3</span> 
+                            <span class="md:hidden bg-brand-yellow text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">4</span>
                             Votre Engagement <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
                         </h3>
                     </div>
@@ -189,14 +309,17 @@
                 <p class="text-center text-xs font-medium text-gray-500 mt-4"><i class="fa-solid fa-lock text-brand-green mr-1"></i> Données sécurisées.</p>
             </div>
 
-            <!-- Success Message -->
-            <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-6 rounded-2xl text-center" *ngIf="success">
-                <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                    <i class="fa-solid fa-check"></i>
-                </div>
-                <h3 class="text-2xl font-black text-gray-900 mb-2">Félicitations !</h3>
-                <p class="text-gray-600">Votre demande d'adhésion a bien été envoyée au mouvement JÀMM AK XÉEWAL.</p>
-            </div>
-            
         </form>
+
+        <!-- Success Message (Hors du formulaire pour qu'il reste visible) -->
+        <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-8 rounded-3xl text-center shadow-lg animate-fade-in-up" *ngIf="success">
+            <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 class="text-3xl font-black text-gray-900 mb-3">Félicitations !</h3>
+            <p class="text-gray-600 text-lg font-medium mb-6">Votre demande d'adhésion a bien été envoyée au mouvement JÀMM AK XÉEWAL.</p>
+            <button (click)="resetForm()" type="button" class="px-6 py-3 bg-[#022c16] text-white font-bold rounded-xl shadow-md hover:bg-[#022c16]/90 transition-colors inline-flex items-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> Inscrire une autre personne
+            </button>
+        </div>
     </div>

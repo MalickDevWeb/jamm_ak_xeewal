@@ -35,9 +35,15 @@
                     <span *ngIf="isSubmitting">Envoi en cours...</span>
                 </button>
             </form>
-            <div class="bg-green-50 border-2 border-green-500 p-6 rounded-2xl text-center" *ngIf="success">
-                <h3 class="text-2xl font-black text-gray-900 mb-2">Idée Envoyée !</h3>
-                <p class="text-gray-600">Merci de votre contribution, votre idée a bien été reçue par l'équipe JÀMM AK XÉEWAL.</p>
+            <div class="bg-green-50 border-2 border-green-500 p-8 rounded-3xl text-center shadow-lg animate-fade-in-up" *ngIf="success">
+                <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <h3 class="text-3xl font-black text-gray-900 mb-3">Idée Envoyée !</h3>
+                <p class="text-gray-600 text-lg font-medium mb-6">Merci de votre contribution, votre idée a bien été reçue par l'équipe JÀMM AK XÉEWAL.</p>
+                <button (click)="resetForm()" type="button" class="px-6 py-3 bg-[#022c16] text-white font-bold rounded-xl shadow-md hover:bg-[#022c16]/90 transition-colors inline-flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Proposer une autre idée
+                </button>
             </div>
         </div>
     

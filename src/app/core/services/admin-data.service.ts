@@ -4,6 +4,15 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
+export interface Option {
+  id: string;
+  type: string;
+  value: string;
+  label: string;
+  ordre: number;
+  actif: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
   private apiUrl = environment.apiUrl;
@@ -39,12 +48,27 @@ export class AdminDataService {
   getSettings(): Observable<any> { return this.http.get(`${this.apiUrl}/settings`); }
   saveSettings(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/settings`, data); }
 
-   // --- Auth / Password ---
-   changePassword(currentPassword: string, newPassword: string): Observable<any> {
-     return this.http.post(`${this.apiUrl}/auth/change-password`, { currentPassword, newPassword });
-   }
+  // --- Auth / Password ---
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/change-password`, { currentPassword, newPassword });
+  }
 
   // --- Editorial ---
   getEditorial(page: string): Observable<any> { return this.http.get(`${this.apiUrl}/editorial?page=${page}`); }
   saveEditorial(page: string, content: any): Observable<any> { return this.http.post(`${this.apiUrl}/editorial`, { page, content }); }
+
+  // --- Options dynamiques ---
+  getOptions(type?: string): Observable<any> { 
+    const url = type ? `${this.apiUrl}/options?type=${type}` : `${this.apiUrl}/options`;
+    return this.http.get(url); 
+  }
+  createOption(data: { type: string; value: string; label: string; ordre?: number }): Observable<any> { 
+    return this.http.post(`${this.apiUrl}/options`, data); 
+  }
+  updateOption(id: string, data: { label?: string; ordre?: number; actif?: boolean }): Observable<any> { 
+    return this.http.put(`${this.apiUrl}/options`, { id, ...data }); 
+  }
+  deleteOption(id: string): Observable<any> { 
+    return this.http.delete(`${this.apiUrl}/options?id=${id}`); 
+  }
 }
