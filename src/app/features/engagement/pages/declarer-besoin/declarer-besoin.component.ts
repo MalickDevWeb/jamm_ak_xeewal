@@ -92,9 +92,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res.success) {
           this.quartiers = res.data;
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         }
-      }
+      },
+      error: (err) => console.error("Erreur lors du chargement des quartiers:", err)
     });
 
     // Charger les urgences

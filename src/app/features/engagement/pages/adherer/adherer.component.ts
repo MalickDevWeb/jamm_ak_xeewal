@@ -60,7 +60,12 @@ export class AdhererComponent implements OnInit, OnDestroy {
         if (res.success) {
           this.quartiers = res.data;
           this.cdr.markForCheck();
+        } else {
+          console.error('Failed to load quartiers:', res);
         }
+      },
+      error: (err) => {
+        console.error('Error loading quartiers:', err);
       }
     });
 
@@ -72,7 +77,12 @@ export class AdhererComponent implements OnInit, OnDestroy {
         if (res.success) {
           this.poles = res.data;
           this.cdr.markForCheck();
+        } else {
+          console.error('Failed to load poles:', res);
         }
+      },
+      error: (err) => {
+        console.error('Error loading poles:', err);
       }
     });
   }
