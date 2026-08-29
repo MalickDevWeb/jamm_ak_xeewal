@@ -112,9 +112,6 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
   formData = {
     nom: ''
   };
@@ -136,9 +133,7 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
       this.formData = { nom: '' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      this.itemToDelete = id;
-      this.confirmTitle = 'Supprimer cette commission ?';
-      this.showConfirmDialog = true;
+      if (confirm('Voulez-vous vraiment supprimer cette commission ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('commissions', id).subscribe(() => this.refreshData());
       }
@@ -158,24 +153,9 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
       alert('Veuillez saisir un nom');
       return;
     }
-    this.isLoading = true;
+      this.isLoading = true;
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.refreshData());
-  }
-
-  
-  deleteItem = (id: string) => {
-    this.deleteCommission(id);
-  };
-  confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
-    }
   }
 
   ngOnDestroy() {

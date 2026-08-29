@@ -3,6 +3,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-sondages',
@@ -116,9 +117,6 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
   formData = {
     question: '',
     optionsStr: ''
@@ -170,9 +168,7 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe(() => this.refreshData());
     } else if (type === 'Supprimer' && id) {
-      this.itemToDelete = id;
-      this.confirmTitle = 'Supprimer ce sondage ?';
-      this.showConfirmDialog = true;
+      if (confirm('Supprimer ce sondage ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('sondages', id).pipe(
           takeUntil(this.destroy$)
@@ -187,26 +183,11 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
       return;
     }
     const options = this.formData.optionsStr.split(',').map(o => o.trim()).filter(o => o.length > 0);
-    this.isLoading = true;
+      this.isLoading = true;
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('sondages', { question: this.formData.question, options }).pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => this.refreshData());
-  }
-
-  
-  deleteItem = (id: string) => {
-    this.deleteSondage(id);
-  };
-  confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
-    }
   }
 
   ngOnDestroy() {

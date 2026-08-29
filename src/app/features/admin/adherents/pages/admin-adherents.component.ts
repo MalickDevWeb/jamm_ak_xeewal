@@ -131,9 +131,6 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
   formData = {
     prenom: '',
     nom: '',
@@ -167,9 +164,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.formData = { prenom: '', nom: '', telephone: '', quartier: '' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      this.itemToDelete = id;
-      this.confirmTitle = 'Supprimer cet adhérent ?';
-      this.showConfirmDialog = true;
+      if (confirm('Voulez-vous vraiment supprimer cet adhérent ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('adherents', id).subscribe(() => this.refreshData());
       }
@@ -188,9 +183,6 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
   }
 
@@ -198,13 +190,15 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   deleteItem = (id: string) => {
     this.deleteAdherent(id);
   };
-  confirmDelete() {
+    confirmDelete() {
     if (this.itemToDelete) {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
       this.showConfirmDialog = false;
     }
   }
+
+    }
 
   ngOnDestroy() {
     this.destroy$.next();

@@ -610,10 +610,6 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteActivite(id: string) {
-    this.itemToDelete = id;
-      this.confirmTitle = 'Supprimer cette activité ?';
-      this.showConfirmDialog = true;
       this.adminData.deleteEntity('activites', id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => this.refreshData(),
         error: () => { this.mediaError = 'Erreur lors de la suppression.'; this.cdr.markForCheck(); }
@@ -626,19 +622,3 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-
-  // Confirmation dialog
-  deleteItem = (id: string) => {
-    this.deleteActivite(id);
-  };
-  confirmDelete() {
-    if (this.itemToDelete) {
-      this.adminData.deleteEntity('activites', this.itemToDelete).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: () => this.refreshData(),
-        error: () => { this.mediaError = 'Erreur lors de la suppression.'; this.cdr.markForCheck(); }
-      });
-      this.itemToDelete = null;
-    }
-  }

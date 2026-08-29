@@ -94,9 +94,6 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
   formData = {
     titre: '',
     lieu: '',
@@ -145,9 +142,7 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
       this.formData = { titre: '', lieu: '', auteur: 'Admin' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      this.itemToDelete = id;
-      this.confirmTitle = 'Supprimer ce compte-rendu ?';
-      this.showConfirmDialog = true;
+      if (confirm('Supprimer ce compte-rendu ?')) {
         this.isLoading = true;
         this.adminData.deleteEntity('comptes-rendus', id).pipe(
           takeUntil(this.destroy$)
@@ -161,11 +156,8 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
       alert('Veuillez saisir un titre');
       return;
     }
-    this.isLoading = true;
+      this.isLoading = true;
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('comptes-rendus', { 
       titre: this.formData.titre, 
       contenu: 'Contenu généré...', 
@@ -175,18 +167,6 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     }).pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => this.refreshData());
-  }
-
-  
-  deleteItem = (id: string) => {
-    this.deleteCompteRendu(id);
-  };
-  confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
-    }
   }
 
   ngOnDestroy() {

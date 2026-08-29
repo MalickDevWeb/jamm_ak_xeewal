@@ -497,16 +497,10 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   deleteBesoin(besoin: any) {
-    this.itemToDelete = besoin.id;
-      this.confirmTitle = `Supprimer le signalement de ${besoin.quartier} ?`;
-      this.showConfirmDialog = true;
+    if (!confirm(`Supprimer définitivement ce signalement de ${besoin.quartier} ?`)) return;
     this.besoins = this.besoins.filter(b => b.id !== besoin.id);
     this.applyClientFilters();
-    this.deleteItem = (id: string) => {
-      this.adminData.deleteEntity('besoins', id).subscribe({
-        next: () => this.refreshData()
-      });
-    };
+    this.adminData.deleteEntity('besoins', besoin.id).subscribe({
       error: () => this.loadBesoins() // Reload si erreur
     });
   }
@@ -538,11 +532,8 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
       alert('Veuillez remplir le quartier et la description');
       return;
     }
-    this.isLoading = true;
+      this.isLoading = true;
     this.showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = "Confirmer la suppression";
     this.adminData.createEntity('besoins', {
       quartier: this.formData.quartier,
       description: this.formData.description,
@@ -557,7 +548,7 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   
-  confirmDelete() {
+    confirmDelete() {
     if (this.itemToDelete) {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
