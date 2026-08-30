@@ -327,7 +327,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   deleteItem = (id: string) => {
     this.adminData.deleteEntity('adherents', id).subscribe({
       next: () => this.refreshData(),
-      error: (err) => this.showAlertMethod('error', 'Erreur', 'Erreur lors de la suppression: ' + (err.message || 'Erreur inconnue'))
+      error: (err) => this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer cet adhérent. Le serveur est surchargé, veuillez réessayer.')
     });
   };
 

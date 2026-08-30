@@ -7,10 +7,32 @@
   </div>
 
   <div class="relative z-10 w-full max-w-md md:-translate-y-[30px] md:translate-x-[45px]">
+    <style>
+      @keyframes rotateSnake {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .snake-wrapper {
+        position: relative;
+        padding: 3px;
+        border-radius: 2rem;
+        overflow: hidden;
+      }
+      .snake-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, transparent 70%, rgba(58, 170, 53, 0.6) 80%, #008d36 100%);
+        animation: rotateSnake 3s linear infinite;
+        z-index: 0;
+      }
+    </style>
 
-
-    <div class="relative p-[2px] rounded-[2rem] bg-gradient-to-br from-brand-greenLight/60 via-brand-green/10 to-transparent shadow-[0_0_40px_rgba(0,141,54,0.15)]">
-      <div class="bg-white rounded-[calc(2rem-2px)] p-8 sm:p-10 min-h-[500px] flex flex-col justify-center relative overflow-hidden">
+    <div class="snake-wrapper shadow-[0_0_50px_rgba(0,141,54,0.25)]">
+      <div class="bg-white rounded-[calc(2rem-3px)] p-8 sm:p-10 min-h-[500px] flex flex-col justify-center relative overflow-hidden z-10">
         <!-- Subtle inner glow -->
         <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-green/5 rounded-full blur-3xl pointer-events-none"></div>
         
