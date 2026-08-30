@@ -325,9 +325,20 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   deleteItem = (id: string) => {
+    const previousAdherents = [...this.adherents];
+    this.adherents = this.adherents.filter(a => a.id !== id);
+    this.cdr.markForCheck();
+
     this.adminData.deleteEntity('adherents', id).subscribe({
-      next: () => this.refreshData(),
-      error: (err) => this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer cet adhérent. Le serveur est surchargé, veuillez réessayer.')
+      next: () => {
+        this.total = Math.max(0, this.total - 1);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.adherents = previousAdherents;
+        this.cdr.markForCheck();
+        this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer cet adhérent. Le serveur est surchargé, veuillez réessayer.');
+      }
     });
   };
 
