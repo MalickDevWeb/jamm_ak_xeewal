@@ -33,9 +33,18 @@ export class ActivitesComponent implements OnInit {
     });
   }
 
-  getMediaUrls(url: string | null): string[] {
+  getMediaUrls(url: any): string[] {
     if (!url) return [];
-    return url.split(',').map(u => u.trim()).filter(Boolean);
+    if (Array.isArray(url)) return url;
+    if (typeof url === 'string') {
+        try {
+            const parsed = JSON.parse(url);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            return url.split(',').map((u: string) => u.trim()).filter(Boolean);
+        }
+    }
+    return [];
   }
 
   getFirstMedia(url: string | null): string {

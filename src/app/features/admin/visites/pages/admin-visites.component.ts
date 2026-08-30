@@ -690,83 +690,50 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
     }
 
     this.isSubmitting = true;
+    this.isUploadingFiles = true;
     this.mediaError = '';
+    this.cdr.markForCheck();
 
     try {
-      let allMediaUrls: string[] = [...this.existingMediaUrls];
+      // Build FormData with all fields + files
+      const fd = new FormData();
+      fd.append('titre', this.formData.titre);
+      fd.append('description', this.formData.description || '');
+      fd.append('lieu', this.formData.lieu || '');
+      fd.append('date', this.formData.date || new Date().toISOString());
+      fd.append('typeMedia', this.formData.typeMedia);
+      fd.append('statut', 'PUBLIE');
+      
+      // Append all media files
+      this.mediaFiles.forEach((media) => {
+        fd.append('files', media.blob, media.name);
+      });
+      
+      // Also append existing media URLs as a JSON string if in edit mode
+      if (!this.isCreating && this.existingMediaUrls.length > 0) {
+        fd.append('existingMediaUrls', JSON.stringify(this.existingMediaUrls));
+      }
 
-      if (this.mediaFiles.length > 0) {
-        this.isUploadingFiles = true;
-        this.cdr.markForCheck();
-
-        const uploadPromises = this.mediaFiles.map(async (media) => {
-          const fd = new FormData();
-          fd.append('file', media.blob);
-          const res = await fetch(`${environment.apiUrl}/upload-public`, {
-            method: 'POST',
-            body: fd,
-          });
-          const result = await res.json();
-          if (result.success) return result.url;
-          else throw new Error(`Erreur upload ${media.name}`);
-        });
-
-        const newUrls = await Promise.all(uploadPromises);
-        allMediaUrls = [...allMediaUrls, ...newUrls];
+      // Use the combined endpoint
+      const endpoint = this.isCreating 
+        ? `${environment.apiUrl}/visites/with-media`
+        : `${environment.apiUrl}/visites/${this.currentVisiteId}/with-media`;
+      
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        body: fd,
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        this.isSubmitting = false;
         this.isUploadingFiles = false;
-      }
-
-      const totalMedia = allMediaUrls.length;
-      const data: any = {
-        titre: this.formData.titre,
-        description: this.formData.description,
-        lieu: this.formData.lieu,
-        date: this.formData.date
-          ? new Date(this.formData.date).toISOString()
-          : new Date().toISOString(),
-        mediaCount: totalMedia,
-        statut: 'PUBLIE',
-      };
-
-      if (totalMedia > 0) {
-        data.mediaUrls = allMediaUrls;
-        data.typeMedia = this.formData.typeMedia;
-      }
-
-      if (this.isCreating) {
-        this.adminData
-          .createEntity('visites', data)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.isSubmitting = false;
-              this.showModal = false;
-              this.refreshData();
-              this.showAlertPopup('success', 'Succès', 'Visite ajoutée avec succès');
-            },
-            error: (err) => {
-              this.isSubmitting = false;
-              this.mediaError = err?.message || 'Erreur lors de la création.';
-              this.cdr.markForCheck();
-            },
-          });
+        this.showModal = false;
+        this.refreshData();
+        this.showAlertPopup('success', 'Succès', 'Visite enregistrée avec succès');
       } else {
-        this.adminData
-          .updateEntity('visites', this.currentVisiteId!, data)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.isSubmitting = false;
-              this.showModal = false;
-              this.refreshData();
-              this.showAlertPopup('success', 'Succès', 'Visite modifiée avec succès');
-            },
-            error: (err) => {
-              this.isSubmitting = false;
-              this.mediaError = err?.message || 'Erreur lors de la modification.';
-              this.cdr.markForCheck();
-            },
-          });
+        throw new Error(result.message || 'Erreur lors de la sauvegarde');
       }
     } catch (err: any) {
       this.isSubmitting = false;
