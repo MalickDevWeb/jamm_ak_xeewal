@@ -10,73 +10,109 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
-  <div class="animate-fade-in-up">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h2 class="text-2xl font-black text-white">Comptes-Rendus</h2>
-        <p class="text-sm text-gray-400 mt-1">{{ total }} rapports et synthèses disponibles.</p>
+  <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#e6f3eb] flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-file-contract text-[#008d36] text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Comptes-Rendus</h2>
+          <p class="text-[13px] text-gray-500 font-medium mt-0.5">{{ total }} rapports et synthèses disponibles.</p>
+        </div>
       </div>
-      <button (click)="action('Rédiger')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
-        <i class="fa-solid fa-pen-nib"></i> Rédiger
-      </button>
+      <div class="flex items-center gap-3">
+        <button (click)="action('Rédiger')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-pen-nib"></i> Rédiger
+        </button>
+      </div>
     </div>
 
-    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="text-center">
-        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-400 text-sm">Chargement depuis l'API...</p>
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#008d36] mb-4"></i>
+        <p class="text-gray-500 text-sm font-medium">Chargement des comptes-rendus...</p>
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="space-y-6">
-      <div *ngFor="let cr of comptesRendus; trackBy: trackById" class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6 hover:shadow-md transition-shadow">
-        <div class="flex items-start justify-between gap-4 mb-3">
+    <div *ngIf="!isLoading && comptesRendus.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+        <i class="fa-solid fa-file-contract text-3xl text-gray-300"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Aucun compte-rendu</h3>
+      <p class="text-sm text-gray-500">Rédigez le premier rapport pour cette instance.</p>
+    </div>
+
+    <div *ngIf="!isLoading && comptesRendus.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div *ngFor="let cr of comptesRendus; trackBy: trackById" class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 p-5 group hover:shadow-lg transition-all relative overflow-hidden flex flex-col">
+        
+        <div class="flex items-start justify-between gap-4 mb-4">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
               <span [class]="getStatutClass(cr.statut)" class="text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">{{ cr.statut }}</span>
             </div>
-            <h3 class="text-lg font-bold text-white">{{ cr.titre }}</h3>
-            <p class="text-xs text-gray-400 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>{{ cr.lieu }} | {{ cr.auteur }}</p>
+            <h3 class="text-[16px] font-bold text-gray-900 leading-snug line-clamp-2">{{ cr.titre }}</h3>
+            <p class="text-[13px] text-gray-500 font-medium mt-2 flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-gray-400"></i> {{ cr.lieu }}</p>
+            <p class="text-[13px] text-gray-500 font-medium mt-1 flex items-center gap-1.5"><i class="fa-solid fa-user-pen text-gray-400"></i> {{ cr.auteur }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+             <i class="fa-regular fa-file-lines text-[#008d36] text-xl"></i>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-          <span class="text-xs text-gray-400">{{ cr.date | date:'dd/MM/yyyy' }}</span>
+        
+        <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+          <span class="text-xs font-bold text-gray-400 flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> {{ cr.date | date:'dd/MM/yyyy' }}</span>
           <div class="flex gap-2">
-            <button (click)="action('Supprimer', cr.id)" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-500/10 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
+            <button class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+               <i class="fa-solid fa-eye text-xs"></i>
+            </button>
+            <button (click)="action('Supprimer', cr.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition-colors">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
     
     <!-- Modal Création -->
-    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white/5 border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-        <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/20">
-          <h3 class="font-black text-white text-lg">Nouveau compte-rendu</h3>
-          <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in-up my-4 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
+             <div class="w-10 h-10 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
+               <i class="fa-solid fa-pen-nib text-[#008d36]"></i>
+             </div>
+             Nouveau compte-rendu
+          </h3>
+          <button (click)="showModal = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
         </div>
-        <div class="p-6">
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Titre</label>
-            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
+        
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre <span class="text-red-500">*</span></label>
+            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Titre du rapport">
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Lieu</label>
-            <input type="text" [(ngModel)]="formData.lieu" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Lieu</label>
+            <input type="text" [(ngModel)]="formData.lieu" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Siège, Mairie, etc.">
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Auteur</label>
-            <input type="text" [(ngModel)]="formData.auteur" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Auteur</label>
+            <input type="text" [(ngModel)]="formData.auteur" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Nom de l'auteur">
           </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">Annuler</button>
-            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Enregistrer</button>
+          <div class="flex justify-end gap-3 pt-3">
+            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
+            <button (click)="submitForm()" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-check"></i> Enregistrer
+            </button>
           </div>
         </div>
       </div>
     </div>
-  
-    <!-- Confirmation Dialog -->
   </div>
   `
 })
@@ -123,11 +159,11 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
 
   getStatutClass(statut: string): string {
     const map: any = {
-      'PUBLIE': 'bg-brand-green/10 text-brand-green',
-      'INTERNE': 'bg-purple-100 text-brand-yellowDark',
-      'BROUILLON': 'bg-white/10 text-gray-400'
+      'PUBLIE': 'bg-[#e6f3eb] text-[#008d36]',
+      'INTERNE': 'bg-purple-50 text-purple-600',
+      'BROUILLON': 'bg-gray-100 text-gray-500'
     };
-    return map[statut] || 'bg-white/10 text-gray-400';
+    return map[statut] || 'bg-gray-100 text-gray-500';
   }
 
   action(type: string, id?: string) {

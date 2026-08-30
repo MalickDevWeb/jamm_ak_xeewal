@@ -23,425 +23,306 @@ import { environment } from '../../../../../environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
-    <div
-      class="animate-fade-in-up min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6"
-    >
+    <div class="animate-fade-in-up max-w-[1600px] mx-auto">
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-4xl font-black text-white flex items-center gap-3">
-            <i class="fa-solid fa-images text-3xl text-[#022c16]"></i>
-            Activités
-          </h2>
-          <p class="text-sm text-gray-400 mt-1">
-            {{ total() }} activité(s) enregistrée(s)
-          </p>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
+            <i class="fa-regular fa-calendar text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-black text-gray-900 tracking-tight">Activités</h2>
+            <p class="text-sm font-medium text-gray-500">{{ total() }} activité(s) enregistrée(s)</p>
+          </div>
         </div>
-        <button
-          (click)="openCreateModal()"
-          class="px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2"
-        >
-          <i class="fa-solid fa-plus text-lg"></i>
-          <span>Nouvelle activité</span>
+        <button (click)="openCreateModal()" class="bg-[#022c16] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
+          <i class="fa-solid fa-plus"></i> Nouvelle activité
         </button>
       </div>
 
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Photos -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-image text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Photos</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ photosCount() }}</h3>
+            <p class="text-[11px] font-bold text-[#008d36] mt-1">{{ photosPercent() | number:'1.1-1' }}% du total</p>
+          </div>
+        </div>
+        <!-- Vidéos -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-video text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Vidéos</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ videosCount() }}</h3>
+            <p class="text-[11px] font-bold text-[#008d36] mt-1">{{ videosPercent() | number:'1.1-1' }}% du total</p>
+          </div>
+        </div>
+        <!-- Ce mois -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-regular fa-calendar text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Ce mois</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ ceMoisCount() }}</h3>
+            <p class="text-[11px] font-bold text-[#008d36] mt-1">{{ ceMoisPercent() | number:'1.1-1' }}% du total</p>
+          </div>
+        </div>
+        <!-- Publiées -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-check-circle text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Publiées</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ publieesCount() }}</h3>
+            <p class="text-[11px] font-bold text-[#008d36] mt-1">{{ publieesPercent() | number:'1.1-1' }}% du total</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Loading state -->
-      <div *ngIf="isLoading()" class="flex items-center justify-center py-20">
+      <div *ngIf="isLoading()" class="flex items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
         <div class="text-center">
-          <i
-            class="fa-solid fa-circle-notch fa-spin text-5xl text-[#022c16] mb-4"
-          ></i>
-          <p class="text-gray-400 text-lg">Chargement des activités...</p>
+          <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#008d36] mb-4"></i>
+          <p class="text-gray-500 text-sm font-medium">Chargement des activités...</p>
         </div>
       </div>
 
       <!-- Empty state -->
-      <div
-        *ngIf="!isLoading() && activites().length === 0"
-        class="text-center py-20 bg-white/5 border border-white/10 rounded-3xl border-2 border-dashed border-white/20"
-      >
-        <i class="fa-solid fa-photo-film text-7xl text-gray-300 mb-4"></i>
-        <p class="text-gray-400 text-xl mb-2">Aucune activité enregistrée</p>
-        <button
-          (click)="openCreateModal()"
-          class="text-[#022c16] font-bold hover:underline text-lg"
-        >
-          Créer la première activité →
+      <div *ngIf="!isLoading() && activites().length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+          <i class="fa-solid fa-photo-film text-3xl text-gray-300"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Aucune activité</h3>
+        <p class="text-sm text-gray-500 mb-6">Commencez par ajouter votre première activité.</p>
+        <button (click)="openCreateModal()" class="text-[#008d36] bg-[#e6f3eb] font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#d1e8d9] transition-colors">
+          Créer une activité
         </button>
       </div>
 
       <!-- Activities Grid -->
-      <div
-        *ngIf="!isLoading() && activites().length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-      >
-        <div
-          *ngFor="let a of activites(); trackBy: trackById"
-          class="group bg-white/5 border border-white/10 rounded-3xl shadow-lg border border-white/10 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
-        >
-          <!-- Media Section -->
-          <div
-            class="relative h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden"
-          >
-            <!-- Main media display -->
-            <img
-              *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)"
-              [src]="getFirstMedia(a)"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            />
-
-            <div *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" class="relative w-full h-full">
-              <img
-                *ngIf="!a._videoPlaying"
-                [src]="getFirstMedia(a) + '?thumbnail=true'"
-                class="w-full h-full object-cover"
-              />
-              <button
-                *ngIf="!a._videoPlaying"
-                (click)="playVideo(a)"
-                class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-all"
-              >
-                <div class="w-16 h-16 bg-white/5 border border-white/10/90 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-                  <i class="fa-solid fa-play text-2xl text-[#022c16] ml-1"></i>
-                </div>
-              </button>
-              <video
-                *ngIf="a._videoPlaying"
-                [src]="getFirstMedia(a)"
-                class="w-full h-full object-cover"
-                autoplay
-                loop
-                muted
-                playsinline
-              ></video>
+      <div *ngIf="!isLoading() && activites().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div *ngFor="let a of activites().slice(0, 3)" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+          <!-- Image/Video Container -->
+          <div class="h-48 relative bg-gray-100 w-full overflow-hidden cursor-pointer" (click)="openEditModal(a)">
+            <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
+            <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getFirstMedia(a) + '?thumbnail=true'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
+            
+            <div *ngIf="!getFirstMedia(a)" class="w-full h-full flex items-center justify-center">
+               <i class="fa-solid fa-image text-3xl text-gray-300"></i>
+            </div>
+            
+            <!-- Badges overlay -->
+            <div class="absolute top-3 left-3 flex items-center gap-2">
+              <span *ngIf="a.typeMedia === 'PHOTOS'" class="bg-[#008d36] text-white text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5"><i class="fa-solid fa-image"></i> PHOTO</span>
+              <span *ngIf="a.typeMedia === 'VIDEOS'" class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5"><i class="fa-solid fa-video"></i> VIDÉO</span>
+            </div>
+            <div class="absolute top-3 right-3" *ngIf="a.mediaCount > 1">
+              <span class="bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-2. py-1 rounded flex items-center gap-1.5 px-2 py-1"><i class="fa-solid fa-images"></i> {{ a.mediaCount }} médias</span>
             </div>
 
-            <!-- Placeholder when no media -->
-            <div
-              *ngIf="!getFirstMedia(a)"
-              class="w-full h-full flex flex-col items-center justify-center text-gray-400"
-            >
-              <i class="fa-solid fa-image text-6xl mb-2"></i>
-              <span class="text-sm">Aucun média</span>
-            </div>
-
-            <!-- Media count badge -->
-            <div
-              *ngIf="a.mediaCount > 1"
-              class="absolute top-3 right-3 bg-black/70 backdrop-blur text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"
-            >
-              <i class="fa-solid fa-images text-xs"></i>
-              {{ a.mediaCount }} médias
-            </div>
-
-            <!-- Type badge -->
-            <div class="absolute top-3 left-3">
-              <span
-                *ngIf="a.typeMedia === 'VIDEOS'"
-                class="bg-red-500/90 backdrop-blur text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
-              >
-                <i class="fa-solid fa-video text-xs"></i> Vidéo
-              </span>
-              <span
-                *ngIf="a.typeMedia === 'PHOTOS'"
-                class="bg-green-500/90 backdrop-blur text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
-              >
-                <i class="fa-solid fa-image text-xs"></i> Photo
-              </span>
-            </div>
-
-            <!-- Hover overlay with actions -->
-            <div
-              class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100"
-            >
-              <button
-                (click)="openEditModal(a)"
-                class="w-12 h-12 bg-white/5 border border-white/10/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-brand-green hover:bg-brand-green/10 hover:scale-110 transition-all"
-                title="Modifier"
-              >
-                <i class="fa-solid fa-pen text-lg"></i>
-              </button>
-              <button
-                (click)="deleteActivite(a.id)"
-                class="w-12 h-12 bg-white/5 border border-white/10/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-red-600 hover:bg-red-500/10 hover:scale-110 transition-all"
-                title="Supprimer"
-              >
-                <i class="fa-solid fa-trash text-lg"></i>
-              </button>
+            <!-- Play button for videos -->
+            <div *ngIf="a.typeMedia === 'VIDEOS'" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                 <i class="fa-solid fa-play text-white text-xl ml-1"></i>
+              </div>
             </div>
           </div>
-
-          <!-- Content -->
-          <div class="p-6 flex-1 flex flex-col">
-            <!-- Category & Date -->
-            <div class="flex items-center gap-2 mb-3">
-              <span
-                class="bg-gradient-to-r from-brand-yellow/10 to-brand-yellowDark/10 text-brand-yellowDark text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
-              >
-                {{ a.categorie }}
-              </span>
-              <span class="text-xs text-gray-400">{{
-                a.date | date: 'dd/MM/yyyy'
-              }}</span>
+          
+          <!-- Card content -->
+          <div class="p-5 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 mb-2.5">
+              <span class="bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{{ a.categorie }}</span>
+              <span class="text-xs text-gray-400 font-medium">{{ a.date | date:'dd/MM/yyyy' }}</span>
             </div>
+            <h3 class="text-[15px] font-bold text-gray-900 mb-4 line-clamp-2 leading-tight">{{ a.titre }}</h3>
+            
+            <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+              <span *ngIf="a.statut === 'PUBLIE'" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2 py-1 rounded flex items-center gap-1.5"><i class="fa-solid fa-check-circle"></i> PUBLIÉE</span>
+              <button (click)="openEditModal(a)" class="text-gray-500 text-xs font-bold hover:text-[#022c16] flex items-center gap-1.5 transition-colors"><i class="fa-solid fa-pen"></i> Modifier</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Title -->
-            <h3 class="text-xl font-black text-white mb-2 line-clamp-1">
-              {{ a.titre }}
-            </h3>
+      <!-- Table View -->
+      <div *ngIf="!isLoading() && activites().length > 0" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col overflow-hidden">
+        <div class="p-5 border-b border-gray-50 flex items-center justify-between">
+          <h3 class="font-bold text-gray-900">Liste des activités</h3>
+        </div>
 
-            <!-- Description -->
-            <p
-              *ngIf="a.description"
-              class="text-sm text-gray-300 line-clamp-3 mb-4 flex-1"
-            >
-              {{ a.description }}
-            </p>
-
-            <!-- Status & Actions -->
-            <div
-              class="flex items-center justify-between pt-4 border-t border-white/10"
-            >
-              <span
-                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold"
-                [ngClass]="
-                  a.statut === 'PUBLIE'
-                    ? 'bg-brand-green/10 text-brand-green'
-                    : 'bg-brand-yellow/10 text-brand-yellow'
-                "
-              >
-                <i
-                  class="fa-solid mr-1.5"
-                  [ngClass]="
-                    a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-clock'
-                  "
-                ></i>
-                {{ a.statut }}
-              </span>
-              <button
-                (click)="openEditModal(a)"
-                class="text-[#022c16] hover:text-[#034256] text-sm font-bold flex items-center gap-1.5 transition-colors"
-              >
-                <i class="fa-solid fa-pen text-xs"></i>
-                Modifier
-              </button>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                <th class="p-4 pl-6">TITRE</th>
+                <th class="p-4">TYPE</th>
+                <th class="p-4">CATÉGORIE</th>
+                <th class="p-4">DATE</th>
+                <th class="p-4">MÉDIAS</th>
+                <th class="p-4">STATUT</th>
+                <th class="p-4">CRÉÉ PAR</th>
+                <th class="p-4 pr-6 text-center">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-gray-50">
+              <tr *ngFor="let a of activites()" class="hover:bg-gray-50/50 transition-colors group">
+                <td class="p-4 pl-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-14 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative cursor-pointer" (click)="openEditModal(a)">
+                       <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
+                       <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getFirstMedia(a) + '?thumbnail=true'" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
+                       <div *ngIf="a.typeMedia === 'VIDEOS'" class="absolute inset-0 flex items-center justify-center bg-black/10">
+                          <i class="fa-solid fa-play text-white text-xs opacity-80 shadow-sm"></i>
+                       </div>
+                       <div *ngIf="!getFirstMedia(a)" class="w-full h-full flex items-center justify-center">
+                          <i class="fa-solid fa-image text-gray-300"></i>
+                       </div>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-[13px] line-clamp-2 max-w-[200px] hover:text-[#008d36] cursor-pointer" (click)="openEditModal(a)">{{ a.titre }}</span>
+                  </div>
+                </td>
+                <td class="p-4">
+                   <span *ngIf="a.typeMedia === 'PHOTOS'" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded">PHOTO</span>
+                   <span *ngIf="a.typeMedia === 'VIDEOS'" class="text-[10px] font-bold text-red-600 bg-red-100 px-2.5 py-1 rounded">VIDÉO</span>
+                </td>
+                <td class="p-4">
+                   <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full uppercase">{{ a.categorie }}</span>
+                </td>
+                <td class="p-4 text-gray-500 font-medium text-[13px]">{{ a.date | date:'dd/MM/yyyy' }}</td>
+                <td class="p-4 text-gray-500 text-[13px] font-medium">{{ a.mediaCount > 0 ? a.mediaCount + ' médias' : '-' }}</td>
+                <td class="p-4">
+                   <span *ngIf="a.statut === 'PUBLIE'" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded flex items-center gap-1.5 w-max"><i class="fa-solid fa-check-circle"></i> PUBLIÉE</span>
+                </td>
+                <td class="p-4 text-gray-500 text-[13px]">Admin</td>
+                <td class="p-4 pr-6">
+                   <div class="flex items-center justify-center gap-3">
+                     <button class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors"><i class="fa-solid fa-eye text-xs"></i></button>
+                     <div class="relative group/menu">
+                        <button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <div class="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 opacity-0 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:pointer-events-auto transition-opacity z-10">
+                          <button (click)="openEditModal(a)" class="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-[#008d36] flex items-center gap-2"><i class="fa-solid fa-pen w-4"></i> Modifier</button>
+                          <button (click)="deleteActivite(a.id)" class="w-full text-left px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash w-4"></i> Supprimer</button>
+                        </div>
+                     </div>
+                   </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination (Mock for UI) -->
+        <div class="p-4 border-t border-gray-50 flex items-center justify-between bg-gray-50/30">
+          <span class="text-xs font-medium text-gray-500">Affichage de 1 à {{ activites().length > 10 ? 10 : activites().length }} sur {{ total() }} résultats</span>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1">
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-[#022c16] text-white text-xs font-bold">1</button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+            </div>
+            <div class="relative">
+              <select class="appearance-none bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 pl-3 pr-8 py-1.5 focus:outline-none focus:border-[#022c16] shadow-sm cursor-pointer">
+                <option>10 par page</option>
+                <option>25 par page</option>
+                <option>50 par page</option>
+              </select>
+              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Modal: Créer / Modifier -->
-      <div
-        *ngIf="showModal()"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto"
-      >
-        <div
-          class="bg-white/5 border border-white/10 rounded-3xl w-full max-w-2xl shadow-2xl animate-fade-in-up my-4"
-        >
+      <div *ngIf="showModal()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl animate-fade-in-up my-4 overflow-hidden">
           <!-- Modal Header -->
-          <div
-            class="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl"
-          >
-            <div class="flex items-center justify-between">
-              <h3
-                class="font-black text-2xl text-white flex items-center gap-3"
-              >
-                <i
-                  class="fa-solid"
-                  [class.fa-plus-circle]="isCreating()"
-                  [class.fa-edit]="!isCreating()"
-                  class="text-[#022c16]"
-                ></i>
-                {{ isCreating() ? 'Nouvelle activité' : "Modifier l'activité" }}
-              </h3>
-              <button
-                (click)="closeModal()"
-                class="text-gray-400 hover:text-gray-300 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-all"
-              >
-                <i class="fa-solid fa-xmark text-xl"></i>
-              </button>
-            </div>
+          <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
+                 <i class="fa-solid" [class.fa-plus]="isCreating()" [class.fa-pen]="!isCreating()" class="text-[#008d36]"></i>
+              </div>
+              {{ isCreating() ? 'Nouvelle activité' : "Modifier l'activité" }}
+            </h3>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
           </div>
 
           <!-- Modal Body -->
-          <div class="p-6 space-y-4">
-            <!-- Title -->
+          <div class="p-6 space-y-5">
+            <!-- Titre -->
             <div>
-              <label
-                class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-heading text-[#022c16]"></i>
-                Titre <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                [(ngModel)]="formData.titre"
-                placeholder="Entrez le titre de l'activité..."
-                class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base text-white font-medium focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none"
-              />
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.titre" placeholder="Entrez le titre de l'activité..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" />
             </div>
 
             <!-- Description -->
             <div>
-              <label
-                class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-align-left text-[#022c16]"></i>
-                Description
-              </label>
-              <textarea
-                [(ngModel)]="formData.description"
-                rows="4"
-                placeholder="Décrivez l'activité en détail..."
-                class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base text-gray-200 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none resize-none"
-              ></textarea>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Description</label>
+              <textarea [(ngModel)]="formData.description" rows="4" placeholder="Décrivez l'activité en détail..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none resize-none"></textarea>
             </div>
 
-            <!-- Category & Date -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2"
-                >
-                  <i class="fa-solid fa-tag text-[#022c16]"></i>
-                  Catégorie
-                </label>
-                <select
-                  [(ngModel)]="formData.categorie"
-                  class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none bg-white/5 border border-white/10"
-                >
-                  <option
-                    *ngFor="let c of categories(); trackBy: trackByOption"
-                    [value]="c.value"
-                  >
-                    {{ c.label }}
-                  </option>
-                </select>
-              </div>
-              <div>
-                <label
-                  class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2"
-                >
-                  <i class="fa-solid fa-calendar text-[#022c16]"></i>
-                  Date
-                </label>
-                <input
-                  type="date"
-                  [(ngModel)]="formData.date"
-                  class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none"
-                />
-              </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+               <div>
+                 <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Catégorie</label>
+                 <select [(ngModel)]="formData.categorie" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none appearance-none cursor-pointer">
+                    <option *ngFor="let c of categories(); trackBy: trackByOption" [value]="c.value">{{ c.label }}</option>
+                 </select>
+               </div>
+               <div>
+                 <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Date</label>
+                 <input type="date" [(ngModel)]="formData.date" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" />
+               </div>
             </div>
 
             <!-- Media Upload -->
             <div>
-              <label
-                class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-photo-film text-[#022c16]"></i>
-                Médias (Photos ou Vidéos)
-              </label>
-
-              <label
-                class="flex flex-col items-center justify-center w-full h-24 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white/5 hover:bg-white/10 hover:border-[#022c16] transition-all"
-              >
-                <div
-                  class="flex flex-col items-center justify-center py-4"
-                >
-                  <i
-                    class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"
-                  ></i>
-                  <p class="text-sm font-bold text-gray-300">
-                    Cliquez pour ajouter des médias
-                  </p>
-                  <p class="text-xs text-gray-400 mt-1">
-                    JPG, PNG, MP4 — max 50MB chacun
-                  </p>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Médias (Photos ou Vidéos)</label>
+              <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#008d36] hover:border-solid transition-all group">
+                <div class="flex flex-col items-center justify-center py-4">
+                  <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-400 group-hover:text-[#008d36] transition-colors mb-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-600">Cliquez pour ajouter des médias</p>
+                  <p class="text-xs text-gray-400 mt-1">JPG, PNG, MP4 — max 50MB chacun</p>
                 </div>
-                <input
-                  type="file"
-                  #mediaInput
-                  (change)="onMediaSelected($event)"
-                  accept="image/*,video/*"
-                  multiple
-                  class="hidden"
-                />
+                <input type="file" #mediaInput (change)="onMediaSelected($event)" accept="image/*,video/*" multiple class="hidden" />
               </label>
 
               <!-- New Media Preview Grid -->
-              <div
-                *ngIf="mediaFiles().length > 0"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4"
-              >
-                <div
-                  *ngFor="let media of mediaFiles(); let i = index"
-                  class="relative group rounded-xl overflow-hidden border-2 border-white/20 bg-black h-24"
-                >
-                  <img
-                    *ngIf="media.type === 'PHOTOS'"
-                    [src]="media.previewUrl"
-                    class="w-full h-full object-cover"
-                  />
-                  <video
-                    *ngIf="media.type === 'VIDEOS'"
-                    [src]="media.previewUrl"
-                    class="w-full h-full object-cover"
-                    muted
-                  ></video>
-                  <div
-                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    <button
-                      (click)="removeMedia(i)"
-                      class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600"
-                    >
+              <div *ngIf="mediaFiles().length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                <div *ngFor="let media of mediaFiles(); let i = index" class="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-100 h-24">
+                  <img *ngIf="media.type === 'PHOTOS'" [src]="media.previewUrl" class="w-full h-full object-cover" />
+                  <video *ngIf="media.type === 'VIDEOS'" [src]="media.previewUrl" class="w-full h-full object-cover" muted></video>
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button (click)="removeMedia(i)" class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600 shadow-sm">
                       <i class="fa-solid fa-trash text-xs"></i>
                     </button>
                   </div>
-                  <div
-                    class="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase"
-                  >
+                  <div class="absolute bottom-1.5 left-1.5 bg-black/70 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase">
                     {{ media.type === 'VIDEOS' ? 'VIDÉO' : 'PHOTO' }}
                   </div>
                 </div>
               </div>
 
               <!-- Existing media (edit mode) -->
-              <div
-                *ngIf="!isCreating() && existingMediaUrls().length > 0"
-                class="mt-4"
-              >
-                <p
-                  class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2"
-                >
-                  Médias existants
-                </p>
-                <div
-                  class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
-                >
-                  <div
-                    *ngFor="let url of existingMediaUrls(); let i = index"
-                    class="relative group rounded-xl overflow-hidden border-2 border-white/20 bg-black h-24"
-                  >
-                    <img
-                      *ngIf="!url.match('\\.(mp4|webm|mov|avi)($|\\?)')"
-                      [src]="url"
-                      class="w-full h-full object-cover"
-                    />
-                    <video
-                      *ngIf="url.match('\\.(mp4|webm|mov|avi)($|\\?)') || url.includes('/video/upload')"
-                      [src]="url"
-                      class="w-full h-full object-cover"
-                      muted
-                    ></video>
-                    <div
-                      class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                    >
-                      <button
-                        (click)="removeExistingMedia(i)"
-                        class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600"
-                      >
+              <div *ngIf="!isCreating() && existingMediaUrls().length > 0" class="mt-4">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Médias existants</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div *ngFor="let url of existingMediaUrls(); let i = index" class="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-100 h-24">
+                    <img *ngIf="!url.match('\\\\.(mp4|webm|mov|avi)($|\\\\?)')" [src]="url" class="w-full h-full object-cover" />
+                    <video *ngIf="url.match('\\\\.(mp4|webm|mov|avi)($|\\\\?)') || url.includes('/video/upload')" [src]="url" class="w-full h-full object-cover" muted></video>
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button (click)="removeExistingMedia(i)" class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600 shadow-sm">
                         <i class="fa-solid fa-trash text-xs"></i>
                       </button>
                     </div>
@@ -449,39 +330,23 @@ import { environment } from '../../../../../environments/environment';
                 </div>
               </div>
 
-              <p
-                *ngIf="mediaError()"
-                class="text-red-500 text-sm font-bold mt-2 flex items-center gap-2"
-              >
+              <p *ngIf="mediaError()" class="text-red-500 text-xs font-bold mt-2 flex items-center gap-1.5 bg-red-50 px-3 py-2 rounded-lg">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError() }}
               </p>
             </div>
           </div>
 
           <!-- Modal Footer -->
-          <div
-            class="px-6 py-4 border-t border-white/10 flex justify-end gap-3 bg-white/5 rounded-b-3xl"
-          >
-            <button
-              (click)="closeModal()"
-              class="px-6 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-all"
-            >
+          <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+            <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">
               Annuler
             </button>
-            <button
-              (click)="submitForm()"
-              [disabled]="isSubmitting() || !formData.titre"
-              class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-70"
-            >
-              <span *ngIf="!isSubmitting()">
-                <i
-                  class="fa-solid"
-                  [class.fa-plus]="isCreating()"
-                  [class.fa-save]="!isCreating()"
-                ></i>
+            <button (click)="submitForm()" [disabled]="isSubmitting() || !formData.titre" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="!isSubmitting()" class="flex items-center gap-2">
+                <i class="fa-solid" [class.fa-plus]="isCreating()" [class.fa-save]="!isCreating()"></i>
                 {{ isCreating() ? 'Créer' : 'Enregistrer' }}
               </span>
-              <span *ngIf="isSubmitting()">
+              <span *ngIf="isSubmitting()" class="flex items-center gap-2">
                 <i class="fa-solid fa-circle-notch fa-spin"></i>
                 Enregistrement...
               </span>
@@ -496,8 +361,7 @@ import { environment } from '../../../../../environments/environment';
         [title]="confirmTitle()"
         message="Cette action est irréversible."
         (confirm)="confirmDelete()"
-        (cancel)="showConfirmDialog.set(false)"
-      >
+        (cancel)="showConfirmDialog.set(false)">
       </app-confirm-dialog>
     </div>
   `,
@@ -537,6 +401,27 @@ export class AdminactivitesComponent implements OnInit {
   activites = signal<any[]>([]);
   total = computed(() => this.activites().length);
   isLoading = signal(true);
+
+  // Stats computed properties
+  photosCount = computed(() => this.activites().filter((a) => a.typeMedia === 'PHOTOS').length);
+  photosPercent = computed(() => this.total() > 0 ? (this.photosCount() / this.total()) * 100 : 0);
+
+  videosCount = computed(() => this.activites().filter((a) => a.typeMedia === 'VIDEOS').length);
+  videosPercent = computed(() => this.total() > 0 ? (this.videosCount() / this.total()) * 100 : 0);
+
+  ceMoisCount = computed(() => {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    return this.activites().filter((a) => {
+      if (!a.date) return false;
+      const d = new Date(a.date);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    }).length;
+  });
+  ceMoisPercent = computed(() => this.total() > 0 ? (this.ceMoisCount() / this.total()) * 100 : 0);
+
+  publieesCount = computed(() => this.activites().filter((a) => a.statut === 'PUBLIE').length);
+  publieesPercent = computed(() => this.total() > 0 ? (this.publieesCount() / this.total()) * 100 : 0);
 
   categories = signal<Option[]>([]);
   showModal = signal(false);
@@ -769,13 +654,32 @@ export class AdminactivitesComponent implements OnInit {
         const uploadPromises = currentNew.map(async (media) => {
           const fd = new FormData();
           fd.append('file', media.blob);
-          const res = await fetch(`${environment.apiUrl}/upload-public`, {
-            method: 'POST',
-            body: fd,
-          });
-          const result = await res.json();
-          if (result.success) return result.url;
-          else throw new Error(`Erreur upload ${media.name}`);
+          
+          try {
+            const res = await fetch(`${environment.apiUrl}/upload-public`, {
+              method: 'POST',
+              body: fd,
+            });
+            
+            const text = await res.text();
+            let result;
+            try {
+              result = text ? JSON.parse(text) : {};
+            } catch (e) {
+              if (res.status === 413) throw new Error(`Le fichier ${media.name} est trop lourd pour le serveur (limite Vercel dépassée).`);
+              if (res.status === 504) throw new Error(`Le téléchargement de ${media.name} a expiré (timeout).`);
+              throw new Error(`Erreur serveur (${res.status}) lors de l'envoi de ${media.name}.`);
+            }
+            
+            if (!res.ok) {
+              throw new Error(result.message || `Erreur HTTP ${res.status} pour ${media.name}.`);
+            }
+            
+            if (result.success) return result.url;
+            else throw new Error(result.message || `Erreur serveur lors de l'upload de ${media.name}.`);
+          } catch (err: any) {
+             throw new Error(err.message || `Connexion échouée pour ${media.name}.`);
+          }
         });
 
         const newUrls = await Promise.all(uploadPromises);

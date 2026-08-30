@@ -9,26 +9,32 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   imports: [CommonModule, FormsModule],
   providers: [AdminDataService],
   template: `
-  <div class="animate-fade-in-up">
-    <div class="mb-8">
-      <h2 class="text-2xl font-black text-white">Contenu Éditorial</h2>
-      <p class="text-sm text-gray-400 mt-1">
-        Modifiez les textes des pages <strong class="text-[#022c16]">Le Mouvement</strong> (/mouvement) et <strong class="text-[#022c16]">Nos Axes</strong> (/axes) du site public.
-      </p>
+  <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#e6f3eb] flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-pen-ruler text-[#008d36] text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Contenu Éditorial</h2>
+          <p class="text-[13px] text-gray-500 font-medium mt-0.5">Modifiez les textes des pages <strong class="text-[#022c16]">Le Mouvement</strong> et <strong class="text-[#022c16]">Nos Axes</strong>.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-2 mb-6">
+    <div class="flex gap-2 mb-6 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm w-max">
       <button (click)="activeTab = 'home'"
-        [class]="activeTab === 'home' ? 'px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow' : 'px-5 py-2.5 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-sm font-bold border border-white/20 hover:bg-white/5 transition-colors'">
+        [class]="activeTab === 'home' ? 'px-5 py-2.5 bg-[#e6f3eb] text-[#008d36] rounded-xl text-sm font-bold shadow-sm' : 'px-5 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-xl text-sm font-bold transition-colors'">
         <i class="fa-solid fa-house mr-2"></i> Accueil
       </button>
       <button (click)="activeTab = 'mouvement'"
-        [class]="activeTab === 'mouvement' ? 'px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow' : 'px-5 py-2.5 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-sm font-bold border border-white/20 hover:bg-white/5 transition-colors'">
+        [class]="activeTab === 'mouvement' ? 'px-5 py-2.5 bg-[#e6f3eb] text-[#008d36] rounded-xl text-sm font-bold shadow-sm' : 'px-5 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-xl text-sm font-bold transition-colors'">
         <i class="fa-solid fa-seedling mr-2"></i> Le Mouvement
       </button>
       <button (click)="activeTab = 'axes'"
-        [class]="activeTab === 'axes' ? 'px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow' : 'px-5 py-2.5 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-sm font-bold border border-white/20 hover:bg-white/5 transition-colors'">
+        [class]="activeTab === 'axes' ? 'px-5 py-2.5 bg-[#e6f3eb] text-[#008d36] rounded-xl text-sm font-bold shadow-sm' : 'px-5 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-xl text-sm font-bold transition-colors'">
         <i class="fa-solid fa-network-wired mr-2"></i> Nos Axes
       </button>
     </div>
@@ -36,87 +42,109 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     <!-- ===== TAB: ACCUEIL ===== -->
     <div *ngIf="activeTab === 'home'" class="space-y-6">
 
+      <!-- Section Hero -->
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-heading"></i></div>
+          Section Hero (Haut de page)
+        </h3>
+        <div class="space-y-5">
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Grand Titre (HTML supporté)</label>
+            <input [(ngModel)]="home.heroTitle" type="text"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm font-bold focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
+              placeholder="Écouter les besoins...">
+          </div>
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Paragraphe sous le titre (HTML supporté)</label>
+            <textarea [(ngModel)]="home.heroParagraph" rows="3"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"
+              placeholder="JÀMM AK XÉEWAL n'est pas..."></textarea>
+          </div>
+        </div>
+      </div>
+
       <!-- Photo du Président -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-camera"></i></div>
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-camera"></i></div>
           Photo du Président
         </h3>
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">URL de la photo</label>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">URL de la photo</label>
             <input [(ngModel)]="home.presidentPhoto" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
               placeholder="https://... ou assets/photo.jpg">
-            <p class="text-xs text-gray-400 mt-1">Collez l'URL de la photo ou uploadez via la section Médias</p>
+            <p class="text-[11px] text-gray-400 font-medium mt-2"><i class="fa-solid fa-circle-info mr-1"></i> Collez l'URL de la photo ou uploadez via la section Médias</p>
           </div>
           <div *ngIf="home.presidentPhoto" class="mt-3">
-            <img [src]="home.presidentPhoto" alt="Aperçu" class="w-32 h-32 object-cover rounded-xl border border-white/20">
+            <img [src]="home.presidentPhoto" alt="Aperçu" class="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm">
           </div>
         </div>
       </div>
 
       <!-- Message du Président -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-green/5 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-quote-right"></i></div>
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-quote-right"></i></div>
           Message du Président
         </h3>
-        <div class="space-y-4">
+        <div class="space-y-5">
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Titre de la section</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre de la section</label>
             <input [(ngModel)]="home.title" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
               placeholder="Ensemble, bâtissons le Thiès-Nord de demain">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Nom du Président</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Nom du Président</label>
             <input [(ngModel)]="home.presidentName" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
               placeholder="Nom complet du président">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Message (HTML supporté)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Message (HTML supporté)</label>
             <textarea [(ngModel)]="home.message" rows="8"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"
               placeholder="<p>Votre message ici...</p>"></textarea>
-            <p class="text-xs text-gray-400 mt-1">Utilisez <code>&lt;p&gt;</code> pour les paragraphes, <code>&lt;strong&gt;</code> pour le texte en gras</p>
+            <p class="text-[11px] text-gray-400 font-medium mt-2">Utilisez <code>&lt;p&gt;</code> pour les paragraphes, <code>&lt;strong&gt;</code> pour le texte en gras</p>
           </div>
         </div>
       </div>
 
       <!-- Statistiques -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chart-bar"></i></div>
           Statistiques d'Impact
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Citoyens actifs</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Citoyens actifs</label>
             <input [(ngModel)]="home.stat1Value" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-1 focus:ring-[#022c16] transition-all outline-none mb-2"
               placeholder="500+">
             <input [(ngModel)]="home.stat1Label" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all mt-2"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-[#022c16] transition-all outline-none"
               placeholder="Citoyens actifs">
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Quartiers</label>
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Quartiers</label>
             <input [(ngModel)]="home.stat2Value" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-1 focus:ring-[#022c16] transition-all outline-none mb-2"
               placeholder="15">
             <input [(ngModel)]="home.stat2Label" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all mt-2"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-[#022c16] transition-all outline-none"
               placeholder="Quartiers">
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Actions réalisées</label>
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Actions réalisées</label>
             <input [(ngModel)]="home.stat3Value" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-1 focus:ring-[#022c16] transition-all outline-none mb-2"
               placeholder="32">
             <input [(ngModel)]="home.stat3Label" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all mt-2"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-[#022c16] transition-all outline-none"
               placeholder="Actions réalisées">
           </div>
         </div>
@@ -124,12 +152,12 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
       <div class="flex items-center gap-3">
         <button (click)="onSave('home')"
-          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#022c16]/80 transition-all flex items-center gap-2 shadow-lg">
+          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Accueil"
         </button>
         <a href="/" target="_blank"
-          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#022c16]/10 rounded-xl hover:bg-[#022c16]/20 transition-colors flex items-center gap-2">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page d'accueil
+          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#e6f3eb] rounded-xl hover:bg-[#d1e8d9] transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page
         </a>
       </div>
     </div>
@@ -138,65 +166,65 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     <div *ngIf="activeTab === 'mouvement'" class="space-y-6">
 
       <!-- Hero & Intro -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-heading"></i></div>
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-heading"></i></div>
           Section Hero — "Qui sommes-nous ?"
         </h3>
-        <div class="space-y-4">
+        <div class="space-y-5">
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sous-titre de page</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Sous-titre de page</label>
             <input [(ngModel)]="mouvement.heroSubtitle" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Titre principal</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre principal</label>
             <input [(ngModel)]="mouvement.heroTitle" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm font-bold focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Paragraphe principal</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Paragraphe principal</label>
             <textarea [(ngModel)]="mouvement.heroParagraph" rows="4"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none"></textarea>
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"></textarea>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sous-paragraphe (3 piliers)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Sous-paragraphe (3 piliers)</label>
             <textarea [(ngModel)]="mouvement.heroSubParagraph" rows="2"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none"></textarea>
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"></textarea>
           </div>
         </div>
       </div>
 
       <!-- Vision / Mission / Valeurs -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-green/5 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-compass"></i></div>
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-compass"></i></div>
           Section "Ce qui nous anime" — Vision, Mission, Valeurs
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="bg-black/20 rounded-xl p-4 border border-white/10">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-6 h-6 bg-brand-green/10 text-brand-green rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-eye"></i></div>
-              <span class="text-sm font-bold text-gray-200">Notre Vision</span>
+          <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-eye"></i></div>
+              <span class="text-sm font-bold text-gray-900">Notre Vision</span>
             </div>
-            <textarea [(ngModel)]="mouvement.vision" rows="4"
-              class="w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none bg-white/5 border border-white/10"></textarea>
+            <textarea [(ngModel)]="mouvement.vision" rows="5"
+              class="w-full px-3 py-2.5 border border-gray-200 bg-white rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"></textarea>
           </div>
-          <div class="bg-black/20 rounded-xl p-4 border border-white/10">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-6 h-6 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-bullseye"></i></div>
-              <span class="text-sm font-bold text-gray-200">Notre Mission</span>
+          <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-bullseye"></i></div>
+              <span class="text-sm font-bold text-gray-900">Notre Mission</span>
             </div>
-            <textarea [(ngModel)]="mouvement.mission" rows="4"
-              class="w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none bg-white/5 border border-white/10"></textarea>
+            <textarea [(ngModel)]="mouvement.mission" rows="5"
+              class="w-full px-3 py-2.5 border border-gray-200 bg-white rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"></textarea>
           </div>
-          <div class="bg-black/20 rounded-xl p-4 border border-white/10">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-6 h-6 bg-brand-green/20 text-brand-green rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-heart"></i></div>
-              <span class="text-sm font-bold text-gray-200">Nos Valeurs</span>
+          <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-[#e6f3eb] text-[#008d36] rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-heart"></i></div>
+              <span class="text-sm font-bold text-gray-900">Nos Valeurs</span>
             </div>
-            <textarea [(ngModel)]="mouvement.valeurs" rows="4"
-              class="w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none bg-white/5 border border-white/10"
+            <textarea [(ngModel)]="mouvement.valeurs" rows="5"
+              class="w-full px-3 py-2.5 border border-gray-200 bg-white rounded-lg text-sm text-gray-700 focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"
               placeholder="Une valeur par ligne..."></textarea>
           </div>
         </div>
@@ -204,12 +232,12 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
       <div class="flex items-center gap-3">
         <button (click)="onSave('mouvement')"
-          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#022c16]/80 transition-all flex items-center gap-2 shadow-lg">
+          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Le Mouvement"
         </button>
         <a href="/mouvement" target="_blank"
-          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#022c16]/10 rounded-xl hover:bg-[#022c16]/20 transition-colors flex items-center gap-2">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page publique
+          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#e6f3eb] rounded-xl hover:bg-[#d1e8d9] transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page
         </a>
       </div>
     </div>
@@ -218,68 +246,70 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     <div *ngIf="activeTab === 'axes'" class="space-y-6">
 
       <!-- Hero Axes -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-heading"></i></div>
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xs"><i class="fa-solid fa-heading"></i></div>
           Section Hero — "Nos 3 Pôles d'Action"
         </h3>
-        <div class="space-y-4">
+        <div class="space-y-5">
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Titre principal</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre principal</label>
             <input [(ngModel)]="axes.heroTitle" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm font-bold focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Description</label>
-            <textarea [(ngModel)]="axes.heroDesc" rows="2"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none"></textarea>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Description</label>
+            <textarea [(ngModel)]="axes.heroDesc" rows="3"
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"></textarea>
           </div>
         </div>
       </div>
 
       <!-- Les 3 pôles -->
-      <div *ngFor="let pole of axes.poles; let i = index" class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
-        <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
+      <div *ngFor="let pole of axes.poles; let i = index" class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <div class="w-7 h-7 rounded-full bg-[#022c16] text-white flex items-center justify-center text-xs font-black">{{ i + 1 }}</div>
           Pôle {{ i + 1 }}
         </h3>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Titre du pôle</label>
-            <input [(ngModel)]="pole.titre" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
+        <div class="space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre du pôle</label>
+              <input [(ngModel)]="pole.titre" type="text"
+                class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm font-bold text-[#008d36] focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none">
+            </div>
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Sous-titre</label>
+              <input [(ngModel)]="pole.soustitre" type="text"
+                class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none">
+            </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sous-titre</label>
-            <input [(ngModel)]="pole.soustitre" type="text"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Actions (une par ligne)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Actions (une par ligne)</label>
             <textarea [(ngModel)]="pole.actions" rows="5"
-              class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all resize-none font-mono text-xs"></textarea>
+              class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none font-mono text-[13px] leading-relaxed outline-none text-gray-700"></textarea>
           </div>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
         <button (click)="onSave('axes')"
-          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#022c16]/80 transition-all flex items-center gap-2 shadow-lg">
+          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Nos Axes"
         </button>
         <a href="/axes" target="_blank"
-          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#022c16]/10 rounded-xl hover:bg-[#022c16]/20 transition-colors flex items-center gap-2">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page publique
+          class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#e6f3eb] rounded-xl hover:bg-[#d1e8d9] transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir la page
         </a>
       </div>
     </div>
 
     <!-- Success toast -->
-    <div *ngIf="saved" class="fixed bottom-6 right-6 bg-[#022c16] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in-up z-50">
+    <div *ngIf="saved" class="fixed bottom-6 right-6 bg-[#008d36] text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 animate-fade-in-up z-50">
       <i class="fa-solid fa-circle-check text-xl"></i>
       <div>
         <p class="font-black text-sm">Contenu enregistré !</p>
-        <p class="text-xs text-white/70">La mise à jour sera visible sur le site public.</p>
+        <p class="text-[11px] text-white/90">La mise à jour sera visible sur le site public.</p>
       </div>
     </div>
   </div>
@@ -291,6 +321,8 @@ export class AdminEditorialComponent implements OnInit {
   isLoading = true;
 
   home: any = {
+    heroTitle: 'Écouter les besoins, <br/>\n<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none">Construire Ensemble.</span>',
+    heroParagraph: 'JÀMM AK XÉEWAL n\'est pas qu\'une idée, c\'est <strong class="text-white">une force en action sur le terrain</strong>.<br/><br/>Rejoignez des centaines de citoyens engagés pour transformer notre quartier, rue par rue.',
     presidentPhoto: 'assets/media_1787574641552.jpg',
     presidentName: 'Le Président',
     title: 'Ensemble, bâtissons <br/><span class=\'text-brand-greenLight\'>le Thiès-Nord de demain</span>',
@@ -350,7 +382,7 @@ export class AdminEditorialComponent implements OnInit {
   }
 
   onSave(section: string) {
-    const content = section === 'mouvement' ? this.mouvement : this.axes;
+    const content = section === 'home' ? this.home : section === 'mouvement' ? this.mouvement : this.axes;
     this.adminData.saveEditorial(section, content).subscribe({
       next: () => {
         this.saved = true;

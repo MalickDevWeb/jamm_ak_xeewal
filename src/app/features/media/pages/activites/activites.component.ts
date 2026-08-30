@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PublicDataService } from '../../../../core/services/public-data.service';
 
 @Component({
@@ -18,8 +19,15 @@ export class ActivitesComponent implements OnInit {
   selectedActivite = signal<any>(null);
   lightboxMediaUrls = signal<string[]>([]);
   lightboxIndex = signal(0);
+  
+  // Broken image trackers
+  brokenImages = new Set<string>();
+  brokenLightboxImages = new Set<string>();
 
-  constructor(private publicData: PublicDataService) {}
+  constructor(
+    private publicData: PublicDataService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     this.publicData.getActivites().subscribe({
@@ -49,27 +57,80 @@ export class ActivitesComponent implements OnInit {
 
   getFirstMedia(url: string | null): string {
     const urls = this.getMediaUrls(url);
-    return urls[0] || 'https://picsum.photos/seed/default/600/400';
+    return urls[0] || 'assets/media_1787574641552.jpg';
   }
 
   isVideo(url: string): boolean {
-    return url.includes('/video/') || url.endsWith('.mp4') || url.endsWith('.webm');
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.includes('.mp4') || lower.includes('.webm') || lower.includes('youtube.com') || lower.includes('youtu.be') || (lower.includes('cloudinary.com') && lower.includes('/video/'));
   }
 
-  getCardThumbnail(url: string): string {
-    if (!url) return 'https://picsum.photos/seed/default/600/400';
+  isDirectVideo(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.includes('.mp4') || lower.includes('.webm') || (lower.includes('cloudinary.com') && lower.includes('/video/'));
+  }
 
-    if (url.includes('res.cloudinary.com') && this.isVideo(url)) {
-      return url
-        .replace('/video/upload/', '/video/upload/w_600,q_auto,so_0/')
-        .replace(/\.(mp4|webm|mov|avi)$/i, '.jpg');
+  isEmbedVideo(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.includes('youtube.com') || lower.includes('youtu.be');
+  }
+
+  getSafeVideoUrl(url: string): SafeResourceUrl {
+    let finalUrl = url;
+    if (url.includes('youtube.com/watch?v=')) {
+      const vidId = url.split('v=')[1].split('&')[0];
+      finalUrl = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0`;
+    } else if (url.includes('youtu.be/')) {
+      const vidId = url.split('youtu.be/')[1].split('?')[0];
+      finalUrl = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+  }
+
+  getCardThumbnail(activite: any): string {
+    if (this.brokenImages.has(activite.id)) {
+      return 'assets/media_1787574641552.jpg';
     }
 
-    if (url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
-      return url.replace('/image/upload/', '/image/upload/w_600,q_auto,f_auto/');
+    const urls = this.getMediaUrls(activite.mediaUrl);
+    const defaultImg = 'assets/media_1787574641552.jpg';
+    if (urls.length === 0) return defaultImg;
+
+    // Prioritize explicitly uploaded image
+    const image = urls.find(u => !this.isVideo(u));
+    if (image) {
+      return image;
     }
 
-    return url;
+    const firstUrl = urls[0];
+    if (this.isVideo(firstUrl)) {
+      if (firstUrl.includes('youtube.com/watch?v=')) {
+        const vidId = firstUrl.split('v=')[1].split('&')[0];
+        return `https://img.youtube.com/vi/${vidId}/maxresdefault.jpg`;
+      } else if (firstUrl.includes('youtu.be/')) {
+        const vidId = firstUrl.split('youtu.be/')[1].split('?')[0];
+        return `https://img.youtube.com/vi/${vidId}/maxresdefault.jpg`;
+      } else if (firstUrl.includes('res.cloudinary.com') && firstUrl.includes('/video/')) {
+        return firstUrl.replace(/\.(mp4|webm|ogg|mov)$/i, '.jpg');
+      }
+      return defaultImg;
+    }
+
+    return firstUrl || defaultImg;
+  }
+
+  onImageError(activiteId: string) {
+    if (!this.brokenImages.has(activiteId)) {
+      this.brokenImages.add(activiteId);
+      // Angular signals update automatically in some contexts, but to be sure we could trigger a ref.
+    }
+  }
+
+  onLightboxImageError(url: string) {
+    this.brokenLightboxImages.add(url);
   }
 
   openLightbox(activite: any) {

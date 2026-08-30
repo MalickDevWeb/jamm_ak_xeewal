@@ -10,86 +10,134 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
-  <div class="animate-fade-in-up">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h2 class="text-2xl font-black text-white">Boîte à Idées</h2>
-        <p class="text-sm text-gray-400 mt-1">{{ total }} idées proposées par les citoyens.</p>
+  <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-[#e6f3eb] flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-lightbulb text-[#008d36] text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Boîte à Idées</h2>
+          <p class="text-[13px] text-gray-500 font-medium mt-0.5">{{ total }} idées proposées par les citoyens.</p>
+        </div>
       </div>
-      <button (click)="action('Nouvelle idée')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
-        <i class="fa-solid fa-plus"></i> Nouvelle idée
-      </button>
+      <div class="flex items-center gap-3">
+        <button (click)="action('Nouvelle idée')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Nouvelle idée
+        </button>
+      </div>
     </div>
 
-    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="text-center">
-        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-400 text-sm">Chargement depuis l'API...</p>
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#008d36] mb-4"></i>
+        <p class="text-gray-500 text-sm font-medium">Chargement des idées...</p>
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <div *ngFor="let idee of idees" class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6 hover:shadow-md transition-all group relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-20 h-20 bg-brand-green/5 rounded-bl-full pointer-events-none"></div>
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs bg-brand-green/20 text-brand-green px-2.5 py-1 rounded-full font-bold">{{ idee.categorie }}</span>
-          <span [class]="getStatutClass(idee.statut)" class="text-[11px] font-bold px-2.5 py-1 rounded-full">{{ idee.statut.replace('_', ' ') }}</span>
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && idees.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+        <i class="fa-regular fa-lightbulb text-3xl text-gray-300"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Aucune idée</h3>
+      <p class="text-sm text-gray-500">La boîte à idées est vide pour le moment.</p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div *ngIf="!isLoading && idees.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div *ngFor="let idee of idees" class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 overflow-hidden flex flex-col p-5 group hover:shadow-lg transition-all border-l-[6px] border-l-[#008d36]">
+        
+        <div class="flex items-center justify-between mb-4">
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-[#e6f3eb] text-[#008d36] uppercase tracking-wide truncate max-w-[150px]">{{ idee.categorie }}</span>
+          <span [class]="getStatutClass(idee.statut)" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide shrink-0">{{ idee.statut.replace('_', ' ') }}</span>
         </div>
-        <h3 class="text-base font-bold text-white mb-2">{{ idee.titre }}</h3>
-        <p class="text-sm text-gray-400 mb-4 line-clamp-2">{{ idee.description }}</p>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3 text-xs text-gray-400">
-            <span><i class="fa-solid fa-user mr-1"></i>Anonyme</span>
-            <span><i class="fa-regular fa-calendar mr-1"></i>{{ idee.createdAt | date:'dd/MM/yyyy' }}</span>
+
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-lightbulb text-[#008d36] text-lg"></i>
           </div>
-          <div class="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-full font-bold text-sm border border-amber-100">
-            <i class="fa-solid fa-thumbs-up text-xs"></i>
-            <span>{{ idee.votes }}</span>
+          <h3 class="font-bold text-[16px] text-gray-900 line-clamp-1" [title]="idee.titre">{{ idee.titre }}</h3>
+        </div>
+
+        <p class="text-[13px] text-gray-500 font-medium mb-4 line-clamp-2 min-h-[40px]">{{ idee.description }}</p>
+
+        <div class="flex items-center justify-between mt-auto mb-4">
+          <div class="flex items-center gap-3 text-[11px] font-medium text-gray-400">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-user"></i> Anonyme</span>
+            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> {{ idee.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full font-black text-xs border border-yellow-100">
+            <i class="fa-solid fa-thumbs-up"></i>
+            <span>{{ idee.votes || 0 }}</span>
           </div>
         </div>
-        <div class="mt-4 pt-4 border-t border-gray-50 flex gap-2">
-          <button (click)="action('Approuver', idee.id)" class="flex-1 py-1.5 text-xs font-bold text-white bg-[#022c16] hover:bg-[#022c16]/80 rounded-lg transition-colors">Approuver</button>
-          <button (click)="action('Rejeter', idee.id)" class="flex-1 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-500/10 rounded-lg transition-colors border border-red-100">Rejeter</button>
-          <button (click)="action('Supprimer', idee.id)" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-500/10 rounded-lg transition-colors border border-red-100"><i class="fa-solid fa-trash"></i></button>
+
+        <!-- Actions -->
+        <div class="pt-4 border-t border-gray-50 flex gap-2">
+          <button (click)="action('Approuver', idee.id)" class="flex-1 py-2 text-xs font-black text-white bg-[#022c16] hover:bg-[#008d36] rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-check"></i> Approuver
+          </button>
+          <button (click)="action('Rejeter', idee.id)" class="flex-1 py-2 text-xs font-black text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-xmark"></i> Rejeter
+          </button>
+          <button (click)="action('Supprimer', idee.id)" class="w-10 h-9 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shrink-0">
+            <i class="fa-solid fa-trash text-xs"></i>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Modal Création -->
-    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white/5 border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-        <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/20">
-          <h3 class="font-black text-white text-lg">Nouvelle Idée</h3>
-          <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in-up my-4 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
+             <div class="w-10 h-10 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
+               <i class="fa-solid fa-plus text-[#008d36]"></i>
+             </div>
+             Nouvelle Idée
+          </h3>
+          <button (click)="showModal = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
         </div>
-        <div class="p-6">
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Titre de l'idée</label>
-            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Ex: Créer un parc...">
+        
+        <div class="p-6 space-y-5">
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre de l'idée <span class="text-red-500">*</span></label>
+            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Ex: Créer un parc...">
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Catégorie</label>
-            <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
+          
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Catégorie</label>
+            <select [(ngModel)]="formData.categorie" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none appearance-none">
               <option value="Environnement">Environnement</option>
               <option value="Santé">Santé</option>
               <option value="Éducation">Éducation</option>
               <option value="Sport">Sport</option>
+              <option value="Social">Social</option>
+              <option value="Économie">Économie</option>
+              <option value="Culture">Culture</option>
             </select>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-200 mb-1">Description</label>
-            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Description de l'idée..."></textarea>
+          
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Description <span class="text-red-500">*</span></label>
+            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none resize-none" placeholder="Description de l'idée..."></textarea>
           </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">Annuler</button>
-            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Créer</button>
+          
+          <div class="flex justify-end gap-3 pt-2">
+            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
+            <button (click)="submitForm()" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Créer
+            </button>
           </div>
         </div>
       </div>
     </div>
-
-  
-    <!-- Confirmation Dialog -->
   </div>
   `
 })
@@ -119,8 +167,13 @@ export class AdminideesComponent implements OnInit, OnDestroy {
   }
 
   getStatutClass(s: string): string {
-    const map: any = { 'NOUVELLE': 'bg-brand-yellow/10 text-brand-yellow', 'A_LETUDE': 'bg-brand-green/10 text-brand-green', 'VALIDEE': 'bg-brand-green/10 text-brand-green', 'REJETEE': 'bg-red-500/10 text-red-400' };
-    return map[s] || 'bg-white/10 text-gray-400';
+    const map: any = { 
+       'NOUVELLE': 'bg-yellow-50 text-yellow-600', 
+       'A_LETUDE': 'bg-[#e6f3eb] text-[#008d36]', 
+       'VALIDEE': 'bg-[#e6f3eb] text-[#008d36]', 
+       'REJETEE': 'bg-red-50 text-red-500' 
+    };
+    return map[s] || 'bg-gray-100 text-gray-500';
   }
 
   action(type: string, id?: string) {

@@ -39,6 +39,10 @@ export class PublicDataService {
   postIdee(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/idees`, data); }
   postMessage(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/messages`, data); }
 
+
+  // --- Agenda ---
+  getEvenements(): Observable<any> { return this.http.get(`${this.apiUrl}/evenements`); }
+
   // --- Upload d'images (recto/verso carte d'identité) ---
   uploadImage(file: File): Observable<any> { const fd = new FormData(); fd.append('file', file); return this.http.post(`${this.apiUrl}/upload-public`, fd); }
 }

@@ -62,7 +62,8 @@
                   CARTE : toujours une image statique (thumbnail) pour ne pas charger
                   la vidéo entière. La vidéo se charge uniquement dans le lightbox.
                 -->
-                <img [src]="getCardThumbnail(getFirstMedia(activite.mediaUrl))"
+                <img [src]="getCardThumbnail(activite)"
+                     (error)="onImageError(activite.id)"
                      [alt]="activite.titre"
                      loading="lazy"
                      class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -137,15 +138,25 @@
         </button>
 
         <!-- Video -->
-        <video *ngIf="isVideo(lightboxMediaUrls()[lightboxIndex()])"
+        <video *ngIf="isDirectVideo(lightboxMediaUrls()[lightboxIndex()])"
                [src]="lightboxMediaUrls()[lightboxIndex()]"
                class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl"
                controls autoplay muted loop playsinline>
         </video>
 
+        <iframe *ngIf="isEmbedVideo(lightboxMediaUrls()[lightboxIndex()])"
+                [src]="getSafeVideoUrl(lightboxMediaUrls()[lightboxIndex()])"
+                title="Lecteur vidéo de l'activité" 
+                class="w-full max-w-4xl h-[60vh] rounded-xl shadow-2xl scale-100 transition-transform duration-300" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+        </iframe>
+
         <!-- Image -->
         <img *ngIf="!isVideo(lightboxMediaUrls()[lightboxIndex()])"
-             [src]="lightboxMediaUrls()[lightboxIndex()]"
+             [src]="brokenLightboxImages.has(lightboxMediaUrls()[lightboxIndex()]) ? 'assets/media_1787574641552.jpg' : lightboxMediaUrls()[lightboxIndex()]"
+             (error)="onLightboxImageError(lightboxMediaUrls()[lightboxIndex()])"
              [alt]="selectedActivite().titre"
              class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl">
 

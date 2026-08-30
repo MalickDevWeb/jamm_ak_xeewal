@@ -78,6 +78,11 @@ export const routes: Routes = [
         path: 'comptes-rendus', 
         loadComponent: () => import('./features/admin/comptes-rendus/pages/admin-comptes-rendus.component')
           .then(m => m.AdminComptesRendusComponent)
+      },
+      { 
+        path: 'evenements', 
+        loadComponent: () => import('./features/admin/evenements/pages/admin-evenements.component')
+          .then(m => m.AdminEvenementsComponent)
       }
     ]
   },
@@ -145,8 +150,19 @@ export const routes: Routes = [
         path: 'compte-rendu', 
         loadComponent: () => import('./features/media/pages/compte-rendu/compte-rendu.component')
           .then(m => m.CompteRenduComponent)
+      },
+      { 
+        path: 'maintenance', 
+        loadComponent: () => import('./features/public/pages/maintenance/maintenance.component')
+          .then(m => m.MaintenanceComponent)
       }
     ]
+  },
+  // --- Super Admin Maintenance System ---
+  {
+    path: 'maintenance_sat',
+    loadComponent: () => import('./features/admin/maintenance/pages/maintenance-sat.component')
+      .then(m => m.MaintenanceSatComponent)
   },
   { path: '**', redirectTo: '' }
 ];

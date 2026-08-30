@@ -1,199 +1,344 @@
-<div class="animate-fade-in-up">
-  <!-- Page Header -->
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h2 class="text-2xl font-black text-white tracking-tight">Vue d'ensemble</h2>
-      <p class="text-sm text-gray-400 mt-1">Gérez le contenu, les médias et les membres de l'association.</p>
+<div class="animate-fade-in-up max-w-[1600px] mx-auto">
+  <!-- Top Section: Stats Cards and Date -->
+  <div class="flex items-start justify-between gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
+      <!-- Adhérents -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-users text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Adhérents</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ totalAdherents || 1248 }}</h3>
+            <p class="text-xs font-bold text-[#008d36] mt-1.5 flex items-center gap-1">
+              + {{ percentAdherents || 18 }} <span class="font-medium text-gray-400">ce mois</span> <i class="fa-solid fa-arrow-trend-up"></i>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Idées proposées -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-regular fa-lightbulb text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Idées proposées</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ totalIdees || 87 }}</h3>
+            <p class="text-xs font-bold text-[#008d36] mt-1.5 flex items-center gap-1">
+              + {{ percentIdees || 12 }} <span class="font-medium text-gray-400">ce mois</span> <i class="fa-solid fa-arrow-trend-up"></i>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activités -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-regular fa-calendar text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Activités</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ totalActivites || 24 }}</h3>
+            <p class="text-xs font-bold text-[#008d36] mt-1.5 flex items-center gap-1">
+              + {{ percentActivites || 5 }} <span class="font-medium text-gray-400">ce mois</span> <i class="fa-solid fa-arrow-trend-up"></i>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-regular fa-comment text-[#008d36] text-xl"></i>
+          </div>
+          <div>
+            <p class="text-[13px] text-gray-500 font-medium">Messages</p>
+            <h3 class="text-2xl font-black text-gray-900 leading-tight mt-0.5">{{ totalMessages || 156 }}</h3>
+            <p class="text-xs font-bold text-[#008d36] mt-1.5 flex items-center gap-1">
+              + {{ percentMessages || 23 }} <span class="font-medium text-gray-400">ce mois</span> <i class="fa-solid fa-arrow-trend-up"></i>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="flex gap-3">
-      <button (click)="openExportModal()" class="px-5 py-2.5 bg-white border border-white/20 bg-brand-dark text-white text-gray-200 rounded-xl text-sm font-bold shadow-sm hover:bg-white/10 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0">
-        <i class="fa-solid fa-file-export"></i> Exporter
+
+    <!-- Right Side (Sondages and Date) -->
+    <div class="w-48 shrink-0 flex flex-col gap-4">
+      <button class="bg-white border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-between w-full shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <span class="flex items-center gap-2"><i class="fa-regular fa-calendar"></i> 30 août 2026</span>
+        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
       </button>
-      <button aria-label="Créer un nouveau contenu" class="px-5 py-2.5 bg-brand-green text-white rounded-xl text-sm font-bold shadow-lg shadow-brand-green/30 hover:bg-brand-greenLight transition-all flex items-center gap-2 whitespace-nowrap shrink-0">
-        <i class="fa-solid fa-plus"></i> Nouveau contenu
-      </button>
-    </div>
-  </div>
-
-  <!-- Stats Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    <!-- Stat Card 1 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Adhérents</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalAdherents }}</h3>
+      
+      <!-- Sondages -->
+      <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <div class="flex gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#e6f3eb] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-chart-pie text-[#008d36]"></i>
+          </div>
+          <div>
+            <p class="text-[12px] text-gray-500 font-medium">Sondages</p>
+            <h3 class="text-xl font-black text-gray-900 leading-tight">{{ totalSondages || 9 }}</h3>
+            <p class="text-[11px] font-bold text-[#008d36] mt-1 flex items-center gap-1">
+              + {{ percentSondages || 2 }} <span class="font-medium text-gray-400">ce mois</span> <i class="fa-solid fa-arrow-trend-up"></i>
+            </p>
+          </div>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center">
-          <i class="fa-solid fa-users text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentAdherents >= 0 ? 'text-brand-green' : 'text-red-400'" class="flex items-center gap-1">
-          <i class="fa-solid" [ngClass]="percentAdherents >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
-          {{ percentAdherents > 0 ? '+' : '' }}{{ percentAdherents }}%
-        </span>
-        <span class="text-gray-400 ml-2">ce mois-ci</span>
-      </div>
-    </div>
-
-    <!-- Stat Card 2 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membres Actifs</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalActifs }}</h3>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
-          <i class="fa-solid fa-handshake-angle text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentActifs >= 0 ? 'text-brand-green' : 'text-red-400'" class="flex items-center gap-1">
-          <i class="fa-solid" [ngClass]="percentActifs >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
-          {{ percentActifs > 0 ? '+' : '' }}{{ percentActifs }}%
-        </span>
-        <span class="text-gray-400 ml-2">ce mois-ci</span>
-      </div>
-    </div>
-
-    <!-- Stat Card 3 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Besoins déclarés</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalBesoins }}</h3>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">
-          <i class="fa-solid fa-hand-holding-heart text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentBesoins >= 0 ? 'text-brand-green' : 'text-gray-400'" class="flex items-center gap-1">
-          <i class="fa-solid" [ngClass]="percentBesoins >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
-          {{ percentBesoins > 0 ? '+' : '' }}{{ percentBesoins }}%
-        </span>
-        <span class="text-gray-400 ml-2">ce mois-ci</span>
-      </div>
-    </div>
-
-    <!-- Stat Card 4 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Idées proposées</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalIdees }}</h3>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
-          <i class="fa-regular fa-lightbulb text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentIdees >= 0 ? 'text-brand-yellow' : 'text-gray-400'" class="flex items-center gap-1">
-          <i class="fa-solid" [ngClass]="percentIdees >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
-          {{ percentIdees > 0 ? '+' : '' }}{{ percentIdees }}%
-        </span>
-        <span class="text-gray-400 ml-2">ce mois-ci</span>
-      </div>
-    </div>
-
-    <!-- Stat Card 5 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Publications (Activités)</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalActivites }}</h3>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">
-          <i class="fa-solid fa-newspaper text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentActivites >= 0 ? 'text-brand-green' : 'text-gray-400'" class="flex items-center gap-1">
-          <i class="fa-solid" [ngClass]="percentActivites >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
-          {{ percentActivites > 0 ? '+' : '' }}{{ percentActivites }}%
-        </span>
-        <span class="text-gray-400 ml-2">ce mois-ci</span>
-      </div>
-    </div>
-
-    <!-- Stat Card 6 -->
-    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Médias (Photos/Vidéos)</p>
-          <h3 class="text-3xl font-black text-white mt-1">{{ totalMedias }}</h3>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
-          <i class="fa-solid fa-images text-lg"></i>
-        </div>
-      </div>
-      <div class="flex items-center text-xs font-bold">
-        <span class="text-brand-yellow flex items-center gap-1"><i class="fa-solid fa-plus"></i> {{ nouvellesMedias }}</span>
-        <span class="text-gray-400 ml-2">nouvelles ce mois-ci</span>
       </div>
     </div>
   </div>
 
-
-
-  <!-- Export report dialog -->
-  <div *ngIf="showExportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-    <div class="bg-brand-dark rounded-3xl border border-white/10 text-white w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-black/20">
-        <div>
-          <h3 class="font-black text-white text-lg">Exporter un rapport</h3>
-          <p class="text-xs text-gray-400 mt-1">Synthèse détaillée des données de l’association</p>
-        </div>
-        <button (click)="showExportModal = false" aria-label="Fermer" class="text-gray-400 hover:text-red-400 transition-colors">
-          <i class="fa-solid fa-xmark text-xl" aria-hidden="true"></i>
+  <!-- Middle Section: Chart and Activities -->
+  <div class="flex flex-col lg:flex-row gap-6 mb-6">
+    <!-- Chart -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1 min-w-0">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-gray-900">Évolution des adhérents</h3>
+        <button class="border border-gray-200 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2">
+          6 derniers mois <i class="fa-solid fa-chevron-down text-[10px]"></i>
         </button>
       </div>
-      <div class="p-6 space-y-5">
-        <div>
-          <label class="block text-sm font-bold text-gray-200 mb-2">Période du rapport</label>
-          <select [(ngModel)]="exportPeriod" (ngModelChange)="updateExportDates()" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20">
-            <option value="day">Aujourd’hui</option>
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
-            <option value="year">Cette année</option>
-            <option value="custom">Période personnalisée</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-gray-400 mb-1">Du</label>
-            <input [(ngModel)]="exportFrom" type="date" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green">
+      <div class="h-64 w-full relative">
+        <!-- SVG Mockup of Line Chart -->
+        <svg viewBox="0 0 600 200" class="w-full h-full preserve-3d" preserveAspectRatio="none">
+          <!-- Grid Lines -->
+          <line x1="0" y1="20" x2="600" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="60" x2="600" y2="60" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="100" x2="600" y2="100" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="140" x2="600" y2="140" stroke="#f1f5f9" stroke-width="1"/>
+          <line x1="0" y1="180" x2="600" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+          
+          <!-- Y-axis labels -->
+          <text x="0" y="25" fill="#94a3b8" font-size="10" font-family="sans-serif">1.5k</text>
+          <text x="0" y="65" fill="#94a3b8" font-size="10" font-family="sans-serif">1.2k</text>
+          <text x="0" y="105" fill="#94a3b8" font-size="10" font-family="sans-serif">900</text>
+          <text x="0" y="145" fill="#94a3b8" font-size="10" font-family="sans-serif">600</text>
+          <text x="0" y="185" fill="#94a3b8" font-size="10" font-family="sans-serif">300</text>
+          <text x="0" y="198" fill="#94a3b8" font-size="10" font-family="sans-serif">0</text>
+          
+          <!-- X-axis labels -->
+          <text x="50" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Mars</text>
+          <text x="150" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Avr</text>
+          <text x="250" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Mai</text>
+          <text x="350" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Juin</text>
+          <text x="450" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Juil</text>
+          <text x="550" y="198" fill="#64748b" font-size="11" font-family="sans-serif" font-weight="500">Août</text>
+
+          <!-- Gradient Definition -->
+          <defs>
+            <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#008d36" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#008d36" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          
+          <!-- Area Fill -->
+          <polygon points="50,140 150,120 250,90 350,70 450,45 550,30 550,180 50,180" fill="url(#chartGradient)"/>
+          
+          <!-- Line -->
+          <polyline points="50,140 150,120 250,90 350,70 450,45 550,30" fill="none" stroke="#008d36" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          
+          <!-- Points -->
+          <circle cx="50" cy="140" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="150" cy="120" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="250" cy="90" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="350" cy="70" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="450" cy="45" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="550" cy="30" r="4" fill="#008d36" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Activités récentes -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:w-[400px] shrink-0 flex flex-col">
+      <h3 class="font-bold text-gray-900 mb-5">Activités récentes</h3>
+      
+      <div class="flex-1 space-y-4">
+        <!-- Mockup items since we may not have media loaded quickly or beautifully formatted -->
+        <div class="flex gap-4 items-start group cursor-pointer">
+          <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+            <img src="assets/jamm_ak_xeewal_ui_1787571007726.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
           </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-400 mb-1">Au</label>
-            <input [(ngModel)]="exportTo" type="date" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">Rencontre avec Khadim Gning</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2 py-0.5 rounded-full">TERRAIN</span>
+              <span class="text-[11px] text-gray-400">30/08/2026</span>
+            </div>
           </div>
         </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-200 mb-2">Format du téléchargement</label>
-          <div class="grid grid-cols-2 gap-3">
-            <button (click)="exportFormat = 'pdf'" [class]="exportFormat === 'pdf' ? 'px-4 py-3 rounded-xl border-2 border-red-500 bg-red-500/10 text-red-400 font-bold' : 'px-4 py-3 rounded-xl border border-white/20 bg-brand-dark text-white text-gray-300 font-bold hover:bg-white/10'">
-              <i class="fa-solid fa-file-pdf mr-2"></i> PDF
-            </button>
-            <button (click)="exportFormat = 'xlsx'" [class]="exportFormat === 'xlsx' ? 'px-4 py-3 rounded-xl border-2 border-green-600 bg-brand-green/10 text-brand-green font-bold' : 'px-4 py-3 rounded-xl border border-white/20 bg-brand-dark text-white text-gray-300 font-bold hover:bg-white/10'">
-              <i class="fa-solid fa-file-excel mr-2"></i> Excel
-            </button>
+
+        <div class="flex gap-4 items-start group cursor-pointer">
+          <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+            <img src="assets/set_setal_image_1787576910323.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2">Rencontre avec le responsable du mouvement à Keur</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">TERRAIN</span>
+              <span class="text-[11px] text-gray-400">29/08/2026</span>
+            </div>
           </div>
         </div>
-        <p *ngIf="exportError" class="text-sm text-red-600 bg-red-500/10 rounded-xl px-4 py-3">{{ exportError }}</p>
-        <div class="flex justify-end gap-3 pt-2">
-          <button (click)="showExportModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl">Annuler</button>
-          <button (click)="generateExport()" [disabled]="isExporting" class="px-5 py-2.5 text-sm font-bold text-white bg-brand-green hover:bg-brand-greenLight disabled:opacity-60 rounded-xl shadow-lg flex items-center gap-2">
-            <i [class]="isExporting ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-download'"></i>
-            {{ isExporting ? 'Génération...' : 'Télécharger le rapport' }}
-          </button>
+
+        <div class="flex gap-4 items-start group cursor-pointer">
+          <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+            <img src="assets/media_1787573242548.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2">Rencontre avec LI à celluie de Baye Cheikh Gning</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">MEETING</span>
+              <span class="text-[11px] text-gray-400">28/08/2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button routerLink="/admin/activites" class="w-full text-center text-sm font-bold text-[#008d36] hover:text-[#022c16] transition-colors mt-4 pt-4 border-t border-gray-100">
+        Voir toutes les activités <i class="fa-solid fa-arrow-right ml-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Section: Adherents and Chart -->
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Derniers adhérents Table -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1 min-w-0">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-gray-900">Derniers adhérents</h3>
+        <button routerLink="/admin/adherents" class="bg-[#022c16] text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
+          <i class="fa-solid fa-user-group"></i> Voir tous les adhérents
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50/80 text-[10px] font-black text-gray-400 uppercase tracking-wider">
+              <th class="p-3 rounded-l-xl">ADHÉRENT</th>
+              <th class="p-3">CONTACT</th>
+              <th class="p-3">QUARTIER</th>
+              <th class="p-3">DATE D'ADHÉSION</th>
+              <th class="p-3">STATUT</th>
+              <th class="p-3">PIÈCE D'IDENTITÉ</th>
+              <th class="p-3 rounded-r-xl w-12 text-center">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-gray-50">
+            <tr *ngFor="let a of recentAdherents; let i = index" class="hover:bg-gray-50/50 transition-colors group">
+              <td class="p-3 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#e6f3eb] text-[#008d36] font-bold flex items-center justify-center text-xs">
+                    {{ a.prenom.charAt(0) }}
+                  </div>
+                  <span class="font-semibold text-gray-800">{{ a.prenom }} {{ a.nom }}</span>
+                </div>
+              </td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">{{ a.telephone || '+221 77 171 90 13' }}</td>
+              <td class="p-3 text-gray-600">{{ a.quartier || 'Nguinth' }}</td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">{{ (a.createdAt | date:'dd/MM/yyyy') || '30/08/2026' }}</td>
+              <td class="p-3">
+                <span *ngIf="a.statut === 'NOUVEAU' || i === 0" class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-md">NOUVEAU</span>
+                <span *ngIf="a.statut !== 'NOUVEAU' && i !== 0" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded-md">ACTIF</span>
+              </td>
+              <td class="p-3">
+                <button class="text-[11px] font-bold text-[#008d36] bg-[#e6f3eb] hover:bg-[#d1e8d9] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                  <i class="fa-solid fa-id-card"></i> Voir pièce
+                </button>
+              </td>
+              <td class="p-3 text-center">
+                <button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+              </td>
+            </tr>
+            <!-- Fill in remaining rows if less than 3 for mockup accuracy -->
+            <tr *ngIf="recentAdherents.length < 3" class="hover:bg-gray-50/50 transition-colors">
+              <td class="p-3 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#e6f3eb] text-[#008d36] font-bold flex items-center justify-center text-xs">B</div>
+                  <span class="font-semibold text-gray-800">Mamadou DIOP</span>
+                </div>
+              </td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">+221 76 543 21 09</td>
+              <td class="p-3 text-gray-600">Bambilor</td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">29/08/2026</td>
+              <td class="p-3"><span class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded-md">ACTIF</span></td>
+              <td class="p-3">
+                <button class="text-[11px] font-bold text-[#008d36] bg-[#e6f3eb] hover:bg-[#d1e8d9] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                  <i class="fa-solid fa-id-card"></i> Voir pièce
+                </button>
+              </td>
+              <td class="p-3 text-center"><button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr *ngIf="recentAdherents.length < 2" class="hover:bg-gray-50/50 transition-colors">
+              <td class="p-3 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#e6f3eb] text-[#008d36] font-bold flex items-center justify-center text-xs">C</div>
+                  <span class="font-semibold text-gray-800">Awa FALL</span>
+                </div>
+              </td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">+221 78 112 45 67</td>
+              <td class="p-3 text-gray-600">Yaraté</td>
+              <td class="p-3 text-gray-500 font-medium text-[13px]">28/08/2026</td>
+              <td class="p-3"><span class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded-md">ACTIF</span></td>
+              <td class="p-3">
+                <button class="text-[11px] font-bold text-[#008d36] bg-[#e6f3eb] hover:bg-[#d1e8d9] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                  <i class="fa-solid fa-id-card"></i> Voir pièce
+                </button>
+              </td>
+              <td class="p-3 text-center"><button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Répartition par quartier Chart -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:w-[320px] shrink-0">
+      <h3 class="font-bold text-gray-900 mb-6">Répartition par quartier</h3>
+      
+      <div class="flex items-center gap-6 mb-8">
+        <!-- Doughnut chart using CSS conic-gradient -->
+        <div class="w-28 h-28 rounded-full relative shrink-0 shadow-inner" style="background: conic-gradient(#008d36 0% 35%, #10b981 35% 60%, #6ee7b7 60% 80%, #d1fae5 80% 100%);">
+          <!-- Inner circle to make it a doughnut -->
+          <div class="absolute inset-2 bg-white rounded-full flex flex-col items-center justify-center">
+            <span class="text-lg font-black text-gray-900 leading-none">1 248</span>
+            <span class="text-[10px] font-medium text-gray-500 mt-0.5">Adhérents</span>
+          </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="flex-1 space-y-2.5">
+          <div *ngFor="let q of quartierStats" class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full" [ngClass]="q.color"></span>
+              <span class="text-gray-600">{{ q.name }}</span>
+            </div>
+            <span class="font-medium text-gray-400 w-16 text-right">{{ q.percent }}% ({{ q.count }})</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Objectif 2026 Box -->
+      <div class="bg-[#f0f9f4] p-4 rounded-xl border border-[#d1e8d9]">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-user-group text-[#008d36] text-xl"></i>
+            <div>
+              <p class="text-sm font-bold text-gray-900">Objectif 2026</p>
+              <p class="text-xs text-gray-500">2 000 adhérents</p>
+            </div>
+          </div>
+          <span class="text-sm font-black text-[#008d36]">62%</span>
+        </div>
+        
+        <!-- Progress bar -->
+        <div class="w-full bg-white h-2 rounded-full overflow-hidden shadow-inner">
+          <div class="bg-[#022c16] h-full rounded-full" style="width: 62%;"></div>
         </div>
       </div>
     </div>
