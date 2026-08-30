@@ -19,7 +19,7 @@ interface CacheEntry {
   timestamp: number;
 }
 
-const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+const CACHE_TTL_MS = 30 * 1000; // 30 secondes
 
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {

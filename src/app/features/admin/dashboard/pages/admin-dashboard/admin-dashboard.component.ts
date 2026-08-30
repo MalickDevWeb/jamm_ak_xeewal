@@ -24,31 +24,88 @@ export class AdminDashboardComponent implements OnInit {
   exportError = '';
 
   totalAdherents = 0;
+  percentAdherents = 0;
   totalActifs = 0;
+  percentActifs = 0;
   totalBesoins = 0;
+  percentBesoins = 0;
   totalIdees = 0;
+  percentIdees = 0;
+  totalActivites = 0;
+  percentActivites = 0;
+  totalMedias = 0;
+  nouvellesMedias = 0;
 
   ngOnInit() {
     this.adminData.getAdherents().subscribe({
       next: (res: any) => {
         if (res.data) {
-          this.totalAdherents = res.total || res.data.length;
-          this.totalActifs = res.data.filter((a: any) => a.statut === 'ACTIF').length;
+          const adherents = res.data;
+          this.totalAdherents = adherents.length;
+          this.percentAdherents = this.calculatePercentage(adherents, 'createdAt');
+          
+          const actifs = adherents.filter((a: any) => a.statut === 'ACTIF');
+          this.totalActifs = actifs.length;
+          this.percentActifs = this.calculatePercentage(actifs, 'createdAt');
         }
       }, error: () => {}
     });
 
     this.adminData.getBesoins().subscribe({
       next: (res: any) => {
-        if (res.data) this.totalBesoins = res.total || res.data.length;
+        if (res.data) {
+          this.totalBesoins = res.data.length;
+          this.percentBesoins = this.calculatePercentage(res.data, 'createdAt');
+        }
       }, error: () => {}
     });
 
     this.adminData.getIdees().subscribe({
       next: (res: any) => {
-        if (res.data) this.totalIdees = res.total || res.data.length;
+        if (res.data) {
+          this.totalIdees = res.data.length;
+          this.percentIdees = this.calculatePercentage(res.data, 'createdAt');
+        }
       }, error: () => {}
     });
+
+    this.adminData.getActivites().subscribe({
+      next: (res: any) => {
+        if (res.data) {
+          this.totalActivites = res.data.length;
+          this.percentActivites = this.calculatePercentage(res.data, 'createdAt');
+          
+          this.totalMedias = res.data.reduce((acc: number, act: any) => acc + (act.mediaCount || 0), 0);
+          
+          const startOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+          let nouvelles = 0;
+          res.data.forEach((act: any) => {
+            const actDate = act.createdAt ? new Date(act.createdAt) : new Date(act.date);
+            if (actDate >= startOfCurrentMonth) nouvelles += (act.mediaCount || 0);
+          });
+          this.nouvellesMedias = nouvelles;
+        }
+      }
+    });
+  }
+
+  private calculatePercentage(items: any[], dateField = 'createdAt'): number {
+    if (!items || items.length === 0) return 0;
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfPreviousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    
+    let currentMonth = 0;
+    let previousMonth = 0;
+
+    items.forEach(item => {
+      const d = new Date(item[dateField]);
+      if (d >= startOfCurrentMonth) currentMonth++;
+      else if (d >= startOfPreviousMonth && d < startOfCurrentMonth) previousMonth++;
+    });
+
+    if (previousMonth === 0) return currentMonth > 0 ? 100 : 0;
+    return Math.round(((currentMonth - previousMonth) / previousMonth) * 100);
   }
 
   private readonly reportSources = [
