@@ -38,10 +38,10 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   touchStartY = 0;
   readonly LOCK_THRESHOLD = 50; // pixels to slide up to lock
 
-  // === PHOTO UPLOAD ===
-  imageBlob: File | null = null;
-  imagePreviewUrl: string | null = null;
-  cloudinaryImageUrl: string | null = null;
+  // === PHOTO UPLOAD (Max 3) ===
+  imageBlobs: File[] = [];
+  imagePreviewUrls: string[] = [];
+  cloudinaryImageUrls: string[] = [];
   isUploadingImage = false;
   imageError = '';
 
@@ -332,9 +332,9 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.recordingTime = 0;
     this.vocalError = '';
     this.isUploadingVocal = false;
-    this.imageBlob = null;
-    this.imagePreviewUrl = null;
-    this.cloudinaryImageUrl = null;
+    this.imageBlobs = [];
+    this.imagePreviewUrls = [];
+    this.cloudinaryImageUrls = [];
     this.imageError = '';
     this.cdr.markForCheck();
   }
@@ -379,27 +379,45 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   }
 
   async onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
       this.imageError = '';
-      if (file.size > 15 * 1024 * 1024) {
-        this.imageError = "L'image est trop lourde (max 15MB).";
+      
+      if (this.imageBlobs.length + files.length > 3) {
+        this.imageError = "Vous ne pouvez ajouter que 3 photos maximum.";
         this.cdr.markForCheck();
         return;
       }
-      try {
-        this.imageBlob = await this.compressImage(file);
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.imagePreviewUrl = e.target.result;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.size > 15 * 1024 * 1024) {
+          this.imageError = "Une des images est trop lourde (max 15MB).";
           this.cdr.markForCheck();
-        };
-        reader.readAsDataURL(this.imageBlob!);
-      } catch (err) {
-        this.imageError = "Erreur de compression d'image.";
-        this.cdr.markForCheck();
+          return;
+        }
+        try {
+          const compressed = await this.compressImage(file);
+          this.imageBlobs.push(compressed);
+          const reader = new FileReader();
+          reader.onload = (e: any) => {
+            this.imagePreviewUrls.push(e.target.result);
+            this.cdr.markForCheck();
+          };
+          reader.readAsDataURL(compressed);
+        } catch (err) {
+          this.imageError = "Erreur de compression d'image.";
+          this.cdr.markForCheck();
+        }
       }
     }
+  }
+
+  removeImage(index: number, event: Event) {
+    event.stopPropagation();
+    this.imageBlobs.splice(index, 1);
+    this.imagePreviewUrls.splice(index, 1);
+    this.cloudinaryImageUrls.splice(index, 1);
   }
 
   // =====================
@@ -449,17 +467,21 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         this.isUploadingVocal = false;
       }
 
-      // 2. Upload image if needed
-      if (this.imageBlob && !this.cloudinaryImageUrl) {
+      // 2. Upload images if needed
+      if (this.imageBlobs.length > 0 && this.cloudinaryImageUrls.length !== this.imageBlobs.length) {
         this.isUploadingImage = true;
         this.cdr.markForCheck();
-        const fd = new FormData();
-        fd.append('file', this.imageBlob);
-        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
-        if (res.success) {
-          this.cloudinaryImageUrl = res.url;
-        } else {
-          throw new Error("Échec de l'envoi de l'image.");
+        
+        this.cloudinaryImageUrls = [];
+        for (const blob of this.imageBlobs) {
+          const fd = new FormData();
+          fd.append('file', blob);
+          const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
+          if (res.success) {
+            this.cloudinaryImageUrls.push(res.url);
+          } else {
+            throw new Error("Échec de l'envoi d'une image.");
+          }
         }
         this.isUploadingImage = false;
       }
@@ -502,8 +524,8 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       payload.vocalUrl = this.cloudinaryVocalUrl;
     }
 
-    if (this.cloudinaryImageUrl) {
-      payload.photoUrl = this.cloudinaryImageUrl; // or adapt depending on how backend expects it
+    if (this.cloudinaryImageUrls.length > 0) {
+      payload.photoUrl = this.cloudinaryImageUrls.join(',');
     }
 
     this.publicData.postBesoin(payload).pipe(

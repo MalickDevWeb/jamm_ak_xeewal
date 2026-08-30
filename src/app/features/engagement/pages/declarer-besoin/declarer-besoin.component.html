@@ -147,34 +147,39 @@
           <!-- PHOTO -->
           <div>
             <label class="block text-[11px] sm:text-xs font-black text-gray-700 uppercase tracking-widest mb-3">
-              Ajoutez une photo <span class="text-gray-400 font-semibold normal-case tracking-normal lowercase">(optionnel)</span>
+              Ajoutez des photos <span class="text-gray-400 font-semibold normal-case tracking-normal lowercase">(max 3, optionnel)</span>
             </label>
             
-            <div class="border-[1.5px] border-dashed border-gray-300 rounded-2xl bg-white hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden" 
-                 [class.opacity-60]="isUploadingImage"
-                 onclick="document.getElementById('photoUpload').click()">
-              
-              <div *ngIf="!imagePreviewUrl && !isUploadingImage" class="py-4 flex items-center justify-center gap-2 text-gray-500 font-semibold text-sm">
-                <i class="fa-solid fa-camera text-gray-400 text-lg"></i>
-                <span>Joindre photo</span>
-              </div>
-
-              <div *ngIf="isUploadingImage" class="py-4 flex items-center justify-center gap-2 text-[#00a651] font-bold text-sm">
-                <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
-                <span>Envoi...</span>
-              </div>
-
-              <div *ngIf="imagePreviewUrl" class="relative w-full h-32">
-                <img [src]="imagePreviewUrl" alt="Photo jointe" class="w-full h-full object-cover">
-                <button (click)="imagePreviewUrl = null; imageBlob = null; cloudinaryImageUrl = null; $event.stopPropagation();" 
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <!-- Uploaded Images -->
+              <div *ngFor="let url of imagePreviewUrls; let i = index" class="relative w-full h-24 rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+                <img [src]="url" alt="Photo jointe" class="w-full h-full object-cover">
+                <button (click)="removeImage(i, $event)" 
                         aria-label="Supprimer la photo"
-                        class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center shadow-md">
+                        class="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-white text-red-500 flex items-center justify-center shadow-md active:scale-95 transition-transform">
                   <i class="fa-solid fa-times text-sm"></i>
                 </button>
               </div>
 
+              <!-- Add Photo Button -->
+              <div *ngIf="imagePreviewUrls.length < 3" 
+                   class="border-[1.5px] border-dashed border-gray-300 rounded-2xl bg-white hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden flex flex-col items-center justify-center h-24" 
+                   [class.opacity-60]="isUploadingImage"
+                   onclick="document.getElementById('photoUpload').click()">
+                
+                <div *ngIf="!isUploadingImage" class="flex flex-col items-center gap-1 text-gray-400">
+                  <i class="fa-solid fa-camera text-xl"></i>
+                  <span class="text-xs font-semibold">{{ imagePreviewUrls.length > 0 ? 'Ajouter autre' : 'Joindre photo' }}</span>
+                </div>
+
+                <div *ngIf="isUploadingImage" class="flex flex-col items-center gap-1 text-[#00a651]">
+                  <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+                  <span class="text-xs font-bold">Envoi...</span>
+                </div>
+              </div>
             </div>
-            <input type="file" id="photoUpload" class="hidden" accept="image/*" (change)="onImageSelected($event)">
+            
+            <input type="file" id="photoUpload" class="hidden" accept="image/*" multiple (change)="onImageSelected($event)">
             
             <p *ngIf="imageError" class="text-red-500 text-xs mt-2 flex items-center gap-1.5 font-bold">
               <i class="fa-solid fa-circle-exclamation"></i> {{ imageError }}
