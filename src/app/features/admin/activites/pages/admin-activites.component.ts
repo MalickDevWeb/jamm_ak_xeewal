@@ -237,11 +237,11 @@ import { environment } from '../../../../../environments/environment';
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto"
       >
         <div
-          class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl animate-fade-in-up my-8"
+          class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl animate-fade-in-up my-4"
         >
           <!-- Modal Header -->
           <div
-            class="px-8 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl"
+            class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl"
           >
             <div class="flex items-center justify-between">
               <h3
@@ -265,7 +265,7 @@ import { environment } from '../../../../../environments/environment';
           </div>
 
           <!-- Modal Body -->
-          <div class="p-8 space-y-6">
+          <div class="p-6 space-y-4">
             <!-- Title -->
             <div>
               <label
@@ -344,10 +344,10 @@ import { environment } from '../../../../../environments/environment';
               </label>
 
               <label
-                class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all"
+                class="flex flex-col items-center justify-center w-full h-24 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all"
               >
                 <div
-                  class="flex flex-col items-center justify-center pt-5 pb-6"
+                  class="flex flex-col items-center justify-center py-4"
                 >
                   <i
                     class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"
@@ -460,7 +460,7 @@ import { environment } from '../../../../../environments/environment';
 
           <!-- Modal Footer -->
           <div
-            class="px-8 py-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-3xl"
+            class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-3xl"
           >
             <button
               (click)="closeModal()"
