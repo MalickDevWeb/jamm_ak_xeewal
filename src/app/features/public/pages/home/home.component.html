@@ -9,13 +9,13 @@
     <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
       <!-- Text Content -->
       <div class="text-center lg:text-left">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-sm font-medium mb-6">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-green/20 border border-brand-green/30 text-brand-greenLight text-sm font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-brand-greenLight animate-pulse"></span>
           Le mouvement de Thiès-Nord
         </div>
         <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-6">
           Écouter les besoins,<br>
-          <span class="text-gradient from-emerald-400 to-teal-300">Construire Ensemble.</span>
+          <span class="text-gradient">Construire Ensemble.</span>
         </h1>
         <p class="text-lg sm:text-xl text-slate-300 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
           JÀMM AK XÉEWAL n'est pas qu'une idée, c'est <strong class="text-white">une force en action sur le terrain</strong>. Rejoignez des centaines de citoyens engagés pour transformer notre quartier.
@@ -37,19 +37,19 @@
         <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
           <div class="grid grid-cols-2 gap-6">
             <div class="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <div class="text-3xl sm:text-4xl font-bold text-emerald-400 mb-1">{{ homeContent?.stat1Value || '500+' }}</div>
+              <div class="text-3xl sm:text-4xl font-bold text-brand-greenLight mb-1">{{ homeContent?.stat1Value || '500+' }}</div>
               <div class="text-sm text-slate-300">{{ homeContent?.stat1Label || 'Citoyens actifs' }}</div>
             </div>
             <div class="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <div class="text-3xl sm:text-4xl font-bold text-teal-400 mb-1">{{ homeContent?.stat2Value || '15' }}</div>
+              <div class="text-3xl sm:text-4xl font-bold text-brand-yellow mb-1">{{ homeContent?.stat2Value || '15' }}</div>
               <div class="text-sm text-slate-300">{{ homeContent?.stat2Label || 'Quartiers' }}</div>
             </div>
             <div class="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <div class="text-3xl sm:text-4xl font-bold text-cyan-400 mb-1">{{ homeContent?.stat3Value || '32' }}</div>
+              <div class="text-3xl sm:text-4xl font-bold text-brand-green mb-1">{{ homeContent?.stat3Value || '32' }}</div>
               <div class="text-sm text-slate-300">{{ homeContent?.stat3Label || 'Actions réalisées' }}</div>
             </div>
             <div class="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <div class="text-3xl sm:text-4xl font-bold text-amber-400 mb-1">3</div>
+              <div class="text-3xl sm:text-4xl font-bold text-brand-yellowDark mb-1">3</div>
               <div class="text-sm text-slate-300">Pôles d'action</div>
             </div>
           </div>
@@ -80,8 +80,8 @@
         <!-- Floating Card -->
         <div class="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-4 border border-slate-100">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <i class="fa-solid fa-signature text-emerald-600 text-lg"></i>
+            <div class="w-12 h-12 rounded-xl bg-brand-green/10 flex items-center justify-center">
+              <i class="fa-solid fa-signature text-brand-green text-lg"></i>
             </div>
             <div>
               <div class="font-bold text-slate-800">{{ homeContent?.presidentName || 'Le Président' }}</div>
@@ -93,7 +93,7 @@
 
       <!-- Content -->
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-green/10 text-brand-green text-sm font-medium mb-4">
           <i class="fa-solid fa-quote-left"></i>
           Le Mot du Président
         </div>
@@ -108,7 +108,7 @@
 <section class="py-20 lg:py-32 bg-white">
   <div class="container-custom">
     <div class="text-center mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-green/10 text-brand-green text-sm font-medium mb-4">
         <i class="fa-solid fa-compass"></i>
         Notre Vision
       </div>
@@ -119,51 +119,51 @@
     <div class="grid md:grid-cols-3 gap-8">
       <!-- Pôle 1 -->
       <div class="card group">
-        <div class="h-2 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+        <div class="h-2 bg-brand-green"></div>
         <div class="card-body">
-          <div class="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-graduation-cap text-emerald-600 text-xl"></i>
+          <div class="w-14 h-14 rounded-2xl bg-brand-green/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-graduation-cap text-brand-green text-xl"></i>
           </div>
           <h3 class="text-xl font-bold text-slate-800 mb-3">Développement Humain</h3>
           <p class="text-slate-600 mb-4">Éducation, santé, autonomisation des femmes et renforcement de la cohésion sociale.</p>
           <ul class="space-y-2 text-sm text-slate-500">
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Formation de base</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Action sociale</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Culture & Sport</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-green"></i> Formation de base</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-green"></i> Action sociale</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-green"></i> Culture & Sport</li>
           </ul>
         </div>
       </div>
 
       <!-- Pôle 2 -->
       <div class="card group">
-        <div class="h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+        <div class="h-2 bg-brand-yellow"></div>
         <div class="card-body">
-          <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-briefcase text-blue-600 text-xl"></i>
+          <div class="w-14 h-14 rounded-2xl bg-brand-yellow/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-briefcase text-brand-yellowDark text-xl"></i>
           </div>
           <h3 class="text-xl font-bold text-slate-800 mb-3">Économie & Innovation</h3>
           <p class="text-slate-600 mb-4">Entrepreneuriat, emploi, formation numérique et incubation de projets locaux.</p>
           <ul class="space-y-2 text-sm text-slate-500">
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-500"></i> Entrepreneuriat</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-500"></i> Métiers du numérique</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-500"></i> Incubation</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-yellowDark"></i> Entrepreneuriat</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-yellowDark"></i> Métiers du numérique</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-yellowDark"></i> Incubation</li>
           </ul>
         </div>
       </div>
 
       <!-- Pôle 3 -->
       <div class="card group">
-        <div class="h-2 bg-gradient-to-r from-teal-400 to-teal-600"></div>
+        <div class="h-2 bg-[#022c16]"></div>
         <div class="card-body">
-          <div class="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-leaf text-teal-600 text-xl"></i>
+          <div class="w-14 h-14 rounded-2xl bg-[#022c16]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-leaf text-[#022c16] text-xl"></i>
           </div>
           <h3 class="text-xl font-bold text-slate-800 mb-3">Cadre de Vie</h3>
           <p class="text-slate-600 mb-4">Environnement, assainissement, sécurité et aménagement des espaces publics.</p>
           <ul class="space-y-2 text-sm text-slate-500">
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-500"></i> Assainissement</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-500"></i> Reboisement</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-500"></i> Sécurité citoyenne</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#022c16]"></i> Assainissement</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#022c16]"></i> Reboisement</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#022c16]"></i> Sécurité citoyenne</li>
           </ul>
         </div>
       </div>
@@ -182,7 +182,7 @@
   <div class="container-custom">
     <div class="flex items-end justify-between mb-12">
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-green/10 text-brand-green text-sm font-medium mb-4">
           <i class="fa-solid fa-calendar-days"></i>
           En action
         </div>

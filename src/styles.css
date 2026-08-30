@@ -46,13 +46,13 @@
 
   /* Boutons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg shadow-emerald-500/25 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-green text-white font-semibold rounded-xl hover:bg-brand-dark transition-all shadow-[0_8px_20px_-6px_rgba(0,141,54,0.5)] active:scale-95;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-700 font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-dark font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95;
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-emerald-500 text-emerald-600 font-semibold rounded-xl hover:bg-emerald-50 transition-all active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-brand-green text-brand-green font-semibold rounded-xl hover:bg-brand-green/10 transition-all active:scale-95;
   }
 
   /* Inputs */
@@ -67,9 +67,9 @@
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full;
   }
-  .badge-green { @apply bg-emerald-100 text-emerald-700; }
+  .badge-green { @apply bg-brand-green/10 text-brand-green; }
   .badge-red { @apply bg-red-100 text-red-700; }
-  .badge-yellow { @apply bg-amber-100 text-amber-700; }
+  .badge-yellow { @apply bg-brand-yellow/10 text-brand-yellowDark; }
   .badge-blue { @apply bg-blue-100 text-blue-700; }
   .badge-purple { @apply bg-purple-100 text-purple-700; }
 }
@@ -91,11 +91,11 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-green to-brand-greenLight;
   }
 
   .bg-gradient-hero {
-    @apply bg-gradient-to-br from-slate-900 via-emerald-900 to-teal-900;
+    @apply bg-brand-dark;
   }
 
   .glass {

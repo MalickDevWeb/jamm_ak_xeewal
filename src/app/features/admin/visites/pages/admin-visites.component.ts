@@ -14,14 +14,14 @@ import {
   AdminDataService,
   Option,
 } from '../../../../core/services/admin-data.service';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, AlertPopupComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: 'app-admin-activites',
+  selector: 'app-admin-visites',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
   template: `
     <div
       class="animate-fade-in-up min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6"
@@ -30,11 +30,11 @@ import { environment } from '../../../../../environments/environment';
       <div class="flex items-center justify-between mb-8">
         <div>
           <h2 class="text-4xl font-black text-gray-900 flex items-center gap-3">
-            <i class="fa-solid fa-images text-3xl text-[#022c16]"></i>
-            Activités
+            <i class="fa-solid fa-map-location-dot text-3xl text-[#022c16]"></i>
+            Visites
           </h2>
           <p class="text-sm text-gray-500 mt-1">
-            {{ total }} activité(s) enregistrée(s)
+            {{ total }} visite(s) enregistrée(s)
           </p>
         </div>
         <button
@@ -42,64 +42,61 @@ import { environment } from '../../../../../environments/environment';
           class="px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2"
         >
           <i class="fa-solid fa-plus text-lg"></i>
-          <span>Nouvelle activité</span>
+          <span>Nouvelle visite</span>
         </button>
       </div>
 
       <!-- Loading state -->
       <div *ngIf="isLoading" class="flex items-center justify-center py-20">
         <div class="text-center">
-          <i
-            class="fa-solid fa-circle-notch fa-spin text-5xl text-[#022c16] mb-4"
-          ></i>
-          <p class="text-gray-500 text-lg">Chargement des activités...</p>
+          <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#022c16] mb-4"></i>
+          <p class="text-gray-500 text-lg">Chargement des visites...</p>
         </div>
       </div>
 
       <!-- Empty state -->
       <div
-        *ngIf="!isLoading && activites.length === 0"
+        *ngIf="!isLoading && visites.length === 0"
         class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200"
       >
-        <i class="fa-solid fa-photo-film text-7xl text-gray-300 mb-4"></i>
-        <p class="text-gray-500 text-xl mb-2">Aucune activité enregistrée</p>
+        <i class="fa-solid fa-map-location-dot text-7xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500 text-xl mb-2">Aucune visite enregistrée</p>
         <button
           (click)="openCreateModal()"
           class="text-[#022c16] font-bold hover:underline text-lg"
         >
-          Créer la première activité →
+          Créer la première visite →
         </button>
       </div>
 
-      <!-- Activities Grid -->
+      <!-- Visites Grid -->
       <div
-        *ngIf="!isLoading && activites.length > 0"
+        *ngIf="!isLoading && visites.length > 0"
         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
       >
         <div
-          *ngFor="let a of activites; trackBy: trackById"
+          *ngFor="let v of visites; trackBy: trackById"
           class="group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
         >
           <!-- Media Section -->
           <div
             class="relative h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden"
           >
-            <!-- Main media display -->
             <img
-              *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)"
-              [src]="getFirstMedia(a)"
+              *ngIf="v.typeMedia === 'PHOTOS' && getFirstMedia(v)"
+              [src]="getFirstMedia(v)"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
 
-            <div *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" class="relative w-full h-full">
+            <div *ngIf="v.typeMedia === 'VIDEOS' && getFirstMedia(v)" class="relative w-full h-full">
               <img
-                *ngIf="!a._videoPlaying"
-                [src]="getFirstMedia(a) + '?thumbnail=true'"
+                *ngIf="!v._videoPlaying"
+                [src]="getFirstMedia(v) + '?thumbnail=true'"
                 class="w-full h-full object-cover"
               />
               <button
-                *ngIf="!a._videoPlaying"
-                (click)="playVideo(a)"
+                *ngIf="!v._videoPlaying"
+                (click)="playVideo(v)"
                 class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-all"
               >
                 <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
@@ -107,8 +104,8 @@ import { environment } from '../../../../../environments/environment';
                 </div>
               </button>
               <video
-                *ngIf="a._videoPlaying"
-                [src]="getFirstMedia(a)"
+                *ngIf="v._videoPlaying"
+                [src]="getFirstMedia(v)"
                 class="w-full h-full object-cover"
                 autoplay
                 loop
@@ -119,32 +116,32 @@ import { environment } from '../../../../../environments/environment';
 
             <!-- Placeholder when no media -->
             <div
-              *ngIf="!getFirstMedia(a)"
+              *ngIf="!getFirstMedia(v)"
               class="w-full h-full flex flex-col items-center justify-center text-gray-400"
             >
-              <i class="fa-solid fa-image text-6xl mb-2"></i>
+              <i class="fa-solid fa-map-location-dot text-6xl mb-2"></i>
               <span class="text-sm">Aucun média</span>
             </div>
 
             <!-- Media count badge -->
             <div
-              *ngIf="a.mediaCount > 1"
+              *ngIf="v.mediaCount > 1"
               class="absolute top-3 right-3 bg-black/70 backdrop-blur text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"
             >
               <i class="fa-solid fa-images text-xs"></i>
-              {{ a.mediaCount }} médias
+              {{ v.mediaCount }} médias
             </div>
 
             <!-- Type badge -->
             <div class="absolute top-3 left-3">
               <span
-                *ngIf="a.typeMedia === 'VIDEOS'"
+                *ngIf="v.typeMedia === 'VIDEOS'"
                 class="bg-red-500/90 backdrop-blur text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
               >
                 <i class="fa-solid fa-video text-xs"></i> Vidéo
               </span>
               <span
-                *ngIf="a.typeMedia === 'PHOTOS'"
+                *ngIf="v.typeMedia === 'PHOTOS'"
                 class="bg-green-500/90 backdrop-blur text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
               >
                 <i class="fa-solid fa-image text-xs"></i> Photo
@@ -156,14 +153,14 @@ import { environment } from '../../../../../environments/environment';
               class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100"
             >
               <button
-                (click)="openEditModal(a)"
+                (click)="openEditModal(v)"
                 class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-blue-600 hover:bg-blue-100 hover:scale-110 transition-all"
                 title="Modifier"
               >
                 <i class="fa-solid fa-pen text-lg"></i>
               </button>
               <button
-                (click)="deleteActivite(a.id)"
+                (click)="deleteVisite(v.id)"
                 class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-red-600 hover:bg-red-100 hover:scale-110 transition-all"
                 title="Supprimer"
               >
@@ -174,264 +171,171 @@ import { environment } from '../../../../../environments/environment';
 
           <!-- Content -->
           <div class="p-6 flex-1 flex flex-col">
-            <!-- Category & Date -->
+            <!-- Lieu & Date -->
             <div class="flex items-center gap-2 mb-3">
               <span
-                class="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
+                *ngIf="v.lieu"
+                class="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
               >
-                {{ a.categorie }}
+                <i class="fa-solid fa-location-dot text-xs"></i>
+                {{ v.lieu }}
               </span>
               <span class="text-xs text-gray-400">{{
-                a.date | date: 'dd/MM/yyyy'
+                v.date | date: 'dd/MM/yyyy'
               }}</span>
             </div>
 
             <!-- Title -->
             <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">
-              {{ a.titre }}
+              {{ v.titre }}
             </h3>
 
             <!-- Description -->
             <p
-              *ngIf="a.description"
-              class="text-sm text-gray-600 line-clamp-3 mb-4 flex-1"
+              class="text-gray-600 text-sm mb-4 line-clamp-2 flex-1"
             >
-              {{ a.description }}
+              {{ v.description || 'Aucune description' }}
             </p>
 
-            <!-- Status & Actions -->
-            <div
-              class="flex items-center justify-between pt-4 border-t border-gray-100"
-            >
+            <!-- Status badge -->
+            <div class="flex items-center justify-between">
               <span
-                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold"
-                [ngClass]="
-                  a.statut === 'PUBLIE'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                "
+                class="text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': v.statut === 'PUBLIE',
+                  'bg-yellow-100 text-yellow-700': v.statut === 'BROUILLON'
+                }"
               >
-                <i
-                  class="fa-solid mr-1.5"
-                  [ngClass]="
-                    a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-clock'
-                  "
-                ></i>
-                {{ a.statut }}
+                {{ v.statut === 'PUBLIE' ? 'Publié' : 'Brouillon' }}
               </span>
-              <button
-                (click)="openEditModal(a)"
-                class="text-[#022c16] hover:text-[#034256] text-sm font-bold flex items-center gap-1.5 transition-colors"
-              >
-                <i class="fa-solid fa-pen text-xs"></i>
-                Modifier
-              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Modal: Créer / Modifier -->
+      <!-- Create/Edit Modal -->
       <div
         *ngIf="showModal"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
       >
-        <div
-          class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl animate-fade-in-up my-8"
-        >
-          <!-- Modal Header -->
-          <div
-            class="px-8 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl"
-          >
-            <div class="flex items-center justify-between">
-              <h3
-                class="font-black text-2xl text-gray-900 flex items-center gap-3"
-              >
-                <i
-                  class="fa-solid"
-                  [class.fa-plus-circle]="isCreating"
-                  [class.fa-edit]="!isCreating"
-                  class="text-[#022c16]"
-                ></i>
-                {{ isCreating ? 'Nouvelle activité' : 'Modifier l'activité' }}
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeModal()"></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="p-8">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-2xl font-black text-gray-900">
+                {{ isCreating ? 'Nouvelle visite' : 'Modifier la visite' }}
               </h3>
               <button
                 (click)="closeModal()"
-                class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-all"
+                class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
               >
-                <i class="fa-solid fa-xmark text-xl"></i>
+                <i class="fa-solid fa-xmark text-lg"></i>
               </button>
             </div>
-          </div>
 
-          <!-- Modal Body -->
-          <div class="p-8 space-y-6">
-            <!-- Title -->
-            <div>
-              <label
-                class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-heading text-[#022c16]"></i>
-                Titre <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                [(ngModel)]="formData.titre"
-                placeholder="Entrez le titre de l'activité..."
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base text-gray-900 font-medium focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
-              />
-            </div>
-
-            <!-- Description -->
-            <div>
-              <label
-                class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-align-left text-[#022c16]"></i>
-                Description
-              </label>
-              <textarea
-                [(ngModel)]="formData.description"
-                rows="4"
-                placeholder="Décrivez l'activité en détail..."
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base text-gray-700 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"
-              ></textarea>
-            </div>
-
-            <!-- Category & Date -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-6">
               <div>
-                <label
-                  class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2"
-                >
-                  <i class="fa-solid fa-tag text-[#022c16]"></i>
-                  Catégorie
-                </label>
-                <select
-                  [(ngModel)]="formData.categorie"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
-                >
-                  <option
-                    *ngFor="let c of categories; trackBy: trackByOption"
-                    [value]="c.value"
-                  >
-                    {{ c.label }}
-                  </option>
-                </select>
-              </div>
-              <div>
-                <label
-                  class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2"
-                >
-                  <i class="fa-solid fa-calendar text-[#022c16]"></i>
-                  Date
+                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                  <i class="fa-solid fa-heading text-[#022c16]"></i>
+                  Titre *
                 </label>
                 <input
-                  type="date"
-                  [(ngModel)]="formData.date"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
+                  type="text"
+                  [(ngModel)]="formData.titre"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
+                  placeholder="Titre de la visite"
                 />
               </div>
-            </div>
 
-            <!-- Media Upload -->
-            <div>
-              <label
-                class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-photo-film text-[#022c16]"></i>
-                Médias (Photos ou Vidéos)
-              </label>
+              <div>
+                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                  <i class="fa-solid fa-align-left text-[#022c16]"></i>
+                  Description
+                </label>
+                <textarea
+                  [(ngModel)]="formData.description"
+                  rows="3"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"
+                  placeholder="Description de la visite..."
+                ></textarea>
+              </div>
 
-              <label
-                class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all"
-              >
-                <div
-                  class="flex flex-col items-center justify-center pt-5 pb-6"
-                >
-                  <i
-                    class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"
-                  ></i>
-                  <p class="text-sm font-bold text-gray-600">
-                    Cliquez pour ajouter des médias
-                  </p>
-                  <p class="text-xs text-gray-400 mt-1">
-                    JPG, PNG, MP4 — max 15MB chacun
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  #mediaInput
-                  (change)="onMediaSelected($event)"
-                  accept="image/*,video/*"
-                  multiple
-                  class="hidden"
-                />
-              </label>
-
-              <!-- New Media Preview Grid -->
-              <div
-                *ngIf="mediaFiles.length > 0"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4"
-              >
-                <div
-                  *ngFor="let media of mediaFiles; let i = index"
-                  class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
-                >
-                  <img
-                    *ngIf="media.type === 'PHOTOS'"
-                    [src]="media.previewUrl"
-                    class="w-full h-full object-cover"
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-[#022c16]"></i>
+                    Lieu
+                  </label>
+                  <input
+                    type="text"
+                    [(ngModel)]="formData.lieu"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
+                    placeholder="Quartier visité"
                   />
-                  <video
-                    *ngIf="media.type === 'VIDEOS'"
-                    [src]="media.previewUrl"
-                    class="w-full h-full object-cover"
-                    muted
-                  ></video>
-                  <div
-                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    <button
-                      (click)="removeMedia(i)"
-                      class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600"
-                    >
-                      <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                  </div>
-                  <div
-                    class="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase"
-                  >
-                    {{ media.type === 'VIDEOS' ? 'VIDÉO' : 'PHOTO' }}
-                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar text-[#022c16]"></i>
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    [(ngModel)]="formData.date"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
+                  />
                 </div>
               </div>
 
-              <!-- Existing media (edit mode) -->
-              <div
-                *ngIf="!isCreating && existingMediaUrls.length > 0"
-                class="mt-4"
-              >
-                <p
-                  class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
-                >
-                  Médias existants
-                </p>
-                <div
-                  class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+              <!-- Media Upload -->
+              <div>
+                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                  <i class="fa-solid fa-photo-film text-[#022c16]"></i>
+                  Médias (Photos ou Vidéos)
+                </label>
+
+                <label
+                  class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all"
                 >
                   <div
-                    *ngFor="let url of existingMediaUrls; let i = index"
+                    class="flex flex-col items-center justify-center pt-5 pb-6"
+                  >
+                    <i
+                      class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"
+                    ></i>
+                    <p class="text-sm font-bold text-gray-600">
+                      Cliquez pour ajouter des médias
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      JPG, PNG, MP4 — max 15MB chacun
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    #mediaInput
+                    (change)="onMediaSelected($event)"
+                    accept="image/*,video/*"
+                    multiple
+                    class="hidden"
+                  />
+                </label>
+
+                <!-- New Media Preview Grid -->
+                <div
+                  *ngIf="mediaFiles.length > 0"
+                  class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4"
+                >
+                  <div
+                    *ngFor="let media of mediaFiles; let i = index"
                     class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
                   >
                     <img
-                      *ngIf="formData.typeMedia === 'PHOTOS'"
-                      [src]="url"
+                      *ngIf="media.type === 'PHOTOS'"
+                      [src]="media.previewUrl"
                       class="w-full h-full object-cover"
                     />
                     <video
-                      *ngIf="formData.typeMedia === 'VIDEOS'"
-                      [src]="url"
+                      *ngIf="media.type === 'VIDEOS'"
+                      [src]="media.previewUrl"
                       class="w-full h-full object-cover"
                       muted
                     ></video>
@@ -439,111 +343,139 @@ import { environment } from '../../../../../environments/environment';
                       class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     >
                       <button
-                        (click)="removeExistingMedia(i)"
+                        (click)="removeMedia(i)"
                         class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600"
                       >
                         <i class="fa-solid fa-trash text-xs"></i>
                       </button>
                     </div>
+                    <div
+                      class="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase"
+                    >
+                      {{ media.type === 'VIDEOS' ? 'VIDÉO' : 'PHOTO' }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Existing media (edit mode) -->
+                <div
+                  *ngIf="!isCreating && existingMediaUrls.length > 0"
+                  class="mt-4"
+                >
+                  <p class="text-xs font-bold text-gray-500 mb-2">Médias existants :</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    <div
+                      *ngFor="let url of existingMediaUrls; let i = index"
+                      class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
+                    >
+                      <img
+                        *ngIf="!url.match(/\.(mp4|webm|mov)/i)"
+                        [src]="url"
+                        class="w-full h-full object-cover"
+                      />
+                      <video
+                        *ngIf="url.match(/\.(mp4|webm|mov)/i)"
+                        [src]="url"
+                        class="w-full h-full object-cover"
+                        muted
+                      ></video>
+                      <div
+                        class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <button
+                          (click)="removeExistingMedia(i)"
+                          class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white hover:bg-red-600"
+                        >
+                          <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <p
-                *ngIf="mediaError"
-                class="text-red-500 text-sm font-bold mt-2 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError }}
-              </p>
+              <div *ngIf="mediaError" class="text-red-500 text-sm font-medium">
+                {{ mediaError }}
+              </div>
             </div>
-          </div>
 
-          <!-- Modal Footer -->
-          <div
-            class="px-8 py-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-3xl"
-          >
-            <button
-              (click)="closeModal()"
-              class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
-            >
-              Annuler
-            </button>
-            <button
-              (click)="submitForm()"
-              [disabled]="isSubmitting || !formData.titre"
-              class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-70"
-            >
-              <span *ngIf="!isSubmitting">
+            <div class="flex gap-3 mt-8">
+              <button
+                (click)="closeModal()"
+                class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
+                [disabled]="isSubmitting"
+              >
+                Annuler
+              </button>
+              <button
+                (click)="submitForm()"
+                class="flex-1 px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                [disabled]="isSubmitting || isUploadingFiles"
+              >
                 <i
-                  class="fa-solid"
-                  [class.fa-plus]="isCreating"
-                  [class.fa-save]="!isCreating"
+                  *ngIf="isSubmitting || isUploadingFiles"
+                  class="fa-solid fa-circle-notch fa-spin"
                 ></i>
-                {{ isCreating ? 'Créer' : 'Enregistrer' }}
-              </span>
-              <span *ngIf="isSubmitting">
-                <i class="fa-solid fa-circle-notch fa-spin"></i>
-                Enregistrement...
-              </span>
-            </button>
+                <span>{{ isCreating ? 'Créer' : 'Enregistrer' }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Confirmation Dialog -->
+      <!-- Confirm Dialog -->
       <app-confirm-dialog
         [visible]="showConfirmDialog"
         [title]="confirmTitle"
         message="Cette action est irréversible."
         (confirm)="confirmDelete()"
         (cancel)="showConfirmDialog = false"
-      >
-      </app-confirm-dialog>
+      ></app-confirm-dialog>
+
+      <!-- Alert Popup -->
+      <app-alert-popup
+        [visible]="showAlert"
+        [type]="alertType"
+        [title]="alertTitle"
+        [message]="alertMessage"
+        (close)="showAlert = false"
+      ></app-alert-popup>
     </div>
   `,
-  styles: [
-    `
-      .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .animate-fade-in-up {
-        animation: fadeInUp 0.5s ease-out;
-      }
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    `,
-  ],
+  styles: [`
+    .line-clamp-1 {
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    :host {
+      display: block;
+    }
+  `],
 })
-export class AdminactivitesComponent implements OnInit, OnDestroy {
+export class AdminVisitesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  activites: any[] = [];
+  visites: any[] = [];
   total = 0;
   isLoading = true;
 
-  categories: Option[] = [];
   showModal = false;
   showConfirmDialog = false;
+  showAlert = false;
+  alertType: 'success' | 'error' | 'warning' | 'info' = 'success';
+  alertTitle = '';
+  alertMessage = '';
   itemToDelete: string | null = null;
   confirmTitle = 'Confirmer la suppression';
-  currentActiviteId: string | null = null;
+  currentVisiteId: string | null = null;
   isCreating = true;
   isUploadingFiles = false;
   isSubmitting = false;
@@ -553,7 +485,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   formData = {
     titre: '',
     description: '',
-    categorie: '',
+    lieu: '',
     date: '',
     typeMedia: 'PHOTOS',
   };
@@ -573,40 +505,21 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadCategories();
-    this.loadActivites();
-  }
-
-  private loadCategories() {
-    this.adminData
-      .getOptions('categorie_activite')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res: any) => {
-          if (res.success) {
-            this.categories = res.data;
-            this.cdr.markForCheck();
-          }
-        },
-      });
+    this.loadVisites();
   }
 
   trackById(index: number, item: any): string {
     return item.id;
   }
 
-  trackByOption(index: number, item: Option): string {
-    return item.id;
-  }
-
-  loadActivites() {
+  loadVisites() {
     this.isLoading = true;
     this.adminData
-      .getActivites()
+      .getVisites()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
-          this.activites = res.data || [];
+          this.visites = res.data || [];
           this.total = res.total || 0;
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -620,16 +533,16 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   }
 
   refreshData() {
-    this.loadActivites();
+    this.loadVisites();
   }
 
-  getFirstMedia(a: any): string | null {
-    if (!a.mediaUrls || !Array.isArray(a.mediaUrls) || a.mediaUrls.length === 0) return null;
-    return a.mediaUrls[0];
+  getFirstMedia(v: any): string | null {
+    if (!v.mediaUrls || !Array.isArray(v.mediaUrls) || v.mediaUrls.length === 0) return null;
+    return v.mediaUrls[0];
   }
 
-  playVideo(a: any) {
-    a._videoPlaying = true;
+  playVideo(v: any) {
+    v._videoPlaying = true;
     this.cdr.markForCheck();
   }
 
@@ -638,7 +551,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     this.formData = {
       titre: '',
       description: '',
-      categorie: this.categories[0]?.value || '',
+      lieu: '',
       date: new Date().toISOString().split('T')[0],
       typeMedia: 'PHOTOS',
     };
@@ -648,21 +561,21 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  openEditModal(a: any) {
+  openEditModal(v: any) {
     this.isCreating = false;
-    this.currentActiviteId = a.id;
+    this.currentVisiteId = v.id;
     this.formData = {
-      titre: a.titre || '',
-      description: a.description || '',
-      categorie: a.categorie || this.categories[0]?.value || '',
-      date: a.date
-        ? new Date(a.date).toISOString().split('T')[0]
+      titre: v.titre || '',
+      description: v.description || '',
+      lieu: v.lieu || '',
+      date: v.date
+        ? new Date(v.date).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0],
-      typeMedia: a.typeMedia || 'PHOTOS',
+      typeMedia: v.typeMedia || 'PHOTOS',
     };
 
-    this.existingMediaUrls = a.mediaUrls && Array.isArray(a.mediaUrls)
-      ? [...a.mediaUrls]
+    this.existingMediaUrls = v.mediaUrls && Array.isArray(v.mediaUrls)
+      ? [...v.mediaUrls]
       : [];
     this.mediaFiles = [];
     this.mediaError = '';
@@ -683,7 +596,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
         img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d')!;
+          const ctx = canvas.getContext('22d')!;
           const MAX_WIDTH = 1200;
           const MAX_HEIGHT = 1200;
           let width = img.width;
@@ -807,14 +720,14 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       const data: any = {
         titre: this.formData.titre,
         description: this.formData.description,
-        categorie: this.formData.categorie,
+        lieu: this.formData.lieu,
         date: this.formData.date
           ? new Date(this.formData.date).toISOString()
           : new Date().toISOString(),
         mediaCount: totalMedia,
         statut: 'PUBLIE',
       };
-      
+
       if (totalMedia > 0) {
         data.mediaUrls = allMediaUrls;
         data.typeMedia = this.formData.typeMedia;
@@ -822,33 +735,35 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
       if (this.isCreating) {
         this.adminData
-          .createEntity('activites', data)
+          .createEntity('visites', data)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
               this.isSubmitting = false;
               this.showModal = false;
               this.refreshData();
+              this.showAlertPopup('success', 'Succès', 'Visite ajoutée avec succès');
             },
-            error: () => {
+            error: (err) => {
               this.isSubmitting = false;
-              this.mediaError = 'Erreur lors de la création.';
+              this.mediaError = err?.message || 'Erreur lors de la création.';
               this.cdr.markForCheck();
             },
           });
       } else {
         this.adminData
-          .updateEntity('activites', this.currentActiviteId!, data)
+          .updateEntity('visites', this.currentVisiteId!, data)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
               this.isSubmitting = false;
               this.showModal = false;
               this.refreshData();
+              this.showAlertPopup('success', 'Succès', 'Visite modifiée avec succès');
             },
-            error: () => {
+            error: (err) => {
               this.isSubmitting = false;
-              this.mediaError = 'Erreur lors de la modification.';
+              this.mediaError = err?.message || 'Erreur lors de la modification.';
               this.cdr.markForCheck();
             },
           });
@@ -861,18 +776,21 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteActivite(id: string) {
+  deleteVisite(id: string) {
     this.itemToDelete = id;
-    this.confirmTitle = 'Supprimer cette activité ?';
+    this.confirmTitle = 'Supprimer cette visite ?';
     this.showConfirmDialog = true;
   }
 
   deleteItem = (id: string) => {
     this.adminData
-      .deleteEntity('activites', id)
+      .deleteEntity('visites', id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.refreshData(),
+        next: () => {
+          this.refreshData();
+          this.showAlertPopup('success', 'Succès', 'Visite supprimée avec succès');
+        },
         error: () => {
           this.mediaError = 'Erreur lors de la suppression.';
           this.cdr.markForCheck();
@@ -886,6 +804,14 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       this.itemToDelete = null;
       this.showConfirmDialog = false;
     }
+  }
+
+  showAlertPopup(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) {
+    this.alertType = type;
+    this.alertTitle = title;
+    this.alertMessage = message;
+    this.showAlert = true;
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy() {
