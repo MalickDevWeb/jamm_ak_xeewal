@@ -119,7 +119,7 @@ export class AdminideesComponent implements OnInit, OnDestroy {
   }
 
   getStatutClass(s: string): string {
-    const map: any = { 'NOUVELLE': 'bg-yellow-100 text-yellow-700', 'A_LETUDE': 'bg-blue-100 text-blue-700', 'VALIDEE': 'bg-green-100 text-green-700', 'REJETEE': 'bg-red-100 text-red-700' };
+    const map: any = { 'NOUVELLE': 'bg-yellow-100 text-yellow-700', 'A_LETUDE': 'bg-brand-green/10 text-brand-green', 'VALIDEE': 'bg-green-100 text-green-700', 'REJETEE': 'bg-red-100 text-red-700' };
     return map[s] || 'bg-gray-100 text-gray-500';
   }
 

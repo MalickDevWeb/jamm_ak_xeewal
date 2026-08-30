@@ -24,7 +24,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
         <p class="text-sm text-gray-500 mt-1">
           <span class="font-bold text-gray-700">{{ total }}</span> signalement(s) —
           <span class="text-purple-600 font-semibold">{{ vocalCount }} vocaux</span> ·
-          <span class="text-blue-600 font-semibold">{{ textCount }} textes</span>
+          <span class="text-brand-green font-semibold">{{ textCount }} textes</span>
         </p>
       </div>
       </div>
@@ -120,7 +120,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       <div *ngIf="hasActiveFilters" class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
         <span class="text-[11px] text-gray-400 font-medium self-center">Filtres actifs :</span>
         <span *ngIf="filters.statut"
-              class="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ filters.statut.replace('_', ' ') }}
           <button (click)="filters.statut=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
@@ -135,7 +135,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           <button (click)="filters.quartier=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
         <span *ngIf="activeType !== 'ALL'"
-              class="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-purple-100 text-brand-yellowDark px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ activeType === 'VOCAL' ? '🎙 Vocal' : '📝 Texte' }}
           <button (click)="setTypeFilter('ALL')"><i class="fa-solid fa-xmark"></i></button>
         </span>
@@ -177,11 +177,11 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
               <div class="flex items-center gap-2 flex-wrap">
                 <!-- Badge Type -->
                 <span *ngIf="b.vocalUrl"
-                      class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full text-[11px] font-black">
+                      class="inline-flex items-center gap-1.5 bg-purple-100 text-brand-yellowDark px-2.5 py-1 rounded-full text-[11px] font-black">
                   <i class="fa-solid fa-microphone text-[10px]"></i> Message Vocal
                 </span>
                 <span *ngIf="!b.vocalUrl"
-                      class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-[11px] font-black">
+                      class="inline-flex items-center gap-1.5 bg-brand-green/10 text-brand-green px-2.5 py-1 rounded-full text-[11px] font-black">
                   <i class="fa-solid fa-align-left text-[10px]"></i> Texte
                 </span>
                 <!-- Urgence -->
@@ -221,7 +221,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
                   <p class="text-[11px] text-purple-500">Cliquez Play pour écouter</p>
                 </div>
                 <a [href]="b.vocalUrl" target="_blank" download
-                   class="ml-auto shrink-0 w-7 h-7 rounded-full bg-purple-200 hover:bg-purple-300 text-purple-700 flex items-center justify-center transition-all"
+                   class="ml-auto shrink-0 w-7 h-7 rounded-full bg-purple-200 hover:bg-purple-300 text-brand-yellowDark flex items-center justify-center transition-all"
                    title="Télécharger">
                   <i class="fa-solid fa-download text-xs"></i>
                 </a>
@@ -356,7 +356,7 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   readonly typeFilters = [
     { value: 'ALL' as BesoinType,   label: 'Tous',  icon: 'fa-solid fa-list',       activeClass: 'bg-gray-800 text-white' },
     { value: 'VOCAL' as BesoinType, label: 'Vocal', icon: 'fa-solid fa-microphone',  activeClass: 'bg-purple-600 text-white' },
-    { value: 'TEXT' as BesoinType,  label: 'Texte', icon: 'fa-solid fa-align-left',  activeClass: 'bg-blue-600 text-white' },
+    { value: 'TEXT' as BesoinType,  label: 'Texte', icon: 'fa-solid fa-align-left',  activeClass: 'bg-brand-green text-white' },
   ];
 
   get hasActiveFilters(): boolean {
@@ -508,7 +508,7 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   getStatutClass(s: string): string {
-    const map: any = { 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'EN_COURS': 'bg-blue-100 text-blue-700', 'RESOLU': 'bg-green-100 text-green-700' };
+    const map: any = { 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'EN_COURS': 'bg-brand-green/10 text-brand-green', 'RESOLU': 'bg-green-100 text-green-700' };
     return map[s] || 'bg-gray-100 text-gray-500';
   }
 

@@ -80,7 +80,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
                   <button (click)="action('Valider', a.id)" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" *ngIf="a.statut === 'NOUVEAU'">
                     <i class="fa-solid fa-check text-xs"></i>
                   </button>
-                  <button (click)="openEditModal(a)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button (click)="openEditModal(a)" class="p-1.5 text-gray-400 hover:text-brand-green hover:bg-brand-green/5 rounded-lg transition-colors">
                     <i class="fa-solid fa-pen text-xs"></i>
                   </button>
                   <button (click)="action('Supprimer', a.id)" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">

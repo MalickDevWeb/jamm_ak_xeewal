@@ -59,7 +59,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <!-- Message du Président -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-quote-right"></i></div>
+          <div class="w-7 h-7 rounded-lg bg-brand-green/5 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-quote-right"></i></div>
           Message du Président
         </h3>
         <div class="space-y-4">
@@ -170,7 +170,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <!-- Vision / Mission / Valeurs -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-compass"></i></div>
+          <div class="w-7 h-7 rounded-lg bg-brand-green/5 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-compass"></i></div>
           Section "Ce qui nous anime" — Vision, Mission, Valeurs
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">

@@ -155,7 +155,7 @@ import { environment } from '../../../../../environments/environment';
             >
               <button
                 (click)="openEditModal(v)"
-                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-blue-600 hover:bg-blue-100 hover:scale-110 transition-all"
+                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-brand-green hover:bg-brand-green/10 hover:scale-110 transition-all"
                 title="Modifier"
               >
                 <i class="fa-solid fa-pen text-lg"></i>
@@ -176,7 +176,7 @@ import { environment } from '../../../../../environments/environment';
             <div class="flex items-center gap-2 mb-3">
               <span
                 *ngIf="v.lieu"
-                class="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
+                class="bg-gradient-to-r from-brand-green/10 to-brand-greenLight/10 text-brand-dark text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1.5"
               >
                 <i class="fa-solid fa-location-dot text-xs"></i>
                 {{ v.lieu }}

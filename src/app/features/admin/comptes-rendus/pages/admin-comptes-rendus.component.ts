@@ -124,7 +124,7 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
   getStatutClass(statut: string): string {
     const map: any = {
       'PUBLIE': 'bg-green-100 text-green-700',
-      'INTERNE': 'bg-purple-100 text-purple-700',
+      'INTERNE': 'bg-purple-100 text-brand-yellowDark',
       'BROUILLON': 'bg-gray-100 text-gray-500'
     };
     return map[statut] || 'bg-gray-100 text-gray-500';

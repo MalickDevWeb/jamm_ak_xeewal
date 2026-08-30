@@ -157,7 +157,7 @@ import { environment } from '../../../../../environments/environment';
             >
               <button
                 (click)="openEditModal(a)"
-                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-blue-600 hover:bg-blue-100 hover:scale-110 transition-all"
+                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-brand-green hover:bg-brand-green/10 hover:scale-110 transition-all"
                 title="Modifier"
               >
                 <i class="fa-solid fa-pen text-lg"></i>
@@ -177,7 +177,7 @@ import { environment } from '../../../../../environments/environment';
             <!-- Category & Date -->
             <div class="flex items-center gap-2 mb-3">
               <span
-                class="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
+                class="bg-gradient-to-r from-brand-yellow/10 to-brand-yellowDark/10 text-brand-yellowDark text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
               >
                 {{ a.categorie }}
               </span>

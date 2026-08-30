@@ -116,7 +116,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
               </button>
             </div>
             <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
-              <i class="fa-solid fa-circle-info text-blue-400"></i>
+              <i class="fa-solid fa-circle-info text-brand-green"></i>
               Exemples : <code class="bg-gray-50 px-1 rounded">https://wa.me/221XXXXXXXXX</code>,
               <code class="bg-gray-50 px-1 rounded">https://forms.gle/xxx</code>,
               <code class="bg-gray-50 px-1 rounded">https://jammakxeewal.sn/adherer</code>
@@ -155,7 +155,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         ═══════════════════════════════════════════ -->
         <div class="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-6 relative overflow-hidden">
           <!-- Badge -->
-          <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-purple-200">
+          <div class="absolute top-4 right-4 bg-purple-100 text-brand-yellowDark text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-purple-200">
             Signalements
           </div>
           <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
@@ -231,7 +231,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
                       class="py-2 rounded-xl text-xs font-black border-2 transition-all"
                       [ngClass]="settings.vocal_max_seconds == preset.val
                         ? 'bg-purple-600 border-purple-600 text-white shadow-md'
-                        : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'">
+                        : 'bg-purple-50 border-purple-200 text-brand-yellowDark hover:bg-purple-100'">
                 {{ preset.label }}
               </button>
             </div>
