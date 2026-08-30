@@ -711,11 +711,10 @@ export class AdminactivitesComponent implements OnInit {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    const processPromises = Array.from(files).map(async (file: any) => {
       if (file.size > 50 * 1024 * 1024) {
         this.mediaError.set(`Le fichier ${file.name} est trop lourd (max 50MB).`);
-        continue;
+        return;
       }
 
       const mediaType = file.type.startsWith('video') ? 'VIDEOS' : 'PHOTOS';
@@ -737,7 +736,9 @@ export class AdminactivitesComponent implements OnInit {
       } catch (err) {
         this.mediaError.set(`Erreur lors du traitement de ${file.name}.`);
       }
-    }
+    });
+
+    await Promise.all(processPromises);
   }
 
   removeMedia(index: number) {

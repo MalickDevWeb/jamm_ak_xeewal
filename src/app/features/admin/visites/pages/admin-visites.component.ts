@@ -642,12 +642,11 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    const processPromises = Array.from(files).map(async (file: any) => {
       if (file.size > 15 * 1024 * 1024) {
         this.mediaError = `Le fichier ${file.name} est trop lourd (max 15MB).`;
         this.cdr.markForCheck();
-        continue;
+        return;
       }
 
       const mediaType = file.type.startsWith('video') ? 'VIDEOS' : 'PHOTOS';
@@ -673,7 +672,9 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
         this.mediaError = `Erreur lors du traitement de ${file.name}.`;
         this.cdr.markForCheck();
       }
-    }
+    });
+
+    await Promise.all(processPromises);
   }
 
   removeMedia(index: number) {
