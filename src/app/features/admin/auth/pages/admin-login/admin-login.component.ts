@@ -47,9 +47,9 @@ export class AdminLoginComponent {
     });
   }
 
-  private prefetchAllData() {
-    // Appels en parallèle, silencieux (erreurs ignorées, but: peupler le cache)
-    [
+  private async prefetchAllData() {
+    // Appels séquentiels pour ne pas saturer le pool de connexions (Prisma/Neon)
+    const requests = [
       this.adminData.getAdherents(),
       this.adminData.getBesoins(),
       this.adminData.getIdees(),
@@ -59,6 +59,15 @@ export class AdminLoginComponent {
       this.adminData.getActivites(),
       this.adminData.getComptesRendus(),
       this.adminData.getSettings(),
-    ].forEach(req$ => req$.subscribe({ error: () => {} }));
+    ];
+    
+    for (const req$ of requests) {
+      await new Promise<void>(resolve => {
+        req$.subscribe({ 
+          next: () => resolve(),
+          error: () => resolve() 
+        });
+      });
+    }
   }
 }
