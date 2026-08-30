@@ -356,7 +356,7 @@ import { environment } from '../../../../../environments/environment';
                     Cliquez pour ajouter des médias
                   </p>
                   <p class="text-xs text-gray-400 mt-1">
-                    JPG, PNG, MP4 — max 15MB chacun
+                    JPG, PNG, MP4 — max 50MB chacun
                   </p>
                 </div>
                 <input
@@ -624,8 +624,8 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   }
 
   getFirstMedia(a: any): string | null {
-    if (!a.mediaUrls || !Array.isArray(a.mediaUrls) || a.mediaUrls.length === 0) return null;
-    return a.mediaUrls[0];
+    if (!a.mediaUrl) return null;
+    return a.mediaUrl.split(',')[0].trim();
   }
 
   playVideo(a: any) {
@@ -661,8 +661,8 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       typeMedia: a.typeMedia || 'PHOTOS',
     };
 
-    this.existingMediaUrls = a.mediaUrls && Array.isArray(a.mediaUrls)
-      ? [...a.mediaUrls]
+    this.existingMediaUrls = a.mediaUrl
+      ? a.mediaUrl.split(',').filter((u: string) => u.trim())
       : [];
     this.mediaFiles = [];
     this.mediaError = '';
@@ -730,8 +730,8 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.size > 15 * 1024 * 1024) {
-        this.mediaError = `Le fichier ${file.name} est trop lourd (max 15MB).`;
+      if (file.size > 50 * 1024 * 1024) {
+        this.mediaError = `Le fichier ${file.name} est trop lourd (max 50MB).`;
         this.cdr.markForCheck();
         continue;
       }
@@ -816,7 +816,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
       };
       
       if (totalMedia > 0) {
-        data.mediaUrls = allMediaUrls;
+        data.mediaUrl = allMediaUrls.join(',');
         data.typeMedia = this.formData.typeMedia;
       }
 
