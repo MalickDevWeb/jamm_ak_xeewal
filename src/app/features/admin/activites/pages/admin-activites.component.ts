@@ -3,7 +3,9 @@ import {
   OnInit,
   signal,
   computed,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  DestroyRef,
+  inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -530,6 +532,8 @@ import { environment } from '../../../../../environments/environment';
   ],
 })
 export class AdminactivitesComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+
   activites = signal<any[]>([]);
   total = computed(() => this.activites().length);
   isLoading = signal(true);
@@ -568,7 +572,7 @@ export class AdminactivitesComponent implements OnInit {
   private loadCategories() {
     this.adminData
       .getOptions('categorie_activite')
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {
           if (res.success) {
@@ -590,7 +594,7 @@ export class AdminactivitesComponent implements OnInit {
     this.isLoading.set(true);
     this.adminData
       .getActivites()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {
           this.activites.set(res.data || []);
@@ -796,7 +800,7 @@ export class AdminactivitesComponent implements OnInit {
       }
 
       if (this.isCreating()) {
-        this.adminData.createEntity('activites', data).pipe(takeUntilDestroyed()).subscribe({
+        this.adminData.createEntity('activites', data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: (res: any) => {
             this.isSubmitting.set(false);
             this.showModal.set(false);
@@ -812,7 +816,7 @@ export class AdminactivitesComponent implements OnInit {
       } else {
         this.adminData
           .updateEntity('activites', this.currentActiviteId()!, data)
-          .pipe(takeUntilDestroyed())
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (res: any) => {
               this.isSubmitting.set(false);
@@ -849,7 +853,7 @@ export class AdminactivitesComponent implements OnInit {
 
     this.adminData
       .deleteEntity('activites', id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {},
         error: () => {
