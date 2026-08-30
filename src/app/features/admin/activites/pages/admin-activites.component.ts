@@ -253,7 +253,7 @@ import { environment } from '../../../../../environments/environment';
                   [class.fa-edit]="!isCreating"
                   class="text-[#022c16]"
                 ></i>
-                {{ isCreating ? 'Nouvelle activité' : 'Modifier l'activité' }}
+                {{ isCreating ? 'Nouvelle activité' : "Modifier l'activité" }}
               </h3>
               <button
                 (click)="closeModal()"
