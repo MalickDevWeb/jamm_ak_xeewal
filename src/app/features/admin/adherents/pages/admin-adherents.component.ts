@@ -237,17 +237,17 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
           <div><strong style="color: #022c16;">Quartier :</strong> {{ selectedAdherent.quartier }}</div>
         </div>
 
-        <div style="text-align: center; margin-bottom: 40px;" *ngIf="selectedAdherent.carteRectoUrl">
+        <div style="text-align: center; margin-bottom: 40px;" *ngIf="exportRectoB64">
           <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Recto</h3>
-            <img [src]="selectedAdherent.carteRectoUrl" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+            <img [src]="exportRectoB64" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
           </div>
         </div>
 
-        <div style="text-align: center;" *ngIf="selectedAdherent.carteVersoUrl">
+        <div style="text-align: center;" *ngIf="exportVersoB64">
           <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Verso</h3>
-            <img [src]="selectedAdherent.carteVersoUrl" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+            <img [src]="exportVersoB64" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
           </div>
         </div>
       </div>
@@ -276,6 +276,8 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   alertTitle = 'Information';
   alertMessage = '';
   selectedAdherent: any = null;
+  exportRectoB64 = '';
+  exportVersoB64 = '';
   itemToDelete: string | null = null;
   confirmTitle = 'Confirmer la suppression';
 
@@ -335,9 +337,35 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  viewIdCard(adherent: any) {
+  async viewIdCard(adherent: any) {
     this.selectedAdherent = adherent;
+    this.exportRectoB64 = '';
+    this.exportVersoB64 = '';
     this.showIdCardModal = true;
+    
+    // Preload images as Base64 for the export template to ensure they render in html2canvas
+    if (adherent.carteRectoUrl) {
+      this.exportRectoB64 = await this.urlToBase64(adherent.carteRectoUrl);
+    }
+    if (adherent.carteVersoUrl) {
+      this.exportVersoB64 = await this.urlToBase64(adherent.carteVersoUrl);
+    }
+    this.cdr.markForCheck();
+  }
+
+  async urlToBase64(url: string): Promise<string> {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      // Fallback if CORS blocks the fetch
+      return url;
+    }
   }
 
   closeIdCard() {
@@ -456,11 +484,15 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       element.style.top = '0';
       element.style.zIndex = '-9999';
 
+      // We add a tiny delay to ensure the browser has fully painted the DOM with base64 images
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 4, // Increased scale for maximum clarity / sharpness
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        logging: false
       });
 
       element.style.left = '-9999px';
