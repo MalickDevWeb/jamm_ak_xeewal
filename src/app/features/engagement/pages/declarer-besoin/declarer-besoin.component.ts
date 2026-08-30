@@ -452,19 +452,20 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     this.errorMsg = '';
 
     try {
+      const uploadPromises: Promise<any>[] = [];
+
       // 1. Upload audio if needed
       if (this.audioBlob && !this.cloudinaryVocalUrl) {
         this.isUploadingVocal = true;
         this.cdr.markForCheck();
         const fd = new FormData();
         fd.append('audio', this.audioBlob, `vocal-${Date.now()}.webm`);
-        const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-audio`, fd));
-        if (res.success) {
-          this.cloudinaryVocalUrl = res.url;
-        } else {
-          throw new Error("Échec de l'envoi du message vocal.");
-        }
-        this.isUploadingVocal = false;
+        uploadPromises.push(
+          firstValueFrom(this.http.post(`${environment.apiUrl}/upload-audio`, fd)).then((res: any) => {
+            if (res.success) this.cloudinaryVocalUrl = res.url;
+            else throw new Error("Échec de l'envoi du message vocal.");
+          })
+        );
       }
 
       // 2. Upload images if needed
@@ -476,15 +477,21 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         for (const blob of this.imageBlobs) {
           const fd = new FormData();
           fd.append('file', blob);
-          const res: any = await firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd));
-          if (res.success) {
-            this.cloudinaryImageUrls.push(res.url);
-          } else {
-            throw new Error("Échec de l'envoi d'une image.");
-          }
+          uploadPromises.push(
+            firstValueFrom(this.http.post(`${environment.apiUrl}/upload-public`, fd)).then((res: any) => {
+              if (res.success) this.cloudinaryImageUrls.push(res.url);
+              else throw new Error("Échec de l'envoi d'une image.");
+            })
+          );
         }
-        this.isUploadingImage = false;
       }
+
+      if (uploadPromises.length > 0) {
+        await Promise.all(uploadPromises);
+      }
+
+      this.isUploadingVocal = false;
+      this.isUploadingImage = false;
 
       // 3. Submit payload
       this.submitFinalPayload();
