@@ -22,9 +22,9 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       <div>
         <h2 class="text-2xl font-black text-gray-900">Besoins Déclarés</h2>
         <p class="text-sm text-gray-500 mt-1">
-          <span class="font-bold text-gray-700">{{ total }}</span> signalement(s) —
-          <span class="text-purple-600 font-semibold">{{ vocalCount }} vocaux</span> ·
-          <span class="text-brand-green font-semibold">{{ textCount }} textes</span>
+          <span class="font-black text-gray-900">{{ total }}</span> signalement(s) —
+          <span class="text-[#022c16] font-bold bg-[#022c16]/10 px-2 py-0.5 rounded">{{ vocalCount }} vocaux</span> ·
+          <span class="text-brand-green font-bold bg-brand-green/10 px-2 py-0.5 rounded">{{ textCount }} textes</span>
         </p>
       </div>
       </div>
@@ -135,7 +135,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           <button (click)="filters.quartier=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
         <span *ngIf="activeType !== 'ALL'"
-              class="inline-flex items-center gap-1 bg-purple-100 text-brand-yellowDark px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-[#022c16]/10 text-[#022c16] px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ activeType === 'VOCAL' ? '🎙 Vocal' : '📝 Texte' }}
           <button (click)="setTypeFilter('ALL')"><i class="fa-solid fa-xmark"></i></button>
         </span>
@@ -163,7 +163,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
     <div *ngIf="!isLoading" class="space-y-4">
       <div *ngFor="let b of filteredBesoins; trackBy: trackById"
            class="bg-white rounded-2xl shadow-sm border transition-all hover:shadow-md group"
-           [ngClass]="b.vocalUrl ? 'border-purple-100' : 'border-gray-100'">
+           [ngClass]="b.vocalUrl ? 'border-[#022c16]/20' : 'border-gray-100'">
 
         <!-- Bande de couleur latérale urgence -->
         <div class="flex">
@@ -177,7 +177,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
               <div class="flex items-center gap-2 flex-wrap">
                 <!-- Badge Type -->
                 <span *ngIf="b.vocalUrl"
-                      class="inline-flex items-center gap-1.5 bg-purple-100 text-brand-yellowDark px-2.5 py-1 rounded-full text-[11px] font-black">
+                      class="inline-flex items-center gap-1.5 bg-[#022c16]/10 text-[#022c16] px-2.5 py-1 rounded-full text-[11px] font-black">
                   <i class="fa-solid fa-microphone text-[10px]"></i> Message Vocal
                 </span>
                 <span *ngIf="!b.vocalUrl"
@@ -209,26 +209,33 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
               Signalement uniquement par message vocal.
             </p>
 
-            <!-- ── LECTEUR VOCAL ── -->
+            <!-- ── LECTEUR VOCAL SÉCURISÉ & ÉLÉGANT ── -->
             <div *ngIf="b.vocalUrl"
-                 class="mb-4 bg-purple-50 border border-purple-100 rounded-xl p-3">
-              <div class="flex items-center gap-2 mb-2">
-                <div class="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs shrink-0">
-                  <i class="fa-solid fa-microphone"></i>
-                </div>
-                <div>
-                  <p class="text-xs font-black text-purple-800">Message Vocal du Citoyen</p>
-                  <p class="text-[11px] text-purple-500">Cliquez Play pour écouter</p>
+                 class="mb-4 relative overflow-hidden bg-gradient-to-r from-[#022c16]/5 to-transparent border border-[#022c16]/10 rounded-2xl p-4">
+              <!-- Effet visuel -->
+              <div class="absolute right-0 top-0 w-24 h-24 bg-[#022c16]/5 rounded-bl-full pointer-events-none"></div>
+              
+              <div class="flex items-center justify-between mb-3 relative z-10">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-[#022c16] text-white flex items-center justify-center shrink-0 shadow-lg shadow-[#022c16]/20">
+                    <i class="fa-solid fa-microphone"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-black text-gray-900">Message Vocal du Citoyen</h4>
+                    <p class="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                      Écoute sécurisée
+                    </p>
+                  </div>
                 </div>
                 <a [href]="b.vocalUrl" target="_blank" download
-                   class="ml-auto shrink-0 w-7 h-7 rounded-full bg-purple-200 hover:bg-purple-300 text-brand-yellowDark flex items-center justify-center transition-all"
-                   title="Télécharger">
-                  <i class="fa-solid fa-download text-xs"></i>
+                   class="shrink-0 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-[#022c16]/30 text-gray-700 hover:text-[#022c16] text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm">
+                  <i class="fa-solid fa-cloud-arrow-down"></i> Télécharger
                 </a>
               </div>
               <audio [src]="b.vocalUrl" controls preload="none"
-                     class="w-full h-9 rounded-lg"
-                     style="accent-color: #7c3aed;"></audio>
+                     class="w-full h-10 rounded-xl bg-white shadow-sm border border-gray-100"
+                     style="accent-color: #022c16;"></audio>
             </div>
 
             <!-- ── Contact ── -->
@@ -354,9 +361,9 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   urgences: any[] = [];
 
   readonly typeFilters = [
-    { value: 'ALL' as BesoinType,   label: 'Tous',  icon: 'fa-solid fa-list',       activeClass: 'bg-gray-800 text-white' },
-    { value: 'VOCAL' as BesoinType, label: 'Vocal', icon: 'fa-solid fa-microphone',  activeClass: 'bg-purple-600 text-white' },
-    { value: 'TEXT' as BesoinType,  label: 'Texte', icon: 'fa-solid fa-align-left',  activeClass: 'bg-brand-green text-white' },
+    { value: 'ALL' as BesoinType,   label: 'Tous',  icon: 'fa-solid fa-list',       activeClass: 'bg-gray-800 text-white shadow-md' },
+    { value: 'VOCAL' as BesoinType, label: 'Vocal', icon: 'fa-solid fa-microphone',  activeClass: 'bg-[#022c16] text-white shadow-md shadow-[#022c16]/20' },
+    { value: 'TEXT' as BesoinType,  label: 'Texte', icon: 'fa-solid fa-align-left',  activeClass: 'bg-brand-green text-white shadow-md shadow-brand-green/20' },
   ];
 
   get hasActiveFilters(): boolean {
