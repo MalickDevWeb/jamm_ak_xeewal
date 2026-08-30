@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 import { environment } from '../../../../../environments/environment';
+import { QuartierSelectComponent } from '../../../../shared/components/quartier-select/quartier-select.component';
 
 declare const RecordRTC: any;
 
@@ -13,7 +14,7 @@ type RecordingState = 'idle' | 'recording' | 'recording_locked' | 'paused' | 'do
 @Component({
   selector: 'app-declarer-besoin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, QuartierSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './declarer-besoin.component.html',
   styleUrl: './declarer-besoin.component.css'
@@ -47,20 +48,6 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   // Options dynamiques depuis la base de données
   quartiers: Option[] = [];
   urgences: Option[] = [];
-  
-  // Custom Dropdown State
-  isQuartierDropdownOpen = false;
-
-  get selectedQuartierLabel(): string {
-    if (!this.formData.quartier) return 'Sélectionnez votre quartier...';
-    const q = this.quartiers.find(q => q.id === this.formData.quartier);
-    return q ? q.label : 'Sélectionnez votre quartier...';
-  }
-
-  selectQuartier(id: string) {
-    this.formData.quartier = id;
-    this.isQuartierDropdownOpen = false;
-  }
 
   // === VOCAL ===
   recordingState: RecordingState = 'idle';
@@ -82,6 +69,12 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   success = false;
   errorMsg = '';
+
+  autoResize(event: Event) {
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
 
   constructor(
     private publicData: PublicDataService, 

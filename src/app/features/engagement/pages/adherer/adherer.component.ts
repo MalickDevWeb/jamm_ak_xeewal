@@ -1,16 +1,17 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
+import { QuartierSelectComponent } from '../../../../shared/components/quartier-select/quartier-select.component';
 
 @Component({
   selector: 'app-adherer',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, QuartierSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './adherer.component.html',
   styleUrl: './adherer.component.css'
@@ -48,7 +49,6 @@ export class AdhererComponent implements OnInit, OnDestroy {
   carteVersoName = '';
   rectoError = '';
   versoError = '';
-  
   rectoBlob: File | null = null;
   versoBlob: File | null = null;
   isUploadingFiles = false;
@@ -104,26 +104,14 @@ export class AdhererComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-  showError(msg: string) {
-    this.errorMsg = msg;
-    setTimeout(() => this.errorMsg = '', 5000);
-  }
+
 
   async onSubmit() {
-    if (!this.formData.prenom) {
-      this.showError('Veuillez renseigner votre Prénom et Nom.');
-      return;
-    }
-    if (!this.formData.telephone) {
-      this.showError('Veuillez renseigner votre Numéro de téléphone.');
-      return;
-    }
-    if (!this.formData.quartier) {
-      this.showError('Veuillez sélectionner votre Quartier.');
+    if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
+      alert('Veuillez remplir tous les champs obligatoires.');
       return;
     }
 
-    this.errorMsg = '';
     this.isSubmitting = true;
 
     try {
@@ -165,14 +153,14 @@ export class AdhererComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.isSubmitting = false;
-          this.showError('Erreur lors de l\'envoi. Veuillez réessayer.');
+          alert('Erreur lors de l\'envoi. Veuillez réessayer.');
           this.cdr.markForCheck();
         }
       });
     } catch (err: any) {
       this.isSubmitting = false;
       this.isUploadingFiles = false;
-      this.showError(err.message || "Erreur réseau. Veuillez réessayer.");
+      alert(err.message || "Erreur réseau. Veuillez réessayer.");
       this.cdr.markForCheck();
     }
   }
@@ -185,42 +173,6 @@ export class AdhererComponent implements OnInit, OnDestroy {
   }
 
   // --- Gestion des fichiers ---
-  async compressImage(file: File): Promise<File> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event: any) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d')!;
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
-          let width = img.width;
-          let height = img.height;
-          if (width > height) {
-            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-          } else {
-            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            if (blob) {
-              // Convert Blob to File object to keep the name
-              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
-              resolve(compressedFile);
-            } else reject(new Error('Compression failed'));
-          }, 'image/jpeg', 0.7); // 70% quality JPEG
-        };
-        img.onerror = (error) => reject(error);
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  }
-
   async onRectoSelected(event: any) {
     this.rectoError = '';
     const file = event.target.files[0];
@@ -230,27 +182,21 @@ export class AdhererComponent implements OnInit, OnDestroy {
       this.rectoError = 'Veuillez sélectionner une image (JPG, PNG).';
       return;
     }
-    if (file.size > 15 * 1024 * 1024) {
-      this.rectoError = "L'image est trop lourde (max 15MB).";
+    if (file.size > 5 * 1024 * 1024) {
+      this.rectoError = "L'image est trop lourde (max 5MB).";
       return;
     }
 
-    try {
-      this.carteRectoName = file.name;
-      // Compress the image before storing it
-      this.rectoBlob = await this.compressImage(file);
-      
-      // Preview locale using the compressed blob
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.carteRectoBase64 = e.target.result;
-        this.cdr.markForCheck();
-      };
-      reader.readAsDataURL(this.rectoBlob!);
-    } catch (err) {
-      this.rectoError = "Erreur lors de la compression de l'image.";
+    this.carteRectoName = file.name;
+    this.rectoBlob = file;
+    
+    // Preview locale
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.carteRectoBase64 = e.target.result;
       this.cdr.markForCheck();
-    }
+    };
+    reader.readAsDataURL(file);
   }
 
   async onVersoSelected(event: any) {
@@ -262,27 +208,21 @@ export class AdhererComponent implements OnInit, OnDestroy {
       this.versoError = 'Veuillez sélectionner une image (JPG, PNG).';
       return;
     }
-    if (file.size > 15 * 1024 * 1024) {
-      this.versoError = "L'image est trop lourde (max 15MB).";
+    if (file.size > 5 * 1024 * 1024) {
+      this.versoError = "L'image est trop lourde (max 5MB).";
       return;
     }
 
-    try {
-      this.carteVersoName = file.name;
-      // Compress the image before storing it
-      this.versoBlob = await this.compressImage(file);
+    this.carteVersoName = file.name;
+    this.versoBlob = file;
 
-      // Preview locale using the compressed blob
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.carteVersoBase64 = e.target.result;
-        this.cdr.markForCheck();
-      };
-      reader.readAsDataURL(this.versoBlob!);
-    } catch (err) {
-      this.versoError = "Erreur lors de la compression de l'image.";
+    // Preview locale
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.carteVersoBase64 = e.target.result;
       this.cdr.markForCheck();
-    }
+    };
+    reader.readAsDataURL(file);
   }
 
   removeRecto() {

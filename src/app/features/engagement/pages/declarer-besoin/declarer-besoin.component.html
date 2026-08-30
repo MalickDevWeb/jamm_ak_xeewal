@@ -78,12 +78,17 @@
                     </ng-container>
 
                     <ng-container *ngIf="recordingState === 'done'">
-                      <p class="font-bold text-green-600 text-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-check-circle"></i> Audio prêt
-                      </p>
-                      <div class="flex items-center gap-2 mt-1">
-                        <audio *ngIf="audioUrl" [src]="audioUrl" controls class="h-6 w-32"></audio>
-                        <button (click)="resetVocal()" class="text-gray-400 hover:text-red-500 p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                      <div class="flex flex-col gap-2 w-full pr-1">
+                        <p class="font-black text-[#00a651] text-[13px] flex items-center gap-1.5 uppercase tracking-wide">
+                          <i class="fa-solid fa-circle-check text-base"></i> Audio prêt
+                        </p>
+                        <div class="flex items-center gap-2 bg-gray-50/80 rounded-[14px] p-1.5 border border-gray-200 shadow-inner w-full overflow-hidden">
+                          <audio *ngIf="audioUrl" [src]="audioUrl" controls class="h-8 w-full min-w-[130px] opacity-90 scale-[0.9] origin-left -ml-1"></audio>
+                          <div class="w-px h-6 bg-gray-300 ml-auto flex-shrink-0"></div>
+                          <button (click)="resetVocal()" class="w-8 h-8 rounded-[10px] text-gray-500 bg-white border border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:bg-red-50 hover:text-red-500 hover:border-red-200 flex items-center justify-center transition-all flex-shrink-0 mr-0.5" title="Supprimer">
+                            <i class="fa-solid fa-trash-can text-[13px]"></i>
+                          </button>
+                        </div>
                       </div>
                     </ng-container>
                   </div>
@@ -107,18 +112,19 @@
 
               <!-- MODE TEXTE -->
               <ng-container *ngIf="inputMode === 'text'">
-                <div class="border border-gray-200 rounded-2xl p-3 bg-white shadow-sm flex flex-col relative transition-all focus-within:border-[#022c16] focus-within:ring-4 focus-within:ring-[#022c16]/5">
+                <div class="border border-gray-200 rounded-2xl bg-gray-50/50 shadow-sm flex flex-col relative transition-all focus-within:border-[#00a651] focus-within:bg-white focus-within:shadow-md overflow-hidden">
                   
-                  <textarea [(ngModel)]="formData.description" name="description" rows="3" 
+                  <textarea [(ngModel)]="formData.description" name="description" rows="2" 
+                            (input)="autoResize($event)"
                             placeholder="Décrivez la situation en détail..." 
-                            class="w-full bg-transparent border-none focus:ring-0 resize-none text-[15px] font-medium text-gray-800 placeholder-gray-400 p-2"></textarea>
+                            class="w-full bg-transparent border-0 focus:border-transparent focus:ring-0 outline-none resize-none text-[15px] font-medium text-gray-800 placeholder-gray-400 p-4 min-h-[60px]" style="box-shadow: none; overflow-y: hidden;"></textarea>
                   
-                  <div class="flex justify-between items-center mt-1 border-t border-gray-50 pt-3">
-                    <span class="text-[11px] text-gray-400 font-medium px-2"><i class="fa-solid fa-pen-nib mr-1"></i> Soyez le plus précis possible.</span>
+                  <div class="flex justify-between items-center bg-white px-4 py-3 border-t border-gray-100">
+                    <span class="text-[12px] text-gray-400 font-medium flex items-center gap-1.5"><i class="fa-solid fa-pen-nib text-gray-300"></i> Soyez le plus précis possible.</span>
                     <!-- Toggle vers Vocal -->
                     <button (click)="inputMode = 'vocal'" type="button" 
-                            class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors border border-red-100 shadow-sm shrink-0">
-                      <i class="fa-solid fa-microphone text-lg"></i>
+                            class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-[0_2px_8px_-2px_rgba(239,68,68,0.3)] flex items-center justify-center shrink-0 border border-red-100 hover:border-red-500 group" title="Passer en mode vocal">
+                      <i class="fa-solid fa-microphone text-lg group-hover:scale-110 transition-transform"></i>
                     </button>
                   </div>
                   
@@ -132,34 +138,9 @@
           </div>
 
           <!-- QUARTIER -->
-          <div>
+          <div class="space-y-2 relative">
             <label class="block text-[11px] sm:text-xs font-black text-gray-700 uppercase tracking-widest mb-3">Dans quel quartier ? <span class="text-red-500">*</span></label>
-            <div class="relative">
-              
-              <!-- Bouton Custom Select -->
-              <button type="button" (click)="isQuartierDropdownOpen = !isQuartierDropdownOpen"
-                      class="w-full text-left pl-4 pr-10 py-3.5 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#022c16]/10 focus:border-[#022c16] text-[15px] font-medium bg-white transition-all shadow-sm flex items-center justify-between relative z-10"
-                      [ngClass]="formData.quartier ? 'text-gray-800' : 'text-gray-400'">
-                <span class="truncate">{{ selectedQuartierLabel }}</span>
-                <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" [class.rotate-180]="isQuartierDropdownOpen"></i>
-              </button>
-
-              <!-- Backdrop invisible pour fermer le menu en cliquant à côté -->
-              <div *ngIf="isQuartierDropdownOpen" (click)="isQuartierDropdownOpen = false" class="fixed inset-0 z-40"></div>
-
-              <!-- Menu déroulant (Options) -->
-              <div *ngIf="isQuartierDropdownOpen" 
-                   class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-64 overflow-y-auto animate-fade-in divide-y divide-gray-50 overflow-hidden">
-                <div *ngFor="let q of quartiers; trackBy: trackByOption" 
-                     (click)="selectQuartier(q.id)"
-                     class="px-5 py-4 hover:bg-[#e6f4ea] hover:text-[#022c16] cursor-pointer transition-colors text-[15px] font-medium text-gray-700 flex items-center gap-3 active:bg-gray-100">
-                  <i class="fa-solid fa-location-dot text-[#ffb000]"></i>
-                  {{ q.label }}
-                  <i *ngIf="formData.quartier === q.id" class="fa-solid fa-check ml-auto text-[#00a651]"></i>
-                </div>
-              </div>
-
-            </div>
+            <app-quartier-select [quartiers]="quartiers" [(value)]="formData.quartier" placeholder="Rechercher un quartier..."></app-quartier-select>
           </div>
 
           <!-- PHOTO -->

@@ -1,36 +1,28 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminDataService, Option } from '../../../../core/services/admin-data.service';
+import { AdminDataService } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 
 @Component({
   selector: 'app-admin-adherents',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
   template: `
   <div class="animate-fade-in-up">
-    <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
         <h2 class="text-2xl font-black text-gray-900">Adhérents</h2>
         <p class="text-sm text-gray-500 mt-1">{{ total }} membres inscrits au mouvement.</p>
       </div>
-      <button (click)="openCreateModal()"
-              class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
+      <button (click)="openCreateModal()" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
         <i class="fa-solid fa-user-plus"></i> Ajouter un adhérent
       </button>
     </div>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
@@ -38,7 +30,6 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
       </div>
     </div>
 
-    <!-- Table -->
     <div *ngIf="!isLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -79,22 +70,20 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
                 <span [class]="getStatutClass(a.statut)" class="text-[11px] font-bold px-2.5 py-1 rounded-full">{{ a.statut }}</span>
               </td>
               <td class="py-4 px-6">
-                <button *ngIf="a.carteRectoUrl || a.carteVersoUrl"
-                        (click)="viewIdCard(a)"
-                        class="px-3 py-1.5 text-xs font-bold text-[#022c16] bg-[#022c16]/10 hover:bg-[#022c16]/20 rounded-lg transition-colors flex items-center gap-1.5">
+                <button *ngIf="a.carteRectoUrl || a.carteVersoUrl" (click)="viewIdCard(a)" class="px-3 py-1.5 text-xs font-bold text-[#022c16] bg-[#022c16]/10 hover:bg-[#022c16]/20 rounded-lg transition-colors flex items-center gap-1.5">
                   <i class="fa-solid fa-id-card"></i> Voir pièce
                 </button>
                 <span *ngIf="!a.carteRectoUrl && !a.carteVersoUrl" class="text-xs text-gray-400">Aucune</span>
               </td>
               <td class="py-4 px-6">
                 <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button (click)="action('Valider', a.id)"
-                          class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors"
-                          *ngIf="a.statut === 'NOUVEAU'">
+                  <button (click)="action('Valider', a.id)" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" *ngIf="a.statut === 'NOUVEAU'">
                     <i class="fa-solid fa-check text-xs"></i>
                   </button>
-                  <button (click)="action('Supprimer', a.id)"
-                          class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                  <button (click)="openEditModal(a)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                  </button>
+                  <button (click)="action('Supprimer', a.id)" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                     <i class="fa-solid fa-trash text-xs"></i>
                   </button>
                 </div>
@@ -105,63 +94,77 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
       </div>
     </div>
 
-    <!-- Modal Création -->
     <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="font-black text-gray-900 text-lg">Nouvel Adhérent</h3>
+          <h3 class="font-black text-gray-900 text-lg">{{ isEditing ? 'Modifier l\'adhérent' : 'Nouvel Adhérent' }}</h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
-        <div class="p-6">
-          <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Prénom</label>
-              <input type="text" [(ngModel)]="formData.prenom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+              <label class="block text-sm font-bold text-gray-700 mb-1">Prénom <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.prenom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Prénom">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Nom</label>
-              <input type="text" [(ngModel)]="formData.nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+              <label class="block text-sm font-bold text-gray-700 mb-1">Nom <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Nom">
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone</label>
-              <input type="text" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
+              <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone <span class="text-red-500">*</span></label>
+              <input type="tel" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="77 123 45 67">
             </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Quartier <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Médina">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-1">Profession</label>
-              <input type="text" [(ngModel)]="formData.profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" />
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Quartier</label>
-              <select [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-                <option value="">Sélectionnez un quartier</option>
-                <option *ngFor="let q of quartiers" [value]="q.label">{{ q.label }}</option>
-              </select>
+              <input type="text" [(ngModel)]="formData.profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Enseignant">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Pôle d'expertise</label>
-              <select [(ngModel)]="formData.pole" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-                <option value="">Sélectionnez un pôle</option>
-                <option *ngFor="let p of poles" [value]="p.label">{{ p.label }}</option>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Disponibilité</label>
+              <select [(ngModel)]="formData.disponibilite" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
+                <option value="">Sélectionner</option>
+                <option value="Temps plein">Temps plein</option>
+                <option value="Temps partiel">Temps partiel</option>
+                <option value="Week-end">Week-end</option>
+                <option value="Soirées">Soirées</option>
+                <option value="Flexible">Flexible</option>
               </select>
             </div>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Motivation / Compétences particulières</label>
-            <textarea [(ngModel)]="formData.motivation" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"></textarea>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Compétences / Motivation</label>
+            <textarea [(ngModel)]="formData.competences" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none" placeholder="Compétences ou motivation..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Pièce d'identité (optionnel)</label>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Recto</label>
+                <input type="text" [(ngModel)]="formData.carteRectoUrl" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="URL image recto">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">Verso</label>
+                <input type="text" [(ngModel)]="formData.carteVersoUrl" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="URL image verso">
+              </div>
+            </div>
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
-            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Ajouter</button>
+            <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">
+              {{ isEditing ? 'Enregistrer' : 'Ajouter' }}
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Pièce d'identité Lightbox -->
     <div *ngIf="showIdCardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4" (click)="closeIdCard()">
       <div class="bg-white rounded-3xl shadow-2xl max-w-5xl w-full p-6 animate-fade-in-up" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-6">
@@ -173,9 +176,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             <i class="fa-solid fa-xmark text-xl"></i>
           </button>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Recto -->
           <div class="text-center">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Recto</p>
             <div class="relative bg-gray-100 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
@@ -188,8 +189,6 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
               </div>
             </div>
           </div>
-
-          <!-- Verso -->
           <div class="text-center">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Verso</p>
             <div class="relative bg-gray-100 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
@@ -203,25 +202,17 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             </div>
           </div>
         </div>
-
         <div class="mt-6 flex justify-end">
-          <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
-            Fermer
-          </button>
+          <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">Fermer</button>
         </div>
       </div>
     </div>
 
-    <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [visible]="showConfirmDialog"
-      [title]="confirmTitle"
-      message="Cette action est irréversible."
-      (confirm)="confirmDelete()"
-      (cancel)="showConfirmDialog = false">
-    </app-confirm-dialog>
+    <app-alert-popup [visible]="showAlert" [type]="alertType" [title]="alertTitle" [message]="alertMessage" (close)="showAlert = false"></app-alert-popup>
+
+    <app-confirm-dialog [visible]="showConfirmDialog" [title]="confirmTitle" message="Cette action est irréversible." (confirm)="confirmDelete()" (cancel)="showConfirmDialog = false"></app-confirm-dialog>
   </div>
-  `,
+  `
 })
 export class AdminadherentsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -230,8 +221,14 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  isEditing = false;
+  editingId: string | null = null;
   showConfirmDialog = false;
   showIdCardModal = false;
+  showAlert = false;
+  alertType: AlertType = 'info';
+  alertTitle = 'Information';
+  alertMessage = '';
   selectedAdherent: any = null;
   itemToDelete: string | null = null;
   confirmTitle = 'Confirmer la suppression';
@@ -242,60 +239,53 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     telephone: '',
     quartier: '',
     profession: '',
-    pole: '',
-    motivation: ''
+    competences: '',
+    disponibilite: '',
+    carteRectoUrl: '',
+    carteVersoUrl: '',
+    statut: 'NOUVEAU'
   };
 
-  quartiers: Option[] = [];
-  poles: Option[] = [];
-
-  constructor(
-    private adminData: AdminDataService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  constructor(private adminData: AdminDataService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.refreshData();
-    this.loadOptions();
-  }
-
-  loadOptions() {
-    this.adminData.getOptions('quartier').pipe(takeUntil(this.destroy$)).subscribe(res => {
-      this.quartiers = res?.data || [];
-      this.cdr.markForCheck();
-    });
-    this.adminData.getOptions('pole_activite').pipe(takeUntil(this.destroy$)).subscribe(res => {
-      this.poles = res?.data || [];
-      this.cdr.markForCheck();
-    });
   }
 
   refreshData() {
-    this.adminData.getAdherents().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res: any) => {
-        this.adherents = res.data;
-        this.total = res.total;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
+    this.adminData.getAdherents().subscribe({
+      next: (res: any) => { this.adherents = res.data; this.total = res.total; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
     });
   }
 
   getStatutClass(statut: string): string {
-    const map: any = {
-      ACTIF: 'bg-green-100 text-green-700',
-      NOUVEAU: 'bg-yellow-100 text-yellow-700',
-      SUSPENDU: 'bg-gray-100 text-gray-500',
-    };
+    const map: any = { ACTIF: 'bg-green-100 text-green-700', NOUVEAU: 'bg-yellow-100 text-yellow-700', SUSPENDU: 'bg-gray-100 text-gray-500' };
     return map[statut] || 'bg-gray-100 text-gray-500';
   }
 
   openCreateModal() {
-    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '' };
+    this.isEditing = false;
+    this.editingId = null;
+    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', competences: '', disponibilite: '', carteRectoUrl: '', carteVersoUrl: '', statut: 'NOUVEAU' };
+    this.showModal = true;
+  }
+
+  openEditModal(adherent: any) {
+    this.isEditing = true;
+    this.editingId = adherent.id;
+    this.formData = {
+      prenom: adherent.prenom || '',
+      nom: adherent.nom || '',
+      telephone: adherent.telephone || '',
+      quartier: adherent.quartier || '',
+      profession: adherent.profession || '',
+      competences: adherent.competences || '',
+      disponibilite: adherent.disponibilite || '',
+      carteRectoUrl: adherent.carteRectoUrl || '',
+      carteVersoUrl: adherent.carteVersoUrl || '',
+      statut: adherent.statut || 'NOUVEAU'
+    };
     this.showModal = true;
   }
 
@@ -309,6 +299,13 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.selectedAdherent = null;
   }
 
+  showAlertMethod(type: AlertType, title: string, message: string) {
+    this.alertType = type;
+    this.alertTitle = title;
+    this.alertMessage = message;
+    this.showAlert = true;
+  }
+
   action(type: string, id?: string) {
     if (type === 'Ajouter un adhérent') {
       this.openCreateModal();
@@ -316,23 +313,21 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.itemToDelete = id;
       this.confirmTitle = 'Supprimer cet adhérent ?';
       this.showConfirmDialog = true;
-      this.cdr.markForCheck();
     } else if (type === 'Valider' && id) {
       this.isLoading = true;
-      this.cdr.markForCheck();
       this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe(() => this.refreshData());
-    } else {
-      alert(type + ' : Formulaire en cours de développement.');
+    } else if (type === 'Éditer' && id) {
+      const adherent = this.adherents.find((a: any) => a.id === id);
+      if (adherent) {
+        this.openEditModal(adherent);
+      }
     }
   }
 
   deleteItem = (id: string) => {
     this.adminData.deleteEntity('adherents', id).subscribe({
       next: () => this.refreshData(),
-      error: (err) => {
-        alert('Erreur lors de la suppression: ' + (err.message || 'Erreur inconnue'));
-        this.cdr.markForCheck();
-      }
+      error: (err) => this.showAlertMethod('error', 'Erreur', 'Erreur lors de la suppression: ' + (err.message || 'Erreur inconnue'))
     });
   };
 
@@ -341,19 +336,54 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
       this.showConfirmDialog = false;
-      this.cdr.markForCheck();
     }
   }
 
   submitForm() {
-    if (!this.formData.nom || !this.formData.prenom || !this.formData.telephone) {
-      alert('Veuillez remplir les champs obligatoires');
+    if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
+      this.showAlertMethod('warning', 'Attention', 'Veuillez remplir les champs obligatoires');
       return;
     }
+
+    const data = {
+      prenom: this.formData.prenom,
+      nom: this.formData.nom,
+      telephone: this.formData.telephone,
+      quartier: this.formData.quartier,
+      profession: this.formData.profession || null,
+      competences: this.formData.competences || null,
+      disponibilite: this.formData.disponibilite || null,
+      carteRectoUrl: this.formData.carteRectoUrl || null,
+      carteVersoUrl: this.formData.carteVersoUrl || null,
+      statut: this.formData.statut || 'NOUVEAU'
+    };
+
     this.isLoading = true;
     this.showModal = false;
-    this.cdr.markForCheck();
-    this.adminData.createEntity('adherents', this.formData).subscribe(() => this.refreshData());
+
+    if (this.isEditing && this.editingId) {
+      this.adminData.updateEntity('adherents', this.editingId, data).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlertMethod('success', 'Succès', 'Adhérent modifié avec succès');
+        },
+        error: () => {
+          this.showAlertMethod('error', 'Erreur', 'Erreur lors de la modification');
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.adminData.createEntity('adherents', data).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlertMethod('success', 'Succès', 'Adhérent ajouté avec succès');
+        },
+        error: () => {
+          this.showAlertMethod('error', 'Erreur', "Erreur lors de l'ajout de l'adhérent");
+          this.cdr.markForCheck();
+        }
+      });
+    }
   }
 
   ngOnDestroy() {

@@ -119,62 +119,96 @@
     </div>
 
     <!-- Liens de navigation -->
-    <div class="flex-1 overflow-y-auto px-4 py-5 space-y-1.5">
-        <a routerLink="/" (click)="toggleMobileMenu()"
-           class="flex items-center gap-3 px-4 py-3.5 text-base font-black text-brand-green bg-brand-green/10 rounded-xl border border-brand-green/20">
-            <i class="fa-solid fa-house w-5 text-center flex-shrink-0"></i>
-            Accueil
-        </a>
-        <a routerLink="/mouvement" (click)="toggleMobileMenu()"
-           class="flex items-center gap-3 px-4 py-3.5 text-base font-bold text-gray-700 hover:text-brand-green hover:bg-brand-green/5 rounded-xl transition-all">
-            <i class="fa-solid fa-users w-5 text-center text-brand-green/50 flex-shrink-0"></i>
-            Le Mouvement
-        </a>
-        <a routerLink="/axes" (click)="toggleMobileMenu()"
-           class="flex items-center gap-3 px-4 py-3.5 text-base font-bold text-gray-700 hover:text-brand-green hover:bg-brand-green/5 rounded-xl transition-all">
-            <i class="fa-solid fa-network-wired w-5 text-center text-brand-green/50 flex-shrink-0"></i>
-            Nos Axes
-        </a>
-        <a routerLink="/activites" (click)="toggleMobileMenu()"
-           class="flex items-center gap-3 px-4 py-3.5 text-base font-bold text-gray-700 hover:text-brand-green hover:bg-brand-green/5 rounded-xl transition-all">
-            <i class="fa-solid fa-calendar-days w-5 text-center text-brand-green/50 flex-shrink-0"></i>
-            Activités &amp; Visites
+    <div class="flex-1 overflow-y-auto px-5 py-6 space-y-2 relative bg-[#f8fafc]">
+        <!-- Decoration de fond douce -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] pointer-events-none mix-blend-multiply"></div>
+
+        <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="!bg-brand-green/10 !text-brand-green !border-brand-green/20 !font-black !shadow-sm"
+           (click)="toggleMobileMenu()"
+           class="flex items-center justify-between px-5 py-4 text-[15px] font-bold text-gray-600 bg-white hover:bg-gray-50 rounded-2xl border border-transparent transition-all shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] relative z-10 group">
+            <div class="flex items-center gap-4">
+                <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-brand-green group-[.font-black]:text-brand-green group-[.font-black]:bg-white shadow-inner transition-colors">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                Accueil
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-brand-green transition-colors"></i>
         </a>
 
-        <div class="h-px bg-gray-100 my-4 mx-2"></div>
+        <a routerLink="/mouvement" routerLinkActive="!bg-brand-green/10 !text-brand-green !border-brand-green/20 !font-black !shadow-sm"
+           (click)="toggleMobileMenu()"
+           class="flex items-center justify-between px-5 py-4 text-[15px] font-bold text-gray-600 bg-white hover:bg-gray-50 rounded-2xl border border-transparent transition-all shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] relative z-10 group">
+            <div class="flex items-center gap-4">
+                <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-brand-green group-[.font-black]:text-brand-green group-[.font-black]:bg-white shadow-inner transition-colors">
+                    <i class="fa-solid fa-users text-sm"></i>
+                </div>
+                Le Mouvement
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-brand-green transition-colors"></i>
+        </a>
 
-        <!-- Boutons d'action -->
-        <div class="flex flex-col gap-3 px-1">
+        <a routerLink="/axes" routerLinkActive="!bg-brand-green/10 !text-brand-green !border-brand-green/20 !font-black !shadow-sm"
+           (click)="toggleMobileMenu()"
+           class="flex items-center justify-between px-5 py-4 text-[15px] font-bold text-gray-600 bg-white hover:bg-gray-50 rounded-2xl border border-transparent transition-all shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] relative z-10 group">
+            <div class="flex items-center gap-4">
+                <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-brand-green group-[.font-black]:text-brand-green group-[.font-black]:bg-white shadow-inner transition-colors">
+                    <i class="fa-solid fa-network-wired text-sm"></i>
+                </div>
+                Nos Axes
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-brand-green transition-colors"></i>
+        </a>
+
+        <a routerLink="/activites" routerLinkActive="!bg-brand-green/10 !text-brand-green !border-brand-green/20 !font-black !shadow-sm"
+           (click)="toggleMobileMenu()"
+           class="flex items-center justify-between px-5 py-4 text-[15px] font-bold text-gray-600 bg-white hover:bg-gray-50 rounded-2xl border border-transparent transition-all shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] relative z-10 group">
+            <div class="flex items-center gap-4">
+                <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:text-brand-green group-[.font-black]:text-brand-green group-[.font-black]:bg-white shadow-inner transition-colors">
+                    <i class="fa-solid fa-calendar-days text-sm"></i>
+                </div>
+                Activités &amp; Visites
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-brand-green transition-colors"></i>
+        </a>
+
+        <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6 relative z-10"></div>
+
+        <!-- Boutons d'action premium -->
+        <div class="flex flex-col gap-4 relative z-10">
             <a routerLink="/declarer-besoin" (click)="toggleMobileMenu()"
-               class="flex justify-center items-center gap-2 w-full text-amber-800 bg-amber-50 hover:bg-amber-100 font-black transition-colors text-sm py-4 rounded-xl border border-amber-200">
-                <i class="fa-solid fa-bullhorn text-amber-500"></i>
+               class="flex justify-center items-center gap-3 w-full text-amber-900 bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 font-black transition-all text-sm py-4 rounded-2xl border border-amber-200/60 shadow-[0_4px_15px_-5px_rgba(251,191,36,0.3)] hover:-translate-y-0.5">
+                <i class="fa-solid fa-bullhorn text-amber-500 text-lg"></i>
                 Signaler un problème
             </a>
             <a routerLink="/adherer" (click)="toggleMobileMenu()"
-               class="flex justify-center items-center gap-2 w-full bg-brand-dark text-white hover:bg-brand-green font-black transition-colors text-sm py-4 rounded-xl shadow-lg">
+               class="flex justify-center items-center gap-3 w-full bg-gradient-to-r from-brand-dark to-brand-green text-white font-black transition-all text-sm py-4 rounded-2xl shadow-[0_10px_20px_-10px_rgba(0,141,54,0.6)] hover:shadow-[0_15px_25px_-10px_rgba(0,141,54,0.7)] hover:-translate-y-0.5 group">
                 S'engager maintenant
-                <i class="fa-solid fa-arrow-right"></i>
+                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
 
-        <!-- Réseaux sociaux -->
-        <div class="flex items-center justify-center gap-5 mt-8 mb-2">
-            <a href="https://wa.me/" target="_blank"
-               class="relative text-[#25D366] bg-[#25D366]/10 p-4 rounded-full hover:scale-110 transition-transform shadow-sm border border-[#25D366]/20">
-                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-[#25D366]"></span>
-                </span>
-                <i class="fa-brands fa-whatsapp text-2xl"></i>
-            </a>
-            <a href="#"
-               class="text-[#1877F2] bg-[#1877F2]/10 p-4 rounded-full hover:scale-110 transition-transform shadow-sm border border-[#1877F2]/20">
-                <i class="fa-brands fa-facebook-f text-2xl"></i>
-            </a>
-            <a href="#"
-               class="text-white bg-gray-800 p-4 rounded-full hover:scale-110 transition-transform shadow-sm border border-gray-700">
-                <i class="fa-brands fa-tiktok text-2xl"></i>
-            </a>
+        <!-- Réseaux sociaux redesignés -->
+        <div class="mt-8 mb-4 flex justify-center relative z-10">
+            <div class="bg-white border border-gray-100 rounded-full py-3 px-6 flex items-center gap-6 shadow-[0_5px_20px_-5px_rgba(0,0,0,0.08)]">
+                <a href="https://wa.me/" target="_blank" aria-label="WhatsApp"
+                   class="relative text-[#25D366] hover:scale-110 transition-transform">
+                    <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#25D366]"></span>
+                    </span>
+                    <i class="fa-brands fa-whatsapp text-[22px]"></i>
+                </a>
+                <div class="w-px h-5 bg-gray-100"></div>
+                <a href="#" aria-label="Facebook"
+                   class="text-[#1877F2] hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-facebook-f text-[20px]"></i>
+                </a>
+                <div class="w-px h-5 bg-gray-100"></div>
+                <a href="#" aria-label="TikTok"
+                   class="text-gray-800 hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-tiktok text-[20px]"></i>
+                </a>
+            </div>
         </div>
     </div>
 
