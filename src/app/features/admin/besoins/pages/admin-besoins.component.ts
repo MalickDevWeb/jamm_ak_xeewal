@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
@@ -13,7 +14,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   selector: 'app-admin-besoins',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up">
 
@@ -327,6 +328,13 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       </div>
     
     <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [visible]="showConfirmDialog"
+      [title]="confirmTitle"
+      message="Cette action est irréversible."
+      (confirm)="confirmDelete()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
   </div>
   `
 })
@@ -340,6 +348,10 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   total = 0;
 
   showModal = false;
+  showConfirmDialog = false;
+  confirmTitle = '';
+  itemToDelete: any = null;
+
   formData = {
     quartier: '',
     description: '',
@@ -494,10 +506,20 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   deleteBesoin(besoin: any) {
-    if (!confirm(`Supprimer définitivement ce signalement de ${besoin.quartier} ?`)) return;
-    this.besoins = this.besoins.filter(b => b.id !== besoin.id);
+    this.itemToDelete = besoin;
+    this.confirmTitle = `Supprimer définitivement ce signalement de ${besoin.quartier || 'ce quartier'} ?`;
+    this.showConfirmDialog = true;
+  }
+
+  confirmDelete() {
+    if (!this.itemToDelete) return;
+    const id = this.itemToDelete.id;
+    this.showConfirmDialog = false;
+    this.itemToDelete = null;
+
+    this.besoins = this.besoins.filter(b => b.id !== id);
     this.applyClientFilters();
-    this.adminData.deleteEntity('besoins', besoin.id).subscribe({
+    this.adminData.deleteEntity('besoins', id).subscribe({
       error: () => this.loadBesoins() // Reload si erreur
     });
   }
