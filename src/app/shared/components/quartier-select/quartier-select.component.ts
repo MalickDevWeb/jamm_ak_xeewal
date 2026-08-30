@@ -80,7 +80,7 @@ export class QuartierSelectComponent implements OnChanges {
     this.valueChange.emit(this.value);
   }
 
-  @HostListener('document:click', ['$event'])
+  @HostListener('document:click')
   closeDropdown() {
     if (this.isOpen) {
       this.isOpen = false;

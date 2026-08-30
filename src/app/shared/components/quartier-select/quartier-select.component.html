@@ -8,7 +8,7 @@
          class="w-full pl-5 pr-10 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00a651]/20 focus:border-[#00a651] text-[15px] font-medium bg-white transition-all shadow-sm text-gray-800 placeholder-gray-400"
          autocomplete="off">
   
-  <button type="button" (click)="toggleDropdown($event)" class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none z-10">
+  <button type="button" (click)="toggleDropdown($event)" aria-label="Ouvrir la liste des quartiers" class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none z-10">
       <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" [class.rotate-180]="isOpen"></i>
   </button>
 

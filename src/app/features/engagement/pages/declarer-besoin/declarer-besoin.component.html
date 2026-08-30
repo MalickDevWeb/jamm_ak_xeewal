@@ -85,7 +85,7 @@
                         <div class="flex items-center gap-2 bg-gray-50/80 rounded-[14px] p-1.5 border border-gray-200 shadow-inner w-full overflow-hidden">
                           <audio *ngIf="audioUrl" [src]="audioUrl" controls class="h-8 w-full min-w-[130px] opacity-90 scale-[0.9] origin-left -ml-1"></audio>
                           <div class="w-px h-6 bg-gray-300 ml-auto flex-shrink-0"></div>
-                          <button (click)="resetVocal()" class="w-8 h-8 rounded-[10px] text-gray-500 bg-white border border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:bg-red-50 hover:text-red-500 hover:border-red-200 flex items-center justify-center transition-all flex-shrink-0 mr-0.5" title="Supprimer">
+                          <button type="button" (click)="resetVocal()" aria-label="Supprimer l'enregistrement" class="w-8 h-8 rounded-[10px] text-gray-500 bg-white border border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:bg-red-50 hover:text-red-500 hover:border-red-200 flex items-center justify-center transition-all flex-shrink-0 mr-0.5" title="Supprimer">
                             <i class="fa-solid fa-trash-can text-[13px]"></i>
                           </button>
                         </div>
@@ -96,12 +96,13 @@
                   <!-- Stop bouton (if locked) -->
                   <button *ngIf="recordingState === 'recording_locked'" 
                           (click)="stopRecording()" 
+                          aria-label="Arrêter l'enregistrement"
                           class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-md active:scale-95 z-10 shrink-0">
                     <i class="fa-solid fa-stop"></i>
                   </button>
 
                   <!-- Toggle vers Texte (Keyboard icon) -->
-                  <button *ngIf="recordingState === 'idle'" (click)="inputMode = 'text'" type="button" class="w-10 h-10 rounded-xl bg-[#e6f4ea] flex items-center justify-center text-[#00a651] transition-colors shrink-0 border border-[#bbf7d0]">
+                  <button *ngIf="recordingState === 'idle'" (click)="inputMode = 'text'" type="button" aria-label="Passer en mode texte" class="w-10 h-10 rounded-xl bg-[#e6f4ea] flex items-center justify-center text-[#00a651] transition-colors shrink-0 border border-[#bbf7d0]">
                     <i class="fa-regular fa-keyboard text-lg"></i>
                   </button>
                   
@@ -166,6 +167,7 @@
               <div *ngIf="imagePreviewUrl" class="relative w-full h-32">
                 <img [src]="imagePreviewUrl" alt="Photo jointe" class="w-full h-full object-cover">
                 <button (click)="imagePreviewUrl = null; imageBlob = null; cloudinaryImageUrl = null; $event.stopPropagation();" 
+                        aria-label="Supprimer la photo"
                         class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center shadow-md">
                   <i class="fa-solid fa-times text-sm"></i>
                 </button>
