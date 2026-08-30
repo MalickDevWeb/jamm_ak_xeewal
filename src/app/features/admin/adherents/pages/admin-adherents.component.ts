@@ -240,14 +240,14 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
         <div style="text-align: center; margin-bottom: 40px;" *ngIf="exportRectoB64">
           <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Recto</h3>
-            <img [src]="exportRectoB64" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+            <img [src]="exportRectoB64" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
           </div>
         </div>
 
         <div style="text-align: center;" *ngIf="exportVersoB64">
           <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Verso</h3>
-            <img [src]="exportVersoB64" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+            <img [src]="exportVersoB64" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
           </div>
         </div>
       </div>
@@ -355,7 +355,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
 
   async urlToBase64(url: string): Promise<string> {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { mode: 'cors' });
       const blob = await response.blob();
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -363,7 +363,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
         reader.readAsDataURL(blob);
       });
     } catch (e) {
-      // Fallback if CORS blocks the fetch
+      console.error("Image to Base64 failed", e);
       return url;
     }
   }
@@ -479,13 +479,15 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     try {
-      // Temporarily bring it on screen to ensure images load correctly (invisible)
+      // Temporarily bring it on screen (fixed) to ensure html2canvas can capture it properly
+      element.style.position = 'fixed';
       element.style.left = '0';
       element.style.top = '0';
       element.style.zIndex = '-9999';
+      element.style.opacity = '1';
 
       // We add a tiny delay to ensure the browser has fully painted the DOM with base64 images
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       const canvas = await html2canvas(element, {
         scale: 4, // Increased scale for maximum clarity / sharpness
