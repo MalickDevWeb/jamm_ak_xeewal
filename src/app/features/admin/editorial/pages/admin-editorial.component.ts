@@ -389,7 +389,7 @@ export class AdminEditorialComponent implements OnInit {
           this.isUploadingPhoto = false;
         },
         error: () => {
-          alert('Erreur lors de l\\'upload de la photo');
+          alert("Erreur lors de l'upload de la photo");
           this.isUploadingPhoto = false;
         }
       });
