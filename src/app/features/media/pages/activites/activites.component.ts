@@ -57,7 +57,7 @@ export class ActivitesComponent implements OnInit {
 
   getFirstMedia(url: string | null): string {
     const urls = this.getMediaUrls(url);
-    return urls[0] || 'assets/media_1787574641552.jpg';
+    return urls[0] || 'assets/president-photo.jpeg';
   }
 
   isVideo(url: string): boolean {
@@ -92,11 +92,11 @@ export class ActivitesComponent implements OnInit {
 
   getCardThumbnail(activite: any): string {
     if (this.brokenImages.has(activite.id)) {
-      return 'assets/media_1787574641552.jpg';
+      return 'assets/president-photo.jpeg';
     }
 
     const urls = this.getMediaUrls(activite.mediaUrl);
-    const defaultImg = 'assets/media_1787574641552.jpg';
+    const defaultImg = 'assets/president-photo.jpeg';
     if (urls.length === 0) return defaultImg;
 
     // Prioritize explicitly uploaded image

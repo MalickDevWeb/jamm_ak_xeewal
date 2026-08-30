@@ -20,9 +20,9 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-brand-yellow animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.8)]"></span>
                         Le mouvement de Thiès-Nord
                     </span>
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tight mb-6 leading-[1.1] drop-shadow-xl" [innerHTML]="homeContent?.heroTitle || defaultHeroTitle">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tight mb-6 leading-[1.1] drop-shadow-xl" [innerHTML]="formatHeroTitle(homeContent?.heroTitle)">
                     </h1>
-                    <div class="text-lg sm:text-xl text-gray-200 mb-10 mt-6 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed" [innerHTML]="homeContent?.heroParagraph || defaultHeroParagraph"></div>
+                    <div class="text-lg sm:text-xl text-gray-200 mb-10 mt-6 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed" [innerHTML]="formatHeroParagraph(homeContent?.heroParagraph)"></div>
 
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                         <a routerLink="/mouvement" class="bg-gradient-to-r from-brand-yellow to-yellow-500 hover:from-yellow-400 hover:to-yellow-400 text-brand-dark px-6 py-3.5 md:px-8 md:py-4 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-[0_15px_30px_-10px_rgba(245,158,11,0.6)] flex items-center gap-3 transform hover:-translate-y-1 hover:scale-105 border border-yellow-300">
@@ -180,7 +180,7 @@
                     <!-- Full-bleed Image (Mis en exergue, pas d'arrondi) -->
                     <div class="w-full md:w-5/12 shrink-0 relative">
                         <!-- Object-top is usually best for portraits so the head isn't cut off -->
-                        <img [src]="homeContent?.presidentPhoto || 'assets/media_1787574641552.jpg'" [alt]="homeContent?.presidentName || 'Le Président'" class="w-full h-[400px] md:h-full min-h-[500px] object-cover object-center">
+                        <img [src]="homeContent?.presidentPhoto || 'assets/president-photo.jpeg'" [alt]="homeContent?.presidentName || 'Le Président'" class="w-full h-[400px] md:h-full min-h-[500px] object-cover object-center">
                     </div>
 
                     <!-- Content area -->
@@ -194,7 +194,7 @@
 
                         <h2 class="text-3xl md:text-5xl font-black text-white mb-8 leading-tight relative z-10" [innerHTML]="homeContent?.title || 'Ensemble, bâtissons <br/><span class=\'text-brand-greenLight\'>le Thiès-Nord de demain</span>'"></h2>
 
-                        <div class="text-gray-300 text-lg space-y-6 font-light leading-relaxed mb-10 relative z-10" [innerHTML]="homeContent?.message || '<p>« Chères citoyennes, chers citoyens de Thiès-Nord,</p><p>Notre localité regorge de talents, de ressources et d\'une jeunesse dynamique. Le mouvement JÀMM AK XÉEWAL est votre outil. Il n\'est pas conçu pour faire des promesses, mais pour bâtir avec vous. Chaque idée que vous proposez, chaque problème que vous signalez, constitue la brique de notre futur programme.</p><p class=\'text-white font-medium\'>Agissons ensemble, dans la paix et pour la prospérité de tous. »</p>'"></div>
+                        <div class="text-gray-300 text-lg space-y-6 font-light leading-relaxed mb-10 relative z-10" [innerHTML]="formatPresidentMessage(homeContent?.message)"></div>
 
                         <div class="flex items-center gap-6 border-t border-white/10 pt-8 relative z-10">
                             <div class="w-16 h-16 bg-brand-yellow text-brand-dark rounded-none flex items-center justify-center text-3xl shadow-lg">
@@ -379,7 +379,7 @@
         </button>
 
         <ng-container *ngIf="!isVideo(currentGallery[currentIndex])">
-            <img [src]="brokenLightboxImages.has(currentGallery[currentIndex]) ? 'assets/media_1787574641552.jpg' : currentGallery[currentIndex]" (error)="onLightboxImageError(currentGallery[currentIndex])" alt="Image de la galerie" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl scale-100 transition-transform duration-300">
+            <img [src]="brokenLightboxImages.has(currentGallery[currentIndex]) ? 'assets/president-photo.jpeg' : currentGallery[currentIndex]" (error)="onLightboxImageError(currentGallery[currentIndex])" alt="Image de la galerie" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl scale-100 transition-transform duration-300">
         </ng-container>
         <ng-container *ngIf="isEmbedVideo(currentGallery[currentIndex])">
             <iframe [src]="getSafeVideoUrl(currentGallery[currentIndex])" title="Lecteur vidéo de l'activité" class="w-full max-w-4xl h-[60vh] rounded-xl shadow-2xl scale-100 transition-transform duration-300" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

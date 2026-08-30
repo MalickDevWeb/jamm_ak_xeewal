@@ -50,13 +50,13 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </h3>
         <div class="space-y-5">
           <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Grand Titre (HTML supporté)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Grand Titre</label>
             <input [(ngModel)]="home.heroTitle" type="text"
               class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm font-bold focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
-              placeholder="Écouter les besoins...">
+              placeholder="Écouter les besoins, Construire Ensemble.">
           </div>
           <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Paragraphe sous le titre (HTML supporté)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Paragraphe sous le titre</label>
             <textarea [(ngModel)]="home.heroParagraph" rows="3"
               class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"
               placeholder="JÀMM AK XÉEWAL n'est pas..."></textarea>
@@ -72,11 +72,17 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </h3>
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">URL de la photo</label>
-            <input [(ngModel)]="home.presidentPhoto" type="text"
-              class="w-full px-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
-              placeholder="https://... ou assets/photo.jpg">
-            <p class="text-[11px] text-gray-400 font-medium mt-2"><i class="fa-solid fa-circle-info mr-1"></i> Collez l'URL de la photo ou uploadez via la section Médias</p>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Changer la photo</label>
+            <div class="flex gap-3">
+              <input type="file" (change)="onUploadPhoto($event)" accept="image/*" class="hidden" #photoInput>
+              <button (click)="photoInput.click()" [disabled]="isUploadingPhoto"
+                class="px-4 py-2 bg-[#e6f3eb] text-[#008d36] font-bold rounded-lg hover:bg-[#d1e8d9] transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> {{ isUploadingPhoto ? 'Upload en cours...' : 'Uploader une image' }}
+              </button>
+              <input [(ngModel)]="home.presidentPhoto" type="text"
+                class="flex-1 px-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all outline-none"
+                placeholder="URL de l'image (auto après upload)">
+            </div>
           </div>
           <div *ngIf="home.presidentPhoto" class="mt-3">
             <img [src]="home.presidentPhoto" alt="Aperçu" class="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm">
@@ -104,11 +110,11 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
               placeholder="Nom complet du président">
           </div>
           <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Message (HTML supporté)</label>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Message du Président</label>
             <textarea [(ngModel)]="home.message" rows="8"
               class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl text-sm focus:ring-1 focus:ring-[#022c16] focus:border-[#022c16] transition-all resize-none outline-none"
-              placeholder="<p>Votre message ici...</p>"></textarea>
-            <p class="text-[11px] text-gray-400 font-medium mt-2">Utilisez <code>&lt;p&gt;</code> pour les paragraphes, <code>&lt;strong&gt;</code> pour le texte en gras</p>
+              placeholder="Votre message ici..."></textarea>
+            <p class="text-[11px] text-gray-400 font-medium mt-2">Tapez votre texte naturellement. Les retours à la ligne seront respectés.</p>
           </div>
         </div>
       </div>
@@ -323,7 +329,7 @@ export class AdminEditorialComponent implements OnInit {
   home: any = {
     heroTitle: 'Écouter les besoins, <br/>\n<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none">Construire Ensemble.</span>',
     heroParagraph: 'JÀMM AK XÉEWAL n\'est pas qu\'une idée, c\'est <strong class="text-white">une force en action sur le terrain</strong>.<br/><br/>Rejoignez des centaines de citoyens engagés pour transformer notre quartier, rue par rue.',
-    presidentPhoto: 'assets/media_1787574641552.jpg',
+    presidentPhoto: 'assets/president-photo.jpeg',
     presidentName: 'Le Président',
     title: 'Ensemble, bâtissons <br/><span class=\'text-brand-greenLight\'>le Thiès-Nord de demain</span>',
     message: '<p>« Chères citoyennes, chers citoyens de Thiès-Nord,</p><p>Notre localité regorge de talents, de ressources et d\'une jeunesse dynamique. Le mouvement JÀMM AK XÉEWAL est votre outil. Il n\'est pas conçu pour faire des promesses, mais pour bâtir avec vous. Chaque idée que vous proposez, chaque problème que vous signalez, constitue la brique de notre futur programme.</p><p class=\'text-white font-medium\'>Agissons ensemble, dans la paix et pour la prospérité de tous. »</p>',
@@ -368,6 +374,27 @@ export class AdminEditorialComponent implements OnInit {
   };
 
   constructor(private adminData: AdminDataService) {}
+
+  isUploadingPhoto = false;
+
+  onUploadPhoto(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.isUploadingPhoto = true;
+      this.adminData.uploadMedia(file).subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            this.home.presidentPhoto = res.data.url;
+          }
+          this.isUploadingPhoto = false;
+        },
+        error: () => {
+          alert('Erreur lors de l\\'upload de la photo');
+          this.isUploadingPhoto = false;
+        }
+      });
+    }
+  }
 
   ngOnInit() {
     this.adminData.getEditorial('home').subscribe({

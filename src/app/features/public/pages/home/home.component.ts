@@ -122,12 +122,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getMediaUrl(activite: any): string {
     if (this.brokenImages.has(activite.id)) {
-      return 'assets/media_1787574641552.jpg';
+      return 'assets/president-photo.jpeg';
     }
 
     const url = activite.mediaUrl;
     const urls = this.getAllMediaUrls(url);
-    const defaultImg = 'assets/media_1787574641552.jpg';
+    const defaultImg = 'assets/president-photo.jpeg';
     if (urls.length === 0) return defaultImg;
     
     // If there's an actual image in the list, prioritize it as the thumbnail!
@@ -154,7 +154,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getAllMediaUrls(url: string | null): string[] {
-    const defaultImg = 'assets/media_1787574641552.jpg';
+    const defaultImg = 'assets/president-photo.jpeg';
     if (!url || typeof url !== 'string' || url.trim() === '' || url === '[]' || url === 'null' || url === 'undefined') {
       return [defaultImg];
     }
@@ -371,5 +371,34 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   trackByEventId(index: number, event: any): string {
     return event?.id || index.toString();
+  }
+
+  formatHeroTitle(title: string | undefined): string {
+    if (!title) return this.defaultHeroTitle;
+    if (title.includes('<')) return title; // Already contains HTML
+
+    const parts = title.split(',');
+    if (parts.length > 1) {
+      const firstPart = parts[0] + ',';
+      const secondPart = parts.slice(1).join(',').trim();
+      return `${firstPart} <br/>\n<span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none'>${secondPart}</span>`;
+    }
+    return title;
+  }
+
+  formatHeroParagraph(paragraph: string | undefined): string {
+    if (!paragraph) return this.defaultHeroParagraph;
+    if (paragraph.includes('<')) return paragraph;
+
+    return paragraph.replace(/\n/g, '<br/>');
+  }
+
+  formatPresidentMessage(message: string | undefined): string {
+    if (!message) return `<p>« Chères citoyennes, chers citoyens de Thiès-Nord,</p><p>Notre localité regorge de talents, de ressources et d'une jeunesse dynamique. Le mouvement JÀMM AK XÉEWAL est votre outil. Il n'est pas conçu pour faire des promesses, mais pour bâtir avec vous. Chaque idée que vous proposez, chaque problème que vous signalez, constitue la brique de notre futur programme.</p><p class='text-white font-medium'>Agissons ensemble, dans la paix et pour la prospérité de tous. »</p>`;
+    
+    if (message.includes('<')) return message;
+
+    // Convert newlines to paragraphs
+    return message.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('');
   }
 }

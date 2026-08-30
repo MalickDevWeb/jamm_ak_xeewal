@@ -155,7 +155,7 @@
 
         <!-- Image -->
         <img *ngIf="!isVideo(lightboxMediaUrls()[lightboxIndex()])"
-             [src]="brokenLightboxImages.has(lightboxMediaUrls()[lightboxIndex()]) ? 'assets/media_1787574641552.jpg' : lightboxMediaUrls()[lightboxIndex()]"
+             [src]="brokenLightboxImages.has(lightboxMediaUrls()[lightboxIndex()]) ? 'assets/president-photo.jpeg' : lightboxMediaUrls()[lightboxIndex()]"
              (error)="onLightboxImageError(lightboxMediaUrls()[lightboxIndex()])"
              [alt]="selectedActivite().titre"
              class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl">
