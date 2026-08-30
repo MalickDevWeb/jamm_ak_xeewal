@@ -326,6 +326,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           </div>
         </div>
       </div>
+    </div>
     
     <!-- Confirmation Dialog -->
     <app-confirm-dialog
