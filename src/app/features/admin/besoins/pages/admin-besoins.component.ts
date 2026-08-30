@@ -21,16 +21,16 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
     <!-- ═══════════════════════════ EN-TÊTE ═══════════════════════════ -->
     <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
       <div>
-        <h2 class="text-2xl font-black text-gray-900">Besoins Déclarés</h2>
-        <p class="text-sm text-gray-500 mt-1">
-          <span class="font-black text-gray-900">{{ total }}</span> signalement(s) —
+        <h2 class="text-2xl font-black text-white">Besoins Déclarés</h2>
+        <p class="text-sm text-gray-400 mt-1">
+          <span class="font-black text-white">{{ total }}</span> signalement(s) —
           <span class="text-[#022c16] font-bold bg-[#022c16]/10 px-2 py-0.5 rounded">{{ vocalCount }} vocaux</span> ·
           <span class="text-brand-green font-bold bg-brand-green/10 px-2 py-0.5 rounded">{{ textCount }} textes</span>
         </p>
       </div>
       <div class="flex gap-2">
         <button (click)="loadBesoins()"
-                class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all shadow-sm">
+                class="flex items-center gap-2 px-4 py-2 bg-white/10 text-gray-200 text-sm font-bold rounded-xl hover:bg-white/20 transition-all shadow-sm">
           <i [class]="isLoading ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-rotate'"></i>
           Actualiser
         </button>
@@ -41,19 +41,19 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
     </div>
 
     <!-- ═══════════════════════════ FILTRES ═══════════════════════════ -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+    <div class="bg-white/5 border border-white/10 rounded-2xl border border-white/10 shadow-sm p-4 mb-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 
         <!-- Type : Texte / Vocal / Tous -->
         <div>
-          <label class="block text-[11px] font-black text-gray-500 uppercase tracking-wide mb-1.5">Type</label>
-          <div class="flex rounded-xl border border-gray-200 overflow-hidden">
+          <label class="block text-[11px] font-black text-gray-400 uppercase tracking-wide mb-1.5">Type</label>
+          <div class="flex rounded-xl border border-white/20 overflow-hidden">
             <button *ngFor="let t of typeFilters"
                     (click)="setTypeFilter(t.value)"
                     class="flex-1 py-2 text-xs font-bold transition-all"
                     [ngClass]="activeType === t.value
                       ? t.activeClass
-                      : 'bg-white text-gray-500 hover:bg-gray-50'">
+                      : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/5'">
               <i [class]="t.icon + ' mr-1'"></i>{{ t.label }}
             </button>
           </div>
@@ -61,10 +61,10 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
         <!-- Statut -->
         <div>
-          <label class="block text-[11px] font-black text-gray-500 uppercase tracking-wide mb-1.5">Statut</label>
+          <label class="block text-[11px] font-black text-gray-400 uppercase tracking-wide mb-1.5">Statut</label>
           <div class="relative">
             <select [(ngModel)]="filters.statut" (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#022c16] appearance-none bg-white">
+                    class="w-full px-3 py-2 border border-white/20 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-brand-green appearance-none bg-white/5 border border-white/10">
               <option value="">Tous les statuts</option>
               <option *ngFor="let s of statuts" [value]="s.value">{{ s.label }}</option>
             </select>
@@ -74,10 +74,10 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
         <!-- Urgence -->
         <div>
-          <label class="block text-[11px] font-black text-gray-500 uppercase tracking-wide mb-1.5">Urgence</label>
+          <label class="block text-[11px] font-black text-gray-400 uppercase tracking-wide mb-1.5">Urgence</label>
           <div class="relative">
             <select [(ngModel)]="filters.urgence" (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#022c16] appearance-none bg-white">
+                    class="w-full px-3 py-2 border border-white/20 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-brand-green appearance-none bg-white/5 border border-white/10">
               <option value="">Toutes urgences</option>
               <option *ngFor="let u of urgences" [value]="u.value">{{ u.label }}</option>
             </select>
@@ -87,10 +87,10 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
         <!-- Quartier -->
         <div>
-          <label class="block text-[11px] font-black text-gray-500 uppercase tracking-wide mb-1.5">Quartier</label>
+          <label class="block text-[11px] font-black text-gray-400 uppercase tracking-wide mb-1.5">Quartier</label>
           <div class="relative">
             <select [(ngModel)]="filters.quartier" (change)="applyFilters()"
-                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#022c16] appearance-none bg-white">
+                    class="w-full px-3 py-2 border border-white/20 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-brand-green appearance-none bg-white/5 border border-white/10">
               <option value="">Tous les quartiers</option>
               <option *ngFor="let q of quartiers" [value]="q">{{ q }}</option>
             </select>
@@ -108,16 +108,16 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
                  (ngModelChange)="onSearchChange()"
                  type="text"
                  placeholder="Rechercher dans les descriptions..."
-                 class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#022c16]">
+                 class="w-full pl-8 pr-4 py-2 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-brand-green">
         </div>
         <button (click)="resetFilters()"
-                class="px-3 py-2 text-xs font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all flex items-center gap-1.5">
+                class="px-3 py-2 text-xs font-bold text-gray-400 bg-white/10 hover:bg-white/20 rounded-xl transition-all flex items-center gap-1.5">
           <i class="fa-solid fa-xmark"></i> Réinitialiser
         </button>
       </div>
 
       <!-- Tags de filtres actifs -->
-      <div *ngIf="hasActiveFilters" class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+      <div *ngIf="hasActiveFilters" class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/10">
         <span class="text-[11px] text-gray-400 font-medium self-center">Filtres actifs :</span>
         <span *ngIf="filters.statut"
               class="inline-flex items-center gap-1 bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full text-[11px] font-bold">
@@ -125,21 +125,21 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           <button (click)="filters.statut=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
         <span *ngIf="filters.urgence"
-              class="inline-flex items-center gap-1 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ filters.urgence }}
           <button (click)="filters.urgence=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
         <span *ngIf="filters.quartier"
-              class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ filters.quartier }}
           <button (click)="filters.quartier=''; applyFilters()"><i class="fa-solid fa-xmark"></i></button>
         </span>
         <span *ngIf="activeType !== 'ALL'"
-              class="inline-flex items-center gap-1 bg-[#022c16]/10 text-[#022c16] px-2 py-0.5 rounded-full text-[11px] font-bold">
+              class="inline-flex items-center gap-1 bg-brand-green/20 text-brand-green px-2 py-0.5 rounded-full text-[11px] font-bold">
           {{ activeType === 'VOCAL' ? '🎙 Vocal' : '📝 Texte' }}
           <button (click)="setTypeFilter('ALL')"><i class="fa-solid fa-xmark"></i></button>
         </span>
-        <span class="text-[11px] text-gray-500 font-bold self-center">→ {{ filteredBesoins.length }} résultat(s)</span>
+        <span class="text-[11px] text-gray-400 font-bold self-center">→ {{ filteredBesoins.length }} résultat(s)</span>
       </div>
     </div>
 
@@ -147,13 +147,13 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
     <div *ngIf="isLoading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-500 text-sm">Chargement des signalements...</p>
+        <p class="text-gray-400 text-sm">Chargement des signalements...</p>
       </div>
     </div>
 
     <!-- ═══════════════════════════ VIDE ═══════════════════════════ -->
     <div *ngIf="!isLoading && filteredBesoins.length === 0"
-         class="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
+         class="bg-white/5 border border-white/10 rounded-2xl border border-dashed border-white/20 p-12 text-center">
       <i class="fa-solid fa-bullhorn text-4xl text-gray-200 mb-4 block"></i>
       <p class="font-bold text-gray-400">Aucun signalement trouvé</p>
       <p class="text-xs text-gray-400 mt-1">Modifiez vos filtres ou attendez de nouveaux signalements.</p>
@@ -162,8 +162,8 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
     <!-- ═══════════════════════════ LISTE ═══════════════════════════ -->
     <div *ngIf="!isLoading" class="space-y-4">
       <div *ngFor="let b of filteredBesoins; trackBy: trackById"
-           class="bg-white rounded-2xl shadow-sm border transition-all hover:shadow-md group"
-           [ngClass]="b.vocalUrl ? 'border-[#022c16]/20' : 'border-gray-100'">
+           class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border transition-all hover:shadow-md group"
+           [ngClass]="b.vocalUrl ? 'border-[#022c16]/20' : 'border-white/10'">
 
         <!-- Bande de couleur latérale urgence -->
         <div class="flex">
@@ -177,7 +177,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
               <div class="flex items-center gap-2 flex-wrap">
                 <!-- Badge Type -->
                 <span *ngIf="b.vocalUrl"
-                      class="inline-flex items-center gap-1.5 bg-[#022c16]/10 text-[#022c16] px-2.5 py-1 rounded-full text-[11px] font-black">
+                      class="inline-flex items-center gap-1.5 bg-brand-green/20 text-brand-green px-2.5 py-1 rounded-full text-[11px] font-black">
                   <i class="fa-solid fa-microphone text-[10px]"></i> Message Vocal
                 </span>
                 <span *ngIf="!b.vocalUrl"
@@ -190,7 +190,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
                   <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ b.urgence }}
                 </span>
                 <!-- Quartier -->
-                <span class="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
+                <span class="text-xs bg-white/10 text-gray-300 px-2.5 py-1 rounded-full font-medium">
                   <i class="fa-solid fa-location-dot mr-1 text-gray-400"></i>{{ b.quartier }}
                 </span>
               </div>
@@ -201,7 +201,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
             <!-- ── Description texte ── -->
             <p *ngIf="b.description && b.description !== '(Message vocal joint)'"
-               class="text-sm text-gray-700 mb-3 leading-relaxed font-medium">
+               class="text-sm text-gray-200 mb-3 leading-relaxed font-medium">
               {{ b.description }}
             </p>
             <p *ngIf="b.description === '(Message vocal joint)'"
@@ -221,20 +221,20 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
                     <i class="fa-solid fa-microphone"></i>
                   </div>
                   <div>
-                    <h4 class="text-sm font-black text-gray-900">Message Vocal du Citoyen</h4>
-                    <p class="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
+                    <h4 class="text-sm font-black text-white">Message Vocal du Citoyen</h4>
+                    <p class="text-[11px] text-gray-400 flex items-center gap-1 font-medium">
                       <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
                       Écoute sécurisée
                     </p>
                   </div>
                 </div>
                 <a [href]="b.vocalUrl" target="_blank" download
-                   class="shrink-0 px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-[#022c16]/30 text-gray-700 hover:text-[#022c16] text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm">
+                   class="shrink-0 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 border border-white/20 hover:border-[#022c16]/30 text-gray-200 hover:text-[#022c16] text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm">
                   <i class="fa-solid fa-cloud-arrow-down"></i> Télécharger
                 </a>
               </div>
               <audio [src]="b.vocalUrl" controls preload="none"
-                     class="w-full h-10 rounded-xl bg-white shadow-sm border border-gray-100"
+                     class="w-full h-10 rounded-xl bg-white/5 border border-white/10 shadow-sm border border-white/10"
                      style="accent-color: #022c16;"></audio>
             </div>
 
@@ -242,12 +242,12 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
             <div class="flex items-center gap-4 text-xs text-gray-400 mb-4">
               <span class="flex items-center gap-1">
                 <i class="fa-solid fa-phone text-gray-300"></i>
-                <span class="font-medium text-gray-600">{{ b.contact || 'Anonyme' }}</span>
+                <span class="font-medium text-gray-300">{{ b.contact || 'Anonyme' }}</span>
               </span>
             </div>
 
             <!-- ── Actions ── -->
-            <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+            <div class="flex items-center justify-between gap-3 pt-3 border-t border-white/10">
               <span [class]="getStatutClass(b.statut)"
                     class="text-[11px] font-bold px-3 py-1.5 rounded-full">
                 {{ b.statut.replace('_', ' ') }}
@@ -260,16 +260,16 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
                 </button>
                 <button *ngIf="b.statut === 'EN_COURS'"
                         (click)="updateStatut(b, 'RESOLU')"
-                        class="px-3 py-1.5 text-xs font-bold text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors flex items-center gap-1">
+                        class="px-3 py-1.5 text-xs font-bold text-brand-green bg-brand-green/10 hover:bg-green-200 rounded-lg transition-colors flex items-center gap-1">
                   <i class="fa-solid fa-check"></i> Résoudre
                 </button>
                 <button *ngIf="b.statut !== 'EN_ATTENTE'"
                         (click)="updateStatut(b, 'EN_ATTENTE')"
-                        class="px-3 py-1.5 text-xs font-bold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition-colors flex items-center gap-1">
+                        class="px-3 py-1.5 text-xs font-bold text-brand-yellow bg-brand-yellow/10 hover:bg-yellow-200 rounded-lg transition-colors flex items-center gap-1">
                   <i class="fa-solid fa-rotate-left"></i> Réouvrir
                 </button>
                 <button (click)="deleteBesoin(b)"
-                        class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                        class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-500/10 rounded-lg transition-colors">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
@@ -282,20 +282,20 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
 
     <!-- Modal Création -->
     <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="font-black text-gray-900 text-lg">Nouveau Besoin</h3>
+      <div class="bg-white/5 border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
+        <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/20">
+          <h3 class="font-black text-white text-lg">Nouveau Besoin</h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         <div class="p-6">
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Quartier</label>
-            <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Médina...">
+            <label class="block text-sm font-bold text-gray-200 mb-1">Quartier</label>
+            <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Ex: Médina...">
           </div>
           <div class="mb-4 flex gap-4">
             <div class="flex-1">
-              <label class="block text-sm font-bold text-gray-700 mb-1">Catégorie</label>
-              <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Catégorie</label>
+              <select [(ngModel)]="formData.categorie" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
                 <option value="Infrastructure">Infrastructure</option>
                 <option value="Environnement">Environnement</option>
                 <option value="Santé">Santé</option>
@@ -303,8 +303,8 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
               </select>
             </div>
             <div class="flex-1">
-              <label class="block text-sm font-bold text-gray-700 mb-1">Urgence</label>
-              <select [(ngModel)]="formData.urgence" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Urgence</label>
+              <select [(ngModel)]="formData.urgence" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none">
                 <option value="BASSE">Basse</option>
                 <option value="MOYENNE">Moyenne</option>
                 <option value="HAUTE">Haute</option>
@@ -312,15 +312,15 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
             </div>
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Contact (Optionnel)</label>
-            <input type="text" [(ngModel)]="formData.contact" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: 77 123 45 67">
+            <label class="block text-sm font-bold text-gray-200 mb-1">Contact (Optionnel)</label>
+            <input type="text" [(ngModel)]="formData.contact" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Ex: 77 123 45 67">
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
-            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Description du besoin..."></textarea>
+            <label class="block text-sm font-bold text-gray-200 mb-1">Description</label>
+            <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Description du besoin..."></textarea>
           </div>
           <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
+            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">Annuler</button>
             <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">Déclarer</button>
           </div>
         </div>
@@ -532,13 +532,13 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   getUrgenceClass(u: string): string {
-    const map: any = { 'HAUTE': 'bg-red-100 text-red-700', 'MOYENNE': 'bg-yellow-100 text-yellow-700', 'BASSE': 'bg-green-100 text-green-700' };
-    return map[u] || 'bg-gray-100 text-gray-500';
+    const map: any = { 'HAUTE': 'bg-red-500/10 text-red-400', 'MOYENNE': 'bg-brand-yellow/10 text-brand-yellow', 'BASSE': 'bg-brand-green/10 text-brand-green' };
+    return map[u] || 'bg-white/10 text-gray-400';
   }
 
   getStatutClass(s: string): string {
-    const map: any = { 'EN_ATTENTE': 'bg-yellow-100 text-yellow-700', 'EN_COURS': 'bg-brand-green/10 text-brand-green', 'RESOLU': 'bg-green-100 text-green-700' };
-    return map[s] || 'bg-gray-100 text-gray-500';
+    const map: any = { 'EN_ATTENTE': 'bg-brand-yellow/10 text-brand-yellow', 'EN_COURS': 'bg-brand-green/10 text-brand-green', 'RESOLU': 'bg-brand-green/10 text-brand-green' };
+    return map[s] || 'bg-white/10 text-gray-400';
   }
 
   openModal() {

@@ -12,36 +12,36 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-black text-gray-900">Messages (Contact)</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ nonLus }} non lu(s) sur {{ total }} messages.</p>
+        <h2 class="text-2xl font-black text-white">Messages (Contact)</h2>
+        <p class="text-sm text-gray-400 mt-1">{{ nonLus }} non lu(s) sur {{ total }} messages.</p>
       </div>
     </div>
 
     <div *ngIf="isLoading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-500 text-sm">Chargement depuis l'API...</p>
+        <p class="text-gray-400 text-sm">Chargement depuis l'API...</p>
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50">
+    <div *ngIf="!isLoading" class="bg-white/5 border border-white/10 rounded-3xl shadow-sm border border-white/10 overflow-hidden divide-y divide-gray-50">
       <div *ngFor="let m of messages; trackBy: trackById"
-        [class]="m.lu ? 'p-6 hover:bg-gray-50/50 transition-colors group' : 'p-6 bg-[#022c16]/[0.02] hover:bg-[#022c16]/[0.04] transition-colors group border-l-4 border-[#022c16]'">
+        [class]="m.lu ? 'p-6 hover:bg-black/20 transition-colors group' : 'p-6 bg-[#022c16]/[0.02] hover:bg-[#022c16]/[0.04] transition-colors group border-l-4 border-[#022c16]'">
         <div class="flex items-start gap-4">
-          <div [class]="m.lu ? 'w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-sm shrink-0' : 'w-10 h-10 rounded-full bg-[#022c16] text-white flex items-center justify-center font-bold text-sm shrink-0'">
+          <div [class]="m.lu ? 'w-10 h-10 rounded-full bg-white/10 text-gray-400 flex items-center justify-center font-bold text-sm shrink-0' : 'w-10 h-10 rounded-full bg-[#022c16] text-white flex items-center justify-center font-bold text-sm shrink-0'">
             {{ m.nom.charAt(0) }}
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2 mb-1 flex-wrap">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-gray-900 text-sm">{{ m.nom }}</span>
+                <span class="font-bold text-white text-sm">{{ m.nom }}</span>
                 <span *ngIf="!m.lu" class="w-2 h-2 bg-[#022c16] rounded-full"></span>
               </div>
               <span class="text-xs text-gray-400">{{ m.createdAt | date:'dd/MM/yyyy' }}</span>
             </div>
             <p class="text-xs text-gray-400 mb-1">{{ m.email }}</p>
-            <p class="text-sm font-semibold text-gray-700 mb-1">{{ m.sujet }}</p>
-            <p class="text-sm text-gray-500 line-clamp-2">{{ m.contenu }}</p>
+            <p class="text-sm font-semibold text-gray-200 mb-1">{{ m.sujet }}</p>
+            <p class="text-sm text-gray-400 line-clamp-2">{{ m.contenu }}</p>
           </div>
           <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             <button (click)="action('Marquer lu', m.id)" *ngIf="!m.lu" class="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" title="Marquer comme lu">

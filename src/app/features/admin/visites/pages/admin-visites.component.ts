@@ -30,11 +30,11 @@ import { environment } from '../../../../../environments/environment';
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-4xl font-black text-gray-900 flex items-center gap-3">
+          <h2 class="text-4xl font-black text-white flex items-center gap-3">
             <i class="fa-solid fa-map-location-dot text-3xl text-[#022c16]"></i>
             Visites
           </h2>
-          <p class="text-sm text-gray-500 mt-1">
+          <p class="text-sm text-gray-400 mt-1">
             {{ total }} visite(s) enregistrée(s)
           </p>
         </div>
@@ -51,17 +51,17 @@ import { environment } from '../../../../../environments/environment';
       <div *ngIf="isLoading" class="flex items-center justify-center py-20">
         <div class="text-center">
           <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#022c16] mb-4"></i>
-          <p class="text-gray-500 text-lg">Chargement des visites...</p>
+          <p class="text-gray-400 text-lg">Chargement des visites...</p>
         </div>
       </div>
 
       <!-- Empty state -->
       <div
         *ngIf="!isLoading && visites.length === 0"
-        class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200"
+        class="text-center py-20 bg-white/5 border border-white/10 rounded-3xl border-2 border-dashed border-white/20"
       >
         <i class="fa-solid fa-map-location-dot text-7xl text-gray-300 mb-4"></i>
-        <p class="text-gray-500 text-xl mb-2">Aucune visite enregistrée</p>
+        <p class="text-gray-400 text-xl mb-2">Aucune visite enregistrée</p>
         <button
           (click)="openCreateModal()"
           class="text-[#022c16] font-bold hover:underline text-lg"
@@ -77,7 +77,7 @@ import { environment } from '../../../../../environments/environment';
       >
         <div
           *ngFor="let v of visites; trackBy: trackById"
-          class="group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
+          class="group bg-white/5 border border-white/10 rounded-3xl shadow-lg border border-white/10 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
         >
           <!-- Media Section -->
           <div
@@ -100,7 +100,7 @@ import { environment } from '../../../../../environments/environment';
                 (click)="playVideo(v)"
                 class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-all"
               >
-                <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+                <div class="w-16 h-16 bg-white/5 border border-white/10/90 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-2xl text-[#022c16] ml-1"></i>
                 </div>
               </button>
@@ -155,14 +155,14 @@ import { environment } from '../../../../../environments/environment';
             >
               <button
                 (click)="openEditModal(v)"
-                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-brand-green hover:bg-brand-green/10 hover:scale-110 transition-all"
+                class="w-12 h-12 bg-white/5 border border-white/10/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-brand-green hover:bg-brand-green/10 hover:scale-110 transition-all"
                 title="Modifier"
               >
                 <i class="fa-solid fa-pen text-lg"></i>
               </button>
               <button
                 (click)="deleteVisite(v.id)"
-                class="w-12 h-12 bg-white/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-red-600 hover:bg-red-100 hover:scale-110 transition-all"
+                class="w-12 h-12 bg-white/5 border border-white/10/90 backdrop-blur rounded-xl shadow-xl flex items-center justify-center text-red-600 hover:bg-red-500/10 hover:scale-110 transition-all"
                 title="Supprimer"
               >
                 <i class="fa-solid fa-trash text-lg"></i>
@@ -187,13 +187,13 @@ import { environment } from '../../../../../environments/environment';
             </div>
 
             <!-- Title -->
-            <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">
+            <h3 class="text-xl font-black text-white mb-2 line-clamp-1">
               {{ v.titre }}
             </h3>
 
             <!-- Description -->
             <p
-              class="text-gray-600 text-sm mb-4 line-clamp-2 flex-1"
+              class="text-gray-300 text-sm mb-4 line-clamp-2 flex-1"
             >
               {{ v.description || 'Aucune description' }}
             </p>
@@ -203,8 +203,8 @@ import { environment } from '../../../../../environments/environment';
               <span
                 class="text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider"
                 [ngClass]="{
-                  'bg-green-100 text-green-700': v.statut === 'PUBLIE',
-                  'bg-yellow-100 text-yellow-700': v.statut === 'BROUILLON'
+                  'bg-brand-green/10 text-brand-green': v.statut === 'PUBLIE',
+                  'bg-brand-yellow/10 text-brand-yellow': v.statut === 'BROUILLON'
                 }"
               >
                 {{ v.statut === 'PUBLIE' ? 'Publié' : 'Brouillon' }}
@@ -220,15 +220,15 @@ import { environment } from '../../../../../environments/environment';
         class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
       >
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeModal()"></div>
-        <div class="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="relative bg-white/5 border border-white/10 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div class="p-8">
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-2xl font-black text-gray-900">
+              <h3 class="text-2xl font-black text-white">
                 {{ isCreating ? 'Nouvelle visite' : 'Modifier la visite' }}
               </h3>
               <button
                 (click)="closeModal()"
-                class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
+                class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-gray-400 hover:bg-white/20 transition-all"
               >
                 <i class="fa-solid fa-xmark text-lg"></i>
               </button>
@@ -236,66 +236,66 @@ import { environment } from '../../../../../environments/environment';
 
             <div class="space-y-6">
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                <label class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2">
                   <i class="fa-solid fa-heading text-[#022c16]"></i>
                   Titre *
                 </label>
                 <input
                   type="text"
                   [(ngModel)]="formData.titre"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
+                  class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none"
                   placeholder="Titre de la visite"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                <label class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2">
                   <i class="fa-solid fa-align-left text-[#022c16]"></i>
                   Description
                 </label>
                 <textarea
                   [(ngModel)]="formData.description"
                   rows="3"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"
+                  class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none resize-none"
                   placeholder="Description de la visite..."
                 ></textarea>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                  <label class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-location-dot text-[#022c16]"></i>
                     Lieu
                   </label>
                   <input
                     type="text"
                     [(ngModel)]="formData.lieu"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
+                    class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none"
                     placeholder="Quartier visité"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                  <label class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-calendar text-[#022c16]"></i>
                     Date
                   </label>
                   <input
                     type="date"
                     [(ngModel)]="formData.date"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
+                    class="w-full px-4 py-3 border-2 border-white/20 rounded-2xl text-base focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none bg-white/5 border border-white/10"
                   />
                 </div>
               </div>
 
               <!-- Media Upload -->
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2 flex items-center gap-2">
+                <label class="block text-sm font-black text-gray-200 mb-2 flex items-center gap-2">
                   <i class="fa-solid fa-photo-film text-[#022c16]"></i>
                   Médias (Photos ou Vidéos)
                 </label>
 
                 <label
-                  class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#022c16] transition-all"
+                  class="flex flex-col items-center justify-center w-full h-32 border-3 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white/5 hover:bg-white/10 hover:border-[#022c16] transition-all"
                 >
                   <div
                     class="flex flex-col items-center justify-center pt-5 pb-6"
@@ -303,7 +303,7 @@ import { environment } from '../../../../../environments/environment';
                     <i
                       class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"
                     ></i>
-                    <p class="text-sm font-bold text-gray-600">
+                    <p class="text-sm font-bold text-gray-300">
                       Cliquez pour ajouter des médias
                     </p>
                     <p class="text-xs text-gray-400 mt-1">
@@ -327,7 +327,7 @@ import { environment } from '../../../../../environments/environment';
                 >
                   <div
                     *ngFor="let media of mediaFiles; let i = index"
-                    class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
+                    class="relative group rounded-xl overflow-hidden border-2 border-white/20 bg-black h-24"
                   >
                     <img
                       *ngIf="media.type === 'PHOTOS'"
@@ -363,11 +363,11 @@ import { environment } from '../../../../../environments/environment';
                   *ngIf="!isCreating && existingMediaUrls.length > 0"
                   class="mt-4"
                 >
-                  <p class="text-xs font-bold text-gray-500 mb-2">Médias existants :</p>
+                  <p class="text-xs font-bold text-gray-400 mb-2">Médias existants :</p>
                   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     <div
                       *ngFor="let url of existingMediaUrls; let i = index"
-                      class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
+                      class="relative group rounded-xl overflow-hidden border-2 border-white/20 bg-black h-24"
                     >
                       <img
                         *ngIf="!url.match(/\.(mp4|webm|mov)/i)"
@@ -403,7 +403,7 @@ import { environment } from '../../../../../environments/environment';
             <div class="flex gap-3 mt-8">
               <button
                 (click)="closeModal()"
-                class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
+                class="flex-1 px-6 py-3 bg-white/10 text-gray-200 rounded-xl text-sm font-bold hover:bg-white/20 transition-all"
                 [disabled]="isSubmitting"
               >
                 Annuler

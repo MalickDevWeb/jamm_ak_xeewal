@@ -17,8 +17,8 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
   <div class="animate-fade-in-up">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-black text-gray-900">Adhérents</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ total }} membres inscrits au mouvement.</p>
+        <h2 class="text-2xl font-black text-white">Adhérents</h2>
+        <p class="text-sm text-gray-400 mt-1">{{ total }} membres inscrits au mouvement.</p>
       </div>
       <button (click)="openCreateModal()" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#022c16]/80 transition-all flex items-center gap-2">
         <i class="fa-solid fa-user-plus"></i> Ajouter un adhérent
@@ -28,15 +28,15 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     <div *ngIf="isLoading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#022c16] mb-3"></i>
-        <p class="text-gray-500 text-sm">Chargement depuis l'API...</p>
+        <p class="text-gray-400 text-sm">Chargement depuis l'API...</p>
       </div>
     </div>
 
-    <div *ngIf="!isLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div *ngIf="!isLoading" class="bg-white/5 border border-white/10 rounded-3xl shadow-sm border border-white/10 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
-            <tr class="border-b border-gray-100 bg-gray-50/50">
+            <tr class="border-b border-white/10 bg-black/20">
               <th class="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Adhérent</th>
               <th class="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Contact</th>
               <th class="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Quartier</th>
@@ -47,25 +47,25 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
-            <tr *ngFor="let a of adherents" class="hover:bg-gray-50/50 transition-colors group">
+            <tr *ngFor="let a of adherents" class="hover:bg-black/20 transition-colors group">
               <td class="py-4 px-6">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-[#022c16]/10 text-[#022c16] flex items-center justify-center font-bold text-sm shrink-0">
+                  <div class="w-9 h-9 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center font-bold text-sm shrink-0">
                     {{ a.prenom.charAt(0) }}
                   </div>
                   <div>
-                    <span class="font-semibold text-gray-900 text-sm block">{{ a.prenom }} {{ a.nom }}</span>
+                    <span class="font-semibold text-white text-sm block">{{ a.prenom }} {{ a.nom }}</span>
                     <span *ngIf="a.profession" class="text-xs text-gray-400">{{ a.profession }}</span>
                   </div>
                 </div>
               </td>
               <td class="py-4 px-6">
-                <p class="text-sm text-gray-700">{{ a.telephone }}</p>
+                <p class="text-sm text-gray-200">{{ a.telephone }}</p>
               </td>
               <td class="py-4 px-6">
-                <span class="text-sm text-gray-600 bg-gray-100 px-2.5 py-1 rounded-lg font-medium">{{ a.quartier }}</span>
+                <span class="text-sm text-gray-300 bg-white/10 px-2.5 py-1 rounded-lg font-medium">{{ a.quartier }}</span>
               </td>
-              <td class="py-4 px-6 text-sm text-gray-500">
+              <td class="py-4 px-6 text-sm text-gray-400">
                 {{ a.createdAt | date: 'dd/MM/yyyy' }}
               </td>
               <td class="py-4 px-6">
@@ -97,40 +97,40 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     </div>
 
     <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 class="font-black text-gray-900 text-lg">{{ isEditing ? 'Modifier l\'adhérent' : 'Nouvel Adhérent' }}</h3>
+      <div class="bg-white/5 border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
+        <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/20">
+          <h3 class="font-black text-white text-lg">{{ isEditing ? 'Modifier l\'adhérent' : 'Nouvel Adhérent' }}</h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         <div class="p-6 space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Prénom <span class="text-red-500">*</span></label>
-              <input type="text" [(ngModel)]="formData.prenom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Prénom">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Prénom <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.prenom" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Prénom">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Nom <span class="text-red-500">*</span></label>
-              <input type="text" [(ngModel)]="formData.nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Nom">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone <span class="text-red-500">*</span></label>
-              <input type="tel" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="77 123 45 67">
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Quartier <span class="text-red-500">*</span></label>
-              <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Médina">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Nom <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.nom" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Nom">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Profession</label>
-              <input type="text" [(ngModel)]="formData.profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="Ex: Enseignant">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Téléphone <span class="text-red-500">*</span></label>
+              <input type="tel" [(ngModel)]="formData.telephone" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="77 123 45 67">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Disponibilité</label>
-              <select [(ngModel)]="formData.disponibilite" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
+              <label class="block text-sm font-bold text-gray-200 mb-1">Quartier <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.quartier" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Ex: Médina">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-200 mb-1">Profession</label>
+              <input type="text" [(ngModel)]="formData.profession" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="Ex: Enseignant">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-200 mb-1">Disponibilité</label>
+              <select [(ngModel)]="formData.disponibilite" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none bg-white/5 border border-white/10">
                 <option value="">Sélectionner</option>
                 <option value="Temps plein">Temps plein</option>
                 <option value="Temps partiel">Temps partiel</option>
@@ -141,24 +141,24 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </div>
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Compétences / Motivation</label>
-            <textarea [(ngModel)]="formData.competences" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none" placeholder="Compétences ou motivation..."></textarea>
+            <label class="block text-sm font-bold text-gray-200 mb-1">Compétences / Motivation</label>
+            <textarea [(ngModel)]="formData.competences" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-white/20 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none resize-none" placeholder="Compétences ou motivation..."></textarea>
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Pièce d'identité (optionnel)</label>
+            <label class="block text-sm font-bold text-gray-200 mb-2">Pièce d'identité (optionnel)</label>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-500 mb-1">Recto</label>
-                <input type="text" [(ngModel)]="formData.carteRectoUrl" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="URL image recto">
+                <label class="block text-xs font-bold text-gray-400 mb-1">Recto</label>
+                <input type="text" [(ngModel)]="formData.carteRectoUrl" class="w-full px-3 py-2 rounded-lg border border-white/20 text-sm focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="URL image recto">
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-500 mb-1">Verso</label>
-                <input type="text" [(ngModel)]="formData.carteVersoUrl" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none" placeholder="URL image verso">
+                <label class="block text-xs font-bold text-gray-400 mb-1">Verso</label>
+                <input type="text" [(ngModel)]="formData.carteVersoUrl" class="w-full px-3 py-2 rounded-lg border border-white/20 text-sm focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all outline-none" placeholder="URL image verso">
               </div>
             </div>
           </div>
           <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
+            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">Annuler</button>
             <button (click)="submitForm()" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-colors shadow-lg shadow-[#022c16]/30">
               {{ isEditing ? 'Enregistrer' : 'Ajouter' }}
             </button>
@@ -168,20 +168,20 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     </div>
 
     <div *ngIf="showIdCardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4" (click)="closeIdCard()">
-      <div class="bg-white rounded-3xl shadow-2xl max-w-5xl w-full p-6 animate-fade-in-up" (click)="$event.stopPropagation()">
+      <div class="bg-white/5 border border-white/10 rounded-3xl shadow-2xl max-w-5xl w-full p-6 animate-fade-in-up" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="font-black text-xl text-gray-900 flex items-center gap-2">
+          <h3 class="font-black text-xl text-white flex items-center gap-2">
             <i class="fa-solid fa-id-card text-[#022c16]"></i>
             Pièce d'identité — {{ selectedAdherent?.prenom }} {{ selectedAdherent?.nom }}
           </h3>
-          <button (click)="closeIdCard()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-all">
+          <button (click)="closeIdCard()" class="text-gray-400 hover:text-gray-300 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-all">
             <i class="fa-solid fa-xmark text-xl"></i>
           </button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="text-center">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Recto</p>
-            <div class="relative bg-gray-100 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Recto</p>
+            <div class="relative bg-white/10 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
               <img *ngIf="selectedAdherent?.carteRectoUrl" [src]="selectedAdherent.carteRectoUrl" class="w-full h-auto object-contain" style="max-height: 400px;">
               <div *ngIf="!selectedAdherent?.carteRectoUrl" class="flex items-center justify-center h-64 text-gray-400">
                 <div class="text-center">
@@ -192,8 +192,8 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </div>
           </div>
           <div class="text-center">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Verso</p>
-            <div class="relative bg-gray-100 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Verso</p>
+            <div class="relative bg-white/10 rounded-2xl overflow-hidden shadow-lg" style="min-height: 220px;">
               <img *ngIf="selectedAdherent?.carteVersoUrl" [src]="selectedAdherent.carteVersoUrl" class="w-full h-auto object-contain" style="max-height: 400px;">
               <div *ngIf="!selectedAdherent?.carteVersoUrl" class="flex items-center justify-center h-64 text-gray-400">
                 <div class="text-center">
@@ -204,7 +204,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </div>
           </div>
         </div>
-        <div class="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
+        <div class="mt-8 flex justify-between items-center border-t border-white/10 pt-6">
           <div class="flex gap-3">
             <button (click)="downloadIdCard('png')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-all flex items-center gap-2 shadow-lg disabled:opacity-50">
               <i class="fa-solid fa-image" *ngIf="!isDownloading"></i>
@@ -217,13 +217,13 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
               Télécharger PDF
             </button>
           </div>
-          <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">Fermer</button>
+          <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl transition-all">Fermer</button>
         </div>
       </div>
     </div>
 
     <!-- Offscreen template for export -->
-    <div *ngIf="selectedAdherent" id="id-card-export" class="bg-white" style="width: 800px; padding: 40px; position: absolute; left: -9999px; top: -9999px; background: white; z-index: -1;">
+    <div *ngIf="selectedAdherent" id="id-card-export" class="bg-white/5 border border-white/10" style="width: 800px; padding: 40px; position: absolute; left: -9999px; top: -9999px; background: white; z-index: -1;">
       <div style="border: 4px solid #022c16; border-radius: 20px; padding: 40px; background: #fafafa; font-family: sans-serif;">
         <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eaeaea; padding-bottom: 20px;">
           <h2 style="font-size: 32px; color: #022c16; margin: 0; font-weight: 900; text-transform: uppercase;">CARTE D'IDENTITÉ</h2>
@@ -308,8 +308,8 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   getStatutClass(statut: string): string {
-    const map: any = { ACTIF: 'bg-green-100 text-green-700', NOUVEAU: 'bg-yellow-100 text-yellow-700', SUSPENDU: 'bg-gray-100 text-gray-500' };
-    return map[statut] || 'bg-gray-100 text-gray-500';
+    const map: any = { ACTIF: 'bg-brand-green/10 text-brand-green', NOUVEAU: 'bg-brand-yellow/10 text-brand-yellow', SUSPENDU: 'bg-white/10 text-gray-400' };
+    return map[statut] || 'bg-white/10 text-gray-400';
   }
 
   openCreateModal() {

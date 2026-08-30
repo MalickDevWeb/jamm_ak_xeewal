@@ -12,8 +12,8 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   template: `
   <div class="animate-fade-in-up">
     <div class="mb-8">
-      <h2 class="text-2xl font-black text-gray-900">Paramètres du Site</h2>
-      <p class="text-sm text-gray-500 mt-1">Modifiez les informations affichées sur le site public (header, footer, réseaux sociaux, QR code).</p>
+      <h2 class="text-2xl font-black text-white">Paramètres du Site</h2>
+      <p class="text-sm text-gray-400 mt-1">Modifiez les informations affichées sur le site public (header, footer, réseaux sociaux, QR code).</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -21,40 +21,40 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <div class="lg:col-span-2 space-y-6">
 
         <!-- Coordonnées -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg bg-[#022c16]/10 text-[#022c16] flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></div>
             Coordonnées affichées (Header & Footer)
           </h3>
           <p class="text-xs text-gray-400 mb-5 ml-9">Ces données apparaissent dans la barre d'info en haut du site et dans le footer.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">
                 <i class="fa-solid fa-phone text-[#022c16] mr-1"></i> Téléphone
               </label>
               <input [(ngModel)]="settings.telephone" type="tel"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">
                 <i class="fa-solid fa-envelope text-[#022c16] mr-1"></i> Email de contact
               </label>
               <input [(ngModel)]="settings.email" type="email"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">
                 <i class="fa-solid fa-location-dot text-[#022c16] mr-1"></i> Adresse (Footer)
               </label>
               <input [(ngModel)]="settings.adresse" type="text"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
           </div>
         </div>
 
         <!-- Réseaux Sociaux -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs"><i class="fa-solid fa-share-nodes"></i></div>
             Liens Réseaux Sociaux (Header & Footer)
           </h3>
@@ -63,17 +63,17 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 bg-[#25D366] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
               <input [(ngModel)]="settings.whatsapp" type="url" placeholder="https://wa.me/221770000000"
-                class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="flex-1 px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-facebook-f"></i></div>
               <input [(ngModel)]="settings.facebook" type="url" placeholder="https://facebook.com/jammakxeewal"
-                class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="flex-1 px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 bg-gray-900 text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-tiktok"></i></div>
               <input [(ngModel)]="settings.tiktok" type="url" placeholder="https://tiktok.com/@jammakxeewal"
-                class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="flex-1 px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
           </div>
         </div>
@@ -81,24 +81,24 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         <!-- ═══════════════════════════════════════════
              QR CODE D'ADHÉSION (NOUVEAU)
         ═══════════════════════════════════════════ -->
-        <div class="bg-white rounded-2xl shadow-sm border-2 border-[#022c16]/20 p-6 relative overflow-hidden">
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border-2 border-[#022c16]/20 p-6 relative overflow-hidden">
           <!-- Badge "Nouveau" -->
           <div class="absolute top-4 right-4 bg-brand-yellow/20 text-amber-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-amber-200">
             Page d'accueil
           </div>
-          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg bg-[#022c16]/10 text-[#022c16] flex items-center justify-center text-xs"><i class="fa-solid fa-qrcode"></i></div>
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center text-xs"><i class="fa-solid fa-qrcode"></i></div>
             QR Code d'Adhésion — Page d'Accueil
           </h3>
           <p class="text-xs text-gray-400 mb-5 ml-9">
-            Entrez l'URL que le QR code doit pointer. Cela peut être votre <strong class="text-gray-600">lien WhatsApp</strong>,
-            un <strong class="text-gray-600">Google Form</strong>, ou n'importe quelle URL d'inscription.
-            Le QR code sera <strong class="text-gray-600">régénéré automatiquement</strong> à chaque modification.
+            Entrez l'URL que le QR code doit pointer. Cela peut être votre <strong class="text-gray-300">lien WhatsApp</strong>,
+            un <strong class="text-gray-300">Google Form</strong>, ou n'importe quelle URL d'inscription.
+            Le QR code sera <strong class="text-gray-300">régénéré automatiquement</strong> à chaque modification.
           </p>
 
           <!-- Champ URL -->
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-1.5">
+            <label class="block text-sm font-bold text-gray-200 mb-1.5">
               <i class="fa-solid fa-link text-[#022c16] mr-1"></i> URL cible du QR Code
             </label>
             <div class="flex items-center gap-2">
@@ -106,7 +106,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
                      (ngModelChange)="onQrUrlChange()"
                      type="url"
                      placeholder="https://wa.me/221770000000 ou https://forms.google.com/..."
-                     class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all font-mono">
+                     class="flex-1 px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all font-mono">
               <!-- Bouton raccourci WhatsApp -->
               <button *ngIf="settings.whatsapp"
                       (click)="useWhatsappAsQr()"
@@ -117,25 +117,25 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             </div>
             <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
               <i class="fa-solid fa-circle-info text-brand-green"></i>
-              Exemples : <code class="bg-gray-50 px-1 rounded">https://wa.me/221XXXXXXXXX</code>,
-              <code class="bg-gray-50 px-1 rounded">https://forms.gle/xxx</code>,
-              <code class="bg-gray-50 px-1 rounded">https://jammakxeewal.sn/adherer</code>
+              Exemples : <code class="bg-white/5 px-1 rounded">https://wa.me/221XXXXXXXXX</code>,
+              <code class="bg-white/5 px-1 rounded">https://forms.gle/xxx</code>,
+              <code class="bg-white/5 px-1 rounded">https://jammakxeewal.sn/adherer</code>
             </p>
           </div>
 
           <!-- Aperçu QR live -->
-          <div *ngIf="previewQrUrl" class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-5">
-            <div class="flex-shrink-0 bg-white p-3 rounded-xl shadow-sm border border-gray-200">
+          <div *ngIf="previewQrUrl" class="mt-4 p-4 bg-white/5 rounded-xl border border-white/20 flex flex-col sm:flex-row items-center gap-5">
+            <div class="flex-shrink-0 bg-white/5 border border-white/10 p-3 rounded-xl shadow-sm border border-white/20">
               <img [src]="previewQrUrl"
                    alt="Aperçu QR Code"
                    class="w-32 h-32 object-contain rounded-lg"
                    onerror="this.style.display='none'">
             </div>
             <div class="min-w-0 text-center sm:text-left">
-              <p class="text-xs font-bold text-gray-700 mb-1 flex items-center gap-1 justify-center sm:justify-start">
+              <p class="text-xs font-bold text-gray-200 mb-1 flex items-center gap-1 justify-center sm:justify-start">
                 <i class="fa-solid fa-eye text-[#022c16]"></i> Aperçu en direct
               </p>
-              <p class="text-[11px] text-gray-500 break-all leading-relaxed">{{ settings.qr_code_url }}</p>
+              <p class="text-[11px] text-gray-400 break-all leading-relaxed">{{ settings.qr_code_url }}</p>
               <a [href]="settings.qr_code_url" target="_blank"
                  class="inline-flex items-center gap-1.5 mt-2 text-xs text-[#022c16] font-bold hover:underline">
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Tester le lien
@@ -144,7 +144,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
 
           <!-- État vide -->
-          <div *ngIf="!previewQrUrl" class="mt-4 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-center text-gray-400 text-xs">
+          <div *ngIf="!previewQrUrl" class="mt-4 p-4 bg-white/5 rounded-xl border border-dashed border-gray-300 text-center text-gray-400 text-xs">
             <i class="fa-solid fa-qrcode text-2xl mb-2 block opacity-30"></i>
             Saisissez une URL ci-dessus pour voir l'aperçu du QR code
           </div>
@@ -153,12 +153,12 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         <!-- ═══════════════════════════════════════════
              DURÉE DES MESSAGES VOCAUX
         ═══════════════════════════════════════════ -->
-        <div class="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-6 relative overflow-hidden">
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border-2 border-purple-100 p-6 relative overflow-hidden">
           <!-- Badge -->
           <div class="absolute top-4 right-4 bg-purple-100 text-brand-yellowDark text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-purple-200">
             Signalements
           </div>
-          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs"><i class="fa-solid fa-microphone"></i></div>
             Durée Max des Messages Vocaux
           </h3>
@@ -177,7 +177,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
           <!-- Slider -->
           <div class="mb-4">
-            <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center justify-between">
+            <label class="block text-sm font-bold text-gray-200 mb-2 flex items-center justify-between">
               <span><i class="fa-solid fa-sliders mr-1 text-purple-500"></i> Glissez pour ajuster</span>
               <span class="font-mono text-purple-600 font-black text-base">{{ settings.vocal_max_seconds }}s</span>
             </label>
@@ -203,7 +203,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           <!-- Input numérique direct -->
           <div class="flex items-center gap-3 mb-5">
             <div class="flex-1">
-              <label class="block text-xs font-bold text-gray-600 mb-1">Ou saisissez directement (en secondes)</label>
+              <label class="block text-xs font-bold text-gray-300 mb-1">Ou saisissez directement (en secondes)</label>
               <div class="flex items-center border-2 border-purple-200 rounded-xl overflow-hidden focus-within:border-purple-500 transition-all">
                 <button type="button"
                         (click)="settings.vocal_max_seconds = Math.max(15, +settings.vocal_max_seconds - 5)"
@@ -213,7 +213,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
                   [(ngModel)]="settings.vocal_max_seconds"
                   min="15" max="300"
                   id="vocal-duration-input"
-                  class="flex-1 px-3 py-2.5 text-center font-black text-gray-800 text-base focus:outline-none bg-white">
+                  class="flex-1 px-3 py-2.5 text-center font-black text-gray-800 text-base focus:outline-none bg-white/5 border border-white/10">
                 <button type="button"
                         (click)="settings.vocal_max_seconds = Math.min(300, +settings.vocal_max_seconds + 5)"
                         class="px-3 py-2.5 bg-purple-50 text-purple-600 font-black hover:bg-purple-100 transition-colors text-lg">+</button>
@@ -223,7 +223,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
           <!-- Presets rapides -->
           <div>
-            <p class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Durées prédéfinies</p>
+            <p class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">Durées prédéfinies</p>
             <div class="grid grid-cols-4 gap-2">
               <button type="button"
                       *ngFor="let preset of [{label:'30s', val:30},{label:'1 min', val:60},{label:'2 min', val:120},{label:'3 min', val:180}]"
@@ -245,27 +245,27 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
 
         <!-- Sécurité -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-6">
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-red-50 text-red-500 flex items-center justify-center text-xs"><i class="fa-solid fa-shield-halved"></i></div>
             Sécurité — Mot de passe Admin
           </h3>
           <p class="text-xs text-gray-400 mb-5 ml-9">Changez le mot de passe de connexion au back-office.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">Mot de passe actuel</label>
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">Mot de passe actuel</label>
               <input [(ngModel)]="settings.currentPassword" type="password" placeholder="••••••••"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">Nouveau mot de passe</label>
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">Nouveau mot de passe</label>
               <input [(ngModel)]="settings.newPassword" type="password" placeholder="••••••••"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1.5">Confirmer</label>
+              <label class="block text-sm font-bold text-gray-200 mb-1.5">Confirmer</label>
               <input [(ngModel)]="settings.confirmPassword" type="password" placeholder="••••••••"
-                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all">
+                class="w-full px-4 py-2.5 border border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all">
             </div>
           </div>
         </div>
@@ -281,15 +281,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <div class="space-y-4">
 
         <!-- Aperçu Header -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sticky top-24">
-          <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm border border-white/10 p-5 sticky top-24">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
             <i class="fa-solid fa-eye mr-1"></i> Aperçu — Barre du header
           </h3>
           <div class="bg-gray-900 text-gray-300 rounded-xl p-3 text-xs flex flex-col gap-2 mb-4">
             <div class="flex items-center gap-2"><i class="fa-solid fa-phone text-green-400 text-xs"></i><span>{{ settings.telephone }}</span></div>
             <div class="flex items-center gap-2"><i class="fa-solid fa-envelope text-green-400 text-xs"></i><span>{{ settings.email }}</span></div>
             <div class="flex items-center gap-3 pt-1 border-t border-white/10">
-              <span class="text-[10px] text-gray-500">Réseaux :</span>
+              <span class="text-[10px] text-gray-400">Réseaux :</span>
               <i class="fa-brands fa-whatsapp text-[#25D366]"></i>
               <i class="fa-brands fa-facebook-f text-[#1877F2]"></i>
               <i class="fa-brands fa-tiktok text-white"></i>
@@ -297,14 +297,14 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
 
           <!-- Aperçu QR mini -->
-          <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
             <i class="fa-solid fa-qrcode mr-1"></i> QR Code — Page d'accueil
           </h3>
           <div class="bg-[#022c16]/5 rounded-xl p-4 border border-[#022c16]/10 text-center">
-            <div *ngIf="previewQrUrl" class="inline-block bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+            <div *ngIf="previewQrUrl" class="inline-block bg-white/5 border border-white/10 p-2 rounded-xl shadow-sm border border-white/10">
               <img [src]="previewQrUrl" alt="QR aperçu" class="w-20 h-20 rounded-lg object-contain">
             </div>
-            <div *ngIf="!previewQrUrl" class="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center mx-auto">
+            <div *ngIf="!previewQrUrl" class="w-20 h-20 bg-white/10 rounded-xl flex items-center justify-center mx-auto">
               <i class="fa-solid fa-qrcode text-gray-300 text-2xl"></i>
             </div>
             <p class="text-[10px] text-gray-400 mt-2 truncate max-w-[160px] mx-auto">
@@ -314,7 +314,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
 
         <!-- Notification succès -->
-        <div *ngIf="saved" class="bg-green-50 border border-green-200 text-green-700 rounded-xl p-4 text-sm font-bold flex items-center gap-2 animate-fade-in-up">
+        <div *ngIf="saved" class="bg-green-50 border border-green-200 text-brand-green rounded-xl p-4 text-sm font-bold flex items-center gap-2 animate-fade-in-up">
           <i class="fa-solid fa-circle-check text-lg"></i>
           <div>
             <p class="font-black">Enregistré !</p>
