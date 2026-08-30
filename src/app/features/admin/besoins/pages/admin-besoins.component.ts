@@ -28,7 +28,6 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
           <span class="text-brand-green font-bold bg-brand-green/10 px-2 py-0.5 rounded">{{ textCount }} textes</span>
         </p>
       </div>
-      </div>
       <div class="flex gap-2">
         <button (click)="loadBesoins()"
                 class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition-all shadow-sm">
