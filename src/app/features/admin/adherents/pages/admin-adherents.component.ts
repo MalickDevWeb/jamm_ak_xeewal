@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -202,8 +204,51 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </div>
           </div>
         </div>
-        <div class="mt-6 flex justify-end">
+        <div class="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
+          <div class="flex gap-3">
+            <button (click)="downloadIdCard('png')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#022c16]/90 rounded-xl transition-all flex items-center gap-2 shadow-lg disabled:opacity-50">
+              <i class="fa-solid fa-image" *ngIf="!isDownloading"></i>
+              <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
+              Télécharger PNG
+            </button>
+            <button (click)="downloadIdCard('pdf')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-[#022c16] bg-[#022c16]/10 hover:bg-[#022c16]/20 rounded-xl transition-all flex items-center gap-2 disabled:opacity-50">
+              <i class="fa-solid fa-file-pdf" *ngIf="!isDownloading"></i>
+              <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
+              Télécharger PDF
+            </button>
+          </div>
           <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offscreen template for export -->
+    <div *ngIf="selectedAdherent" id="id-card-export" class="bg-white" style="width: 800px; padding: 40px; position: absolute; left: -9999px; top: -9999px; background: white; z-index: -1;">
+      <div style="border: 4px solid #022c16; border-radius: 20px; padding: 40px; background: #fafafa; font-family: sans-serif;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eaeaea; padding-bottom: 20px;">
+          <h2 style="font-size: 32px; color: #022c16; margin: 0; font-weight: 900; text-transform: uppercase;">CARTE D'IDENTITÉ</h2>
+          <p style="font-size: 18px; color: #666; margin-top: 10px; font-weight: bold;">JÀMM AK XÉEWAL - THIÈS NORD</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; font-size: 20px; color: #333;">
+          <div><strong style="color: #022c16;">Prénom :</strong> {{ selectedAdherent.prenom }}</div>
+          <div><strong style="color: #022c16;">Nom :</strong> {{ selectedAdherent.nom }}</div>
+          <div><strong style="color: #022c16;">Téléphone :</strong> {{ selectedAdherent.telephone }}</div>
+          <div><strong style="color: #022c16;">Quartier :</strong> {{ selectedAdherent.quartier }}</div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 40px;" *ngIf="selectedAdherent.carteRectoUrl">
+          <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Recto</h3>
+            <img [src]="selectedAdherent.carteRectoUrl" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+          </div>
+        </div>
+
+        <div style="text-align: center;" *ngIf="selectedAdherent.carteVersoUrl">
+          <div style="display: inline-block; padding: 10px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h3 style="color: #888; text-transform: uppercase; margin: 0 0 15px 0; font-size: 14px; font-weight: bold;">Verso</h3>
+            <img [src]="selectedAdherent.carteVersoUrl" crossorigin="anonymous" style="max-width: 100%; max-height: 350px; border-radius: 8px;">
+          </div>
         </div>
       </div>
     </div>
@@ -219,6 +264,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   adherents: any[] = [];
   total = 0;
   isLoading = true;
+  isDownloading = false;
 
   showModal = false;
   isEditing = false;
@@ -394,6 +440,53 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }
       });
+    }
+  }
+
+  async downloadIdCard(format: 'png' | 'pdf') {
+    const element = document.getElementById('id-card-export');
+    if (!element) return;
+    
+    this.isDownloading = true;
+    this.cdr.markForCheck();
+
+    try {
+      // Temporarily bring it on screen to ensure images load correctly (invisible)
+      element.style.left = '0';
+      element.style.top = '0';
+      element.style.zIndex = '-9999';
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      element.style.left = '-9999px';
+      element.style.top = '-9999px';
+
+      if (format === 'png') {
+        const imgData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `carte_id_${this.selectedAdherent.prenom}_${this.selectedAdherent.nom}.png`;
+        link.href = imgData;
+        link.click();
+      } else {
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: [canvas.width / 2, canvas.height / 2]
+        });
+        pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width / 2, canvas.height / 2);
+        pdf.save(`carte_id_${this.selectedAdherent.prenom}_${this.selectedAdherent.nom}.pdf`);
+      }
+    } catch (err) {
+      this.showAlertMethod('error', 'Erreur', 'Impossible de générer le fichier.');
+    } finally {
+      this.isDownloading = false;
+      this.cdr.markForCheck();
     }
   }
 
