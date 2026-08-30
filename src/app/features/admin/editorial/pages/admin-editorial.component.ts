@@ -2,14 +2,23 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 
 @Component({
   selector: 'app-admin-editorial',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AlertPopupComponent],
   providers: [AdminDataService],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+    <!-- Alert Popup -->
+    <app-alert-popup 
+      [message]="alertMessage" 
+      [type]="alertType" 
+      [show]="showAlertPopup" 
+      (closed)="showAlertPopup = false">
+    </app-alert-popup>
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
@@ -375,6 +384,17 @@ export class AdminEditorialComponent implements OnInit {
 
   constructor(private adminData: AdminDataService) {}
 
+  alertMessage = '';
+  alertType: AlertType = 'success';
+  showAlertPopup = false;
+
+  showAlert(message: string, type: AlertType = 'success') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertPopup = true;
+    setTimeout(() => this.showAlertPopup = false, 3000);
+  }
+
   isUploadingPhoto = false;
 
   onUploadPhoto(event: Event) {
@@ -385,11 +405,12 @@ export class AdminEditorialComponent implements OnInit {
         next: (res: any) => {
           if (res.success) {
             this.home.presidentPhoto = res.data.url;
+            this.showAlert('Photo uploadée avec succès !', 'success');
           }
           this.isUploadingPhoto = false;
         },
         error: () => {
-          alert("Erreur lors de l'upload de la photo");
+          this.showAlert("Erreur lors de l'upload de la photo", 'error');
           this.isUploadingPhoto = false;
         }
       });
@@ -413,9 +434,10 @@ export class AdminEditorialComponent implements OnInit {
     this.adminData.saveEditorial(section, content).subscribe({
       next: () => {
         this.saved = true;
+        this.showAlert('Contenu enregistré avec succès !', 'success');
         setTimeout(() => this.saved = false, 3500);
       },
-      error: () => alert("Erreur de sauvegarde")
+      error: () => this.showAlert("Erreur de sauvegarde", 'error')
     });
   }
 }
