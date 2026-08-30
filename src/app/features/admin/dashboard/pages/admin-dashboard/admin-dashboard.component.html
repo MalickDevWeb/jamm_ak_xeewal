@@ -23,7 +23,7 @@
       <div class="flex justify-between items-start mb-4">
         <div>
           <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Adhérents</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">1,248</h3>
+          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalAdherents }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center">
           <i class="fa-solid fa-users text-lg"></i>
@@ -41,7 +41,7 @@
       <div class="flex justify-between items-start mb-4">
         <div>
           <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Membres Actifs</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">456</h3>
+          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalActifs }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
           <i class="fa-solid fa-handshake-angle text-lg"></i>
@@ -58,16 +58,15 @@
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Médias (Photos)</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">342</h3>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Besoins déclarés</p>
+          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalBesoins }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">
-          <i class="fa-solid fa-image text-lg"></i>
+          <i class="fa-solid fa-hand-holding-heart text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span class="text-brand-green flex items-center gap-1"><i class="fa-solid fa-plus"></i> 24</span>
-        <span class="text-gray-400 ml-2">nouvelles</span>
+        <span class="text-brand-green flex items-center gap-1">En attente</span>
       </div>
     </div>
 
@@ -76,74 +75,20 @@
       <div class="absolute right-0 top-0 w-24 h-24 bg-purple-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Publications</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">89</h3>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Idées proposées</p>
+          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalIdees }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
-          <i class="fa-solid fa-newspaper text-lg"></i>
+          <i class="fa-regular fa-lightbulb text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span class="text-gray-500">Mis à jour hier</span>
+        <span class="text-gray-500 flex items-center gap-1">Initiatives citoyennes</span>
       </div>
     </div>
   </div>
 
-  <!-- Media Management Section (Photos) -->
-  <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-brand-green/5 to-transparent rounded-bl-full pointer-events-none"></div>
-    
-    <div class="flex items-center justify-between mb-6 relative z-10">
-      <div>
-        <h3 class="text-xl font-bold text-gray-900">Insertion de Médias & Photos</h3>
-        <p class="text-sm text-gray-500 mt-1">Uploadez des photos pour la page d'accueil ou la galerie.</p>
-      </div>
-      <a href="#" class="text-sm font-bold text-brand-green hover:text-brand-greenLight">Voir toute la galerie <i class="fa-solid fa-arrow-right ml-1"></i></a>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-      
-      <!-- Upload Dropzone -->
-      <div class="lg:col-span-1 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 flex flex-col items-center justify-center p-8 hover:bg-gray-100 hover:border-brand-green/50 transition-colors cursor-pointer group">
-        <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-green"></i>
-        </div>
-        <h4 class="font-bold text-gray-900 mb-1">Glissez vos photos ici</h4>
-        <p class="text-xs text-gray-500 text-center">SVG, PNG, JPG ou GIF (max. 5MB)</p>
-        <button class="mt-4 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-bold hover:text-brand-green transition-colors">
-          Parcourir les fichiers
-        </button>
-      </div>
-
-      <!-- Recent Uploads Preview -->
-      <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <!-- Photo 1 -->
-        <div class="relative group rounded-xl overflow-hidden aspect-square bg-gray-100">
-          <img src="https://images.unsplash.com/photo-1593113588931-c0fb9faebed9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Action sociale" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <button class="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-brand-green hover:text-white transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
-            <button class="w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
-          </div>
-        </div>
-        <!-- Photo 2 -->
-        <div class="relative group rounded-xl overflow-hidden aspect-square bg-gray-100">
-          <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Réunion" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <button class="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-brand-green hover:text-white transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
-            <button class="w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
-          </div>
-        </div>
-        <!-- Photo 3 -->
-        <div class="relative group rounded-xl overflow-hidden aspect-square bg-gray-100">
-          <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Soutien" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <button class="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-brand-green hover:text-white transition-colors"><i class="fa-solid fa-pen text-xs"></i></button>
-            <button class="w-8 h-8 rounded-full bg-white text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Export report dialog -->
   <div *ngIf="showExportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">

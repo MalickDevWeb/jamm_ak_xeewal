@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -14,7 +14,7 @@ import { AdminDataService } from '../../../../../core/services/admin-data.servic
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
   showExportModal = false;
   exportFormat: 'pdf' | 'xlsx' = 'pdf';
   exportPeriod: 'day' | 'week' | 'month' | 'year' | 'custom' = 'month';
@@ -22,6 +22,34 @@ export class AdminDashboardComponent {
   exportTo = this.toInputDate(new Date());
   isExporting = false;
   exportError = '';
+
+  totalAdherents = 0;
+  totalActifs = 0;
+  totalBesoins = 0;
+  totalIdees = 0;
+
+  ngOnInit() {
+    this.adminData.getAdherents().subscribe({
+      next: (res: any) => {
+        if (res.data) {
+          this.totalAdherents = res.total || res.data.length;
+          this.totalActifs = res.data.filter((a: any) => a.statut === 'ACTIF').length;
+        }
+      }, error: () => {}
+    });
+
+    this.adminData.getBesoins().subscribe({
+      next: (res: any) => {
+        if (res.data) this.totalBesoins = res.total || res.data.length;
+      }, error: () => {}
+    });
+
+    this.adminData.getIdees().subscribe({
+      next: (res: any) => {
+        if (res.data) this.totalIdees = res.total || res.data.length;
+      }, error: () => {}
+    });
+  }
 
   private readonly reportSources = [
     { key: 'Adherents', label: 'Adhérents', load: () => this.adminData.getAdherents() },
