@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PublicDataService } from '../../../../core/services/public-data.service';
@@ -11,24 +11,24 @@ import { PublicDataService } from '../../../../core/services/public-data.service
   styleUrl: './activites.component.css'
 })
 export class ActivitesComponent implements OnInit {
-  activites: any[] = [];
-  isLoading = true;
+  activites = signal<any[]>([]);
+  isLoading = signal(true);
 
   // Lightbox state
-  selectedActivite: any = null;
-  lightboxMediaUrls: string[] = [];
-  lightboxIndex = 0;
+  selectedActivite = signal<any>(null);
+  lightboxMediaUrls = signal<string[]>([]);
+  lightboxIndex = signal(0);
 
   constructor(private publicData: PublicDataService) {}
 
   ngOnInit() {
     this.publicData.getActivites().subscribe({
       next: (res: any) => {
-        this.activites = res.data || [];
-        this.isLoading = false;
+        this.activites.set(res.data || []);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
@@ -56,23 +56,15 @@ export class ActivitesComponent implements OnInit {
     return url.includes('/video/') || url.endsWith('.mp4') || url.endsWith('.webm');
   }
 
-  /**
-   * Retourne une URL d'aperçu STATIQUE optimisée pour la carte :
-   * - Vidéo Cloudinary  → miniature JPG extraite automatiquement (frame 0)
-   * - Image Cloudinary  → compressée w_600,q_auto,f_auto
-   * - Autres URLs       → retournées telles quelles
-   */
   getCardThumbnail(url: string): string {
     if (!url) return 'https://picsum.photos/seed/default/600/400';
 
-    // Vidéo Cloudinary : /video/upload/... → /video/upload/w_600,q_auto,so_0/...(ext → .jpg)
     if (url.includes('res.cloudinary.com') && this.isVideo(url)) {
       return url
         .replace('/video/upload/', '/video/upload/w_600,q_auto,so_0/')
         .replace(/\.(mp4|webm|mov|avi)$/i, '.jpg');
     }
 
-    // Image Cloudinary : ajouter transformations de compression
     if (url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
       return url.replace('/image/upload/', '/image/upload/w_600,q_auto,f_auto/');
     }
@@ -81,38 +73,33 @@ export class ActivitesComponent implements OnInit {
   }
 
   openLightbox(activite: any) {
-    this.selectedActivite = activite;
-    this.lightboxMediaUrls = this.getMediaUrls(activite.mediaUrl);
-    this.lightboxIndex = 0;
+    this.selectedActivite.set(activite);
+    this.lightboxMediaUrls.set(this.getMediaUrls(activite.mediaUrl));
+    this.lightboxIndex.set(0);
   }
 
   closeLightbox() {
-    this.selectedActivite = null;
-    this.lightboxMediaUrls = [];
-    this.lightboxIndex = 0;
+    this.selectedActivite.set(null);
+    this.lightboxMediaUrls.set([]);
+    this.lightboxIndex.set(0);
   }
 
   nextMedia() {
-    if (this.lightboxIndex < this.lightboxMediaUrls.length - 1) {
-      this.lightboxIndex++;
-    } else {
-      this.lightboxIndex = 0; // loop
-    }
+    const max = this.lightboxMediaUrls().length - 1;
+    this.lightboxIndex.update(i => (i < max ? i + 1 : 0));
   }
 
   prevMedia() {
-    if (this.lightboxIndex > 0) {
-      this.lightboxIndex--;
-    } else {
-      this.lightboxIndex = this.lightboxMediaUrls.length - 1; // loop
-    }
+    const max = this.lightboxMediaUrls().length - 1;
+    this.lightboxIndex.update(i => (i > 0 ? i - 1 : max));
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
-    if (!this.selectedActivite) return;
+    if (!this.selectedActivite()) return;
     if (event.key === 'ArrowRight') this.nextMedia();
     if (event.key === 'ArrowLeft') this.prevMedia();
     if (event.key === 'Escape') this.closeLightbox();
   }
 }
+

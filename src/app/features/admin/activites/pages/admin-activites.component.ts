@@ -1,13 +1,11 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  ElementRef,
-  ViewChild,
+  signal,
+  computed,
+  ChangeDetectionStrategy
 } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -34,7 +32,7 @@ import { environment } from '../../../../../environments/environment';
             Activités
           </h2>
           <p class="text-sm text-gray-500 mt-1">
-            {{ total }} activité(s) enregistrée(s)
+            {{ total() }} activité(s) enregistrée(s)
           </p>
         </div>
         <button
@@ -47,7 +45,7 @@ import { environment } from '../../../../../environments/environment';
       </div>
 
       <!-- Loading state -->
-      <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+      <div *ngIf="isLoading()" class="flex items-center justify-center py-20">
         <div class="text-center">
           <i
             class="fa-solid fa-circle-notch fa-spin text-5xl text-[#022c16] mb-4"
@@ -58,7 +56,7 @@ import { environment } from '../../../../../environments/environment';
 
       <!-- Empty state -->
       <div
-        *ngIf="!isLoading && activites.length === 0"
+        *ngIf="!isLoading() && activites().length === 0"
         class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200"
       >
         <i class="fa-solid fa-photo-film text-7xl text-gray-300 mb-4"></i>
@@ -73,11 +71,11 @@ import { environment } from '../../../../../environments/environment';
 
       <!-- Activities Grid -->
       <div
-        *ngIf="!isLoading && activites.length > 0"
+        *ngIf="!isLoading() && activites().length > 0"
         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
       >
         <div
-          *ngFor="let a of activites; trackBy: trackById"
+          *ngFor="let a of activites(); trackBy: trackById"
           class="group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
         >
           <!-- Media Section -->
@@ -233,7 +231,7 @@ import { environment } from '../../../../../environments/environment';
 
       <!-- Modal: Créer / Modifier -->
       <div
-        *ngIf="showModal"
+        *ngIf="showModal()"
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto"
       >
         <div
@@ -249,11 +247,11 @@ import { environment } from '../../../../../environments/environment';
               >
                 <i
                   class="fa-solid"
-                  [class.fa-plus-circle]="isCreating"
-                  [class.fa-edit]="!isCreating"
+                  [class.fa-plus-circle]="isCreating()"
+                  [class.fa-edit]="!isCreating()"
                   class="text-[#022c16]"
                 ></i>
-                {{ isCreating ? 'Nouvelle activité' : "Modifier l'activité" }}
+                {{ isCreating() ? 'Nouvelle activité' : "Modifier l'activité" }}
               </h3>
               <button
                 (click)="closeModal()"
@@ -312,7 +310,7 @@ import { environment } from '../../../../../environments/environment';
                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
                 >
                   <option
-                    *ngFor="let c of categories; trackBy: trackByOption"
+                    *ngFor="let c of categories(); trackBy: trackByOption"
                     [value]="c.value"
                   >
                     {{ c.label }}
@@ -329,7 +327,7 @@ import { environment } from '../../../../../environments/environment';
                 <input
                   type="date"
                   [(ngModel)]="formData.date"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl text-base focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none"
                 />
               </div>
             </div>
@@ -371,11 +369,11 @@ import { environment } from '../../../../../environments/environment';
 
               <!-- New Media Preview Grid -->
               <div
-                *ngIf="mediaFiles.length > 0"
+                *ngIf="mediaFiles().length > 0"
                 class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4"
               >
                 <div
-                  *ngFor="let media of mediaFiles; let i = index"
+                  *ngFor="let media of mediaFiles(); let i = index"
                   class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
                 >
                   <img
@@ -409,7 +407,7 @@ import { environment } from '../../../../../environments/environment';
 
               <!-- Existing media (edit mode) -->
               <div
-                *ngIf="!isCreating && existingMediaUrls.length > 0"
+                *ngIf="!isCreating() && existingMediaUrls().length > 0"
                 class="mt-4"
               >
                 <p
@@ -421,7 +419,7 @@ import { environment } from '../../../../../environments/environment';
                   class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
                 >
                   <div
-                    *ngFor="let url of existingMediaUrls; let i = index"
+                    *ngFor="let url of existingMediaUrls(); let i = index"
                     class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
                   >
                     <img
@@ -450,10 +448,10 @@ import { environment } from '../../../../../environments/environment';
               </div>
 
               <p
-                *ngIf="mediaError"
+                *ngIf="mediaError()"
                 class="text-red-500 text-sm font-bold mt-2 flex items-center gap-2"
               >
-                <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError }}
+                <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError() }}
               </p>
             </div>
           </div>
@@ -470,18 +468,18 @@ import { environment } from '../../../../../environments/environment';
             </button>
             <button
               (click)="submitForm()"
-              [disabled]="isSubmitting || !formData.titre"
+              [disabled]="isSubmitting() || !formData.titre"
               class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-70"
             >
-              <span *ngIf="!isSubmitting">
+              <span *ngIf="!isSubmitting()">
                 <i
                   class="fa-solid"
-                  [class.fa-plus]="isCreating"
-                  [class.fa-save]="!isCreating"
+                  [class.fa-plus]="isCreating()"
+                  [class.fa-save]="!isCreating()"
                 ></i>
-                {{ isCreating ? 'Créer' : 'Enregistrer' }}
+                {{ isCreating() ? 'Créer' : 'Enregistrer' }}
               </span>
-              <span *ngIf="isSubmitting">
+              <span *ngIf="isSubmitting()">
                 <i class="fa-solid fa-circle-notch fa-spin"></i>
                 Enregistrement...
               </span>
@@ -492,11 +490,11 @@ import { environment } from '../../../../../environments/environment';
 
       <!-- Confirmation Dialog -->
       <app-confirm-dialog
-        [visible]="showConfirmDialog"
-        [title]="confirmTitle"
+        [visible]="showConfirmDialog()"
+        [title]="confirmTitle()"
         message="Cette action est irréversible."
         (confirm)="confirmDelete()"
-        (cancel)="showConfirmDialog = false"
+        (cancel)="showConfirmDialog.set(false)"
       >
       </app-confirm-dialog>
     </div>
@@ -531,46 +529,36 @@ import { environment } from '../../../../../environments/environment';
     `,
   ],
 })
-export class AdminactivitesComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+export class AdminactivitesComponent implements OnInit {
+  activites = signal<any[]>([]);
+  total = computed(() => this.activites().length);
+  isLoading = signal(true);
 
-  activites: any[] = [];
-  total = 0;
-  isLoading = true;
+  categories = signal<Option[]>([]);
+  showModal = signal(false);
+  showConfirmDialog = signal(false);
+  itemToDelete = signal<string | null>(null);
+  confirmTitle = signal('Confirmer la suppression');
+  currentActiviteId = signal<string | null>(null);
+  isCreating = signal(true);
+  isUploadingFiles = signal(false);
+  isSubmitting = signal(false);
 
-  categories: Option[] = [];
-  showModal = false;
-  showConfirmDialog = false;
-  itemToDelete: string | null = null;
-  confirmTitle = 'Confirmer la suppression';
-  currentActiviteId: string | null = null;
-  isCreating = true;
-  isUploadingFiles = false;
-  isSubmitting = false;
-
-  @ViewChild('mediaInput') mediaInput!: ElementRef;
+  mediaFiles = signal<
+    { blob: File | Blob; previewUrl: string; type: string; name: string }[]
+  >([]);
+  existingMediaUrls = signal<string[]>([]);
+  mediaError = signal('');
 
   formData = {
     titre: '',
     description: '',
     categorie: '',
     date: '',
-    typeMedia: 'PHOTOS',
+    typeMedia: 'PHOTOS' as 'PHOTOS' | 'VIDEOS',
   };
 
-  mediaFiles: {
-    blob: File | Blob;
-    previewUrl: string;
-    type: string;
-    name: string;
-  }[] = [];
-  existingMediaUrls: string[] = [];
-  mediaError = '';
-
-  constructor(
-    private adminData: AdminDataService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  constructor(private adminData: AdminDataService) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -580,12 +568,11 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   private loadCategories() {
     this.adminData
       .getOptions('categorie_activite')
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe({
         next: (res: any) => {
           if (res.success) {
-            this.categories = res.data;
-            this.cdr.markForCheck();
+            this.categories.set(res.data);
           }
         },
       });
@@ -600,27 +587,20 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   }
 
   loadActivites() {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.adminData
       .getActivites()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe({
         next: (res: any) => {
-          this.activites = res.data || [];
-          this.total = res.total || 0;
-          this.isLoading = false;
-          this.cdr.markForCheck();
+          this.activites.set(res.data || []);
+          this.isLoading.set(false);
         },
-        error: (err: any) => {
-          this.isLoading = false;
-          this.mediaError = err?.message || 'Erreur de chargement';
-          this.cdr.markForCheck();
+        error: () => {
+          this.isLoading.set(false);
+          this.mediaError.set('Erreur de chargement');
         },
       });
-  }
-
-  refreshData() {
-    this.loadActivites();
   }
 
   getFirstMedia(a: any): string | null {
@@ -630,48 +610,47 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
   playVideo(a: any) {
     a._videoPlaying = true;
-    this.cdr.markForCheck();
   }
 
   openCreateModal() {
-    this.isCreating = true;
+    this.isCreating.set(true);
     this.formData = {
       titre: '',
       description: '',
-      categorie: this.categories[0]?.value || '',
+      categorie: this.categories()[0]?.value || '',
       date: new Date().toISOString().split('T')[0],
       typeMedia: 'PHOTOS',
     };
-    this.mediaFiles = [];
-    this.existingMediaUrls = [];
-    this.mediaError = '';
-    this.showModal = true;
+    this.mediaFiles.set([]);
+    this.existingMediaUrls.set([]);
+    this.mediaError.set('');
+    this.showModal.set(true);
   }
 
   openEditModal(a: any) {
-    this.isCreating = false;
-    this.currentActiviteId = a.id;
+    this.isCreating.set(false);
+    this.currentActiviteId.set(a.id);
     this.formData = {
       titre: a.titre || '',
       description: a.description || '',
-      categorie: a.categorie || this.categories[0]?.value || '',
+      categorie: a.categorie || this.categories()[0]?.value || '',
       date: a.date
         ? new Date(a.date).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0],
       typeMedia: a.typeMedia || 'PHOTOS',
     };
 
-    this.existingMediaUrls = a.mediaUrl
-      ? a.mediaUrl.split(',').filter((u: string) => u.trim())
-      : [];
-    this.mediaFiles = [];
-    this.mediaError = '';
-    this.showModal = true;
+    this.existingMediaUrls.set(
+      a.mediaUrl ? a.mediaUrl.split(',').filter((u: string) => u.trim()) : []
+    );
+    this.mediaFiles.set([]);
+    this.mediaError.set('');
+    this.showModal.set(true);
   }
 
   closeModal() {
-    this.showModal = false;
-    this.mediaError = '';
+    this.showModal.set(false);
+    this.mediaError.set('');
   }
 
   async compressImage(file: File): Promise<File> {
@@ -724,15 +703,14 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
   }
 
   async onMediaSelected(event: any) {
-    this.mediaError = '';
+    this.mediaError.set('');
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.size > 50 * 1024 * 1024) {
-        this.mediaError = `Le fichier ${file.name} est trop lourd (max 50MB).`;
-        this.cdr.markForCheck();
+        this.mediaError.set(`Le fichier ${file.name} est trop lourd (max 50MB).`);
         continue;
       }
 
@@ -746,47 +724,44 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
         const reader = new FileReader();
         reader.onload = (e: any) => {
-          this.mediaFiles.push({
-            blob,
-            previewUrl: e.target.result,
-            type: mediaType,
-            name: file.name,
-          });
-          this.cdr.markForCheck();
+          this.mediaFiles.update((list) => [
+            ...list,
+            { blob, previewUrl: e.target.result, type: mediaType, name: file.name },
+          ]);
         };
         reader.readAsDataURL(blob);
       } catch (err) {
-        this.mediaError = `Erreur lors du traitement de ${file.name}.`;
-        this.cdr.markForCheck();
+        this.mediaError.set(`Erreur lors du traitement de ${file.name}.`);
       }
     }
   }
 
   removeMedia(index: number) {
-    this.mediaFiles.splice(index, 1);
+    this.mediaFiles.update((list) => list.filter((_, i) => i !== index));
   }
 
   removeExistingMedia(index: number) {
-    this.existingMediaUrls.splice(index, 1);
+    this.existingMediaUrls.update((list) => list.filter((_, i) => i !== index));
   }
 
   async submitForm() {
     if (!this.formData.titre) {
-      this.mediaError = 'Veuillez saisir un titre.';
+      this.mediaError.set('Veuillez saisir un titre.');
       return;
     }
 
-    this.isSubmitting = true;
-    this.mediaError = '';
+    this.isSubmitting.set(true);
+    this.mediaError.set('');
 
     try {
-      let allMediaUrls: string[] = [...this.existingMediaUrls];
+      const currentExisting = [...this.existingMediaUrls()];
+      const currentNew = [...this.mediaFiles()];
+      let allMediaUrls: string[] = [...currentExisting];
 
-      if (this.mediaFiles.length > 0) {
-        this.isUploadingFiles = true;
-        this.cdr.markForCheck();
+      if (currentNew.length > 0) {
+        this.isUploadingFiles.set(true);
 
-        const uploadPromises = this.mediaFiles.map(async (media) => {
+        const uploadPromises = currentNew.map(async (media) => {
           const fd = new FormData();
           fd.append('file', media.blob);
           const res = await fetch(`${environment.apiUrl}/upload-public`, {
@@ -800,7 +775,7 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
 
         const newUrls = await Promise.all(uploadPromises);
         allMediaUrls = [...allMediaUrls, ...newUrls];
-        this.isUploadingFiles = false;
+        this.isUploadingFiles.set(false);
       }
 
       const totalMedia = allMediaUrls.length;
@@ -814,82 +789,83 @@ export class AdminactivitesComponent implements OnInit, OnDestroy {
         mediaCount: totalMedia,
         statut: 'PUBLIE',
       };
-      
+
       if (totalMedia > 0) {
         data.mediaUrl = allMediaUrls.join(',');
         data.typeMedia = this.formData.typeMedia;
       }
 
-      if (this.isCreating) {
-        this.adminData
-          .createEntity('activites', data)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.isSubmitting = false;
-              this.showModal = false;
-              this.refreshData();
-            },
-            error: () => {
-              this.isSubmitting = false;
-              this.mediaError = 'Erreur lors de la création.';
-              this.cdr.markForCheck();
-            },
-          });
+      if (this.isCreating()) {
+        this.adminData.createEntity('activites', data).pipe(takeUntilDestroyed()).subscribe({
+          next: (res: any) => {
+            this.isSubmitting.set(false);
+            this.showModal.set(false);
+            this.mediaFiles.set([]);
+            this.existingMediaUrls.set([]);
+            this.activites.update((list) => [res.data, ...list]);
+          },
+          error: () => {
+            this.isSubmitting.set(false);
+            this.mediaError.set('Erreur lors de la création.');
+          },
+        });
       } else {
         this.adminData
-          .updateEntity('activites', this.currentActiviteId!, data)
-          .pipe(takeUntil(this.destroy$))
+          .updateEntity('activites', this.currentActiviteId()!, data)
+          .pipe(takeUntilDestroyed())
           .subscribe({
-            next: () => {
-              this.isSubmitting = false;
-              this.showModal = false;
-              this.refreshData();
+            next: (res: any) => {
+              this.isSubmitting.set(false);
+              this.showModal.set(false);
+              this.mediaFiles.set([]);
+              this.existingMediaUrls.set([]);
+              this.activites.update((list) =>
+                list.map((item) => (item.id === res.data.id ? res.data : item)),
+              );
             },
             error: () => {
-              this.isSubmitting = false;
-              this.mediaError = 'Erreur lors de la modification.';
-              this.cdr.markForCheck();
+              this.isSubmitting.set(false);
+              this.mediaError.set('Erreur lors de la modification.');
             },
           });
       }
     } catch (err: any) {
-      this.isSubmitting = false;
-      this.isUploadingFiles = false;
-      this.mediaError = err.message || 'Erreur réseau.';
-      this.cdr.markForCheck();
+      this.isSubmitting.set(false);
+      this.isUploadingFiles.set(false);
+      this.mediaError.set(err.message || 'Erreur réseau.');
     }
   }
 
   deleteActivite(id: string) {
-    this.itemToDelete = id;
-    this.confirmTitle = 'Supprimer cette activité ?';
-    this.showConfirmDialog = true;
+    this.itemToDelete.set(id);
+    this.confirmTitle.set('Supprimer cette activité ?');
+    this.showConfirmDialog.set(true);
   }
 
   deleteItem = (id: string) => {
+    const previous = this.activites();
+
+    this.activites.update((list) => list.filter((a) => a.id !== id));
+
     this.adminData
       .deleteEntity('activites', id)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe({
-        next: () => this.refreshData(),
+        next: () => {},
         error: () => {
-          this.mediaError = 'Erreur lors de la suppression.';
-          this.cdr.markForCheck();
+          this.activites.set(previous);
+          this.mediaError.set('Erreur lors de la suppression.');
         },
       });
   };
 
   confirmDelete() {
-    if (this.itemToDelete) {
-      this.deleteItem(this.itemToDelete);
-      this.itemToDelete = null;
-      this.showConfirmDialog = false;
+    const id = this.itemToDelete();
+    if (id) {
+      this.deleteItem(id);
+      this.itemToDelete.set(null);
+      this.showConfirmDialog.set(false);
     }
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

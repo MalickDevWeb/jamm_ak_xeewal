@@ -77,7 +77,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getMediaUrl(url: string | null): string {
-    return url || 'https://images.unsplash.com/photo-1593113588931-c0fb9faebed9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+    if (!url) return 'https://images.unsplash.com/photo-1593113588931-c0fb9faebed9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+    const urls = url.split(',').map((u: string) => u.trim()).filter(Boolean);
+    return urls[0] || 'https://images.unsplash.com/photo-1593113588931-c0fb9faebed9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
   }
 
   trackByActivite(index: number, item: any): string {

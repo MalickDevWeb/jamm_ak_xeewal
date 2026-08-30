@@ -37,12 +37,12 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <!-- Skeletons -->
-        <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div *ngIf="isLoading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <div *ngFor="let _ of [1,2,3,4,5,6]" class="h-[280px] rounded-3xl bg-gray-300 animate-pulse"></div>
         </div>
 
         <!-- Empty -->
-        <div *ngIf="!isLoading && activites.length === 0" class="text-center py-24">
+        <div *ngIf="!isLoading() && activites().length === 0" class="text-center py-24">
             <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fa-solid fa-photo-film text-3xl text-gray-400"></i>
             </div>
@@ -51,10 +51,10 @@
         </div>
 
         <!-- Cards Grid -->
-        <div *ngIf="!isLoading && activites.length > 0"
+        <div *ngIf="!isLoading() && activites().length > 0"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-            <div *ngFor="let activite of activites; let i = index"
+            <div *ngFor="let activite of activites(); let i = index"
                  (click)="openLightbox(activite)"
                  class="relative rounded-3xl overflow-hidden cursor-pointer h-[280px] group shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
 
@@ -113,7 +113,7 @@
 </div>
 
 <!-- ============================= LIGHTBOX ============================= -->
-<div *ngIf="selectedActivite"
+<div *ngIf="selectedActivite()"
      class="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center"
      (click)="closeLightbox()">
 
@@ -129,7 +129,7 @@
          (click)="$event.stopPropagation()">
 
         <!-- Left arrow -->
-        <button *ngIf="lightboxMediaUrls.length > 1"
+        <button *ngIf="lightboxMediaUrls().length > 1"
                 (click)="prevMedia()"
                 aria-label="Image ou vidéo précédente"
                 class="absolute left-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/25 text-white rounded-full flex items-center justify-center border border-white/20 transition-all hover:scale-110">
@@ -137,20 +137,20 @@
         </button>
 
         <!-- Video -->
-        <video *ngIf="isVideo(lightboxMediaUrls[lightboxIndex])"
-               [src]="lightboxMediaUrls[lightboxIndex]"
+        <video *ngIf="isVideo(lightboxMediaUrls()[lightboxIndex()])"
+               [src]="lightboxMediaUrls()[lightboxIndex()]"
                class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl"
                controls autoplay muted loop playsinline>
         </video>
 
         <!-- Image -->
-        <img *ngIf="!isVideo(lightboxMediaUrls[lightboxIndex])"
-             [src]="lightboxMediaUrls[lightboxIndex]"
-             [alt]="selectedActivite.titre"
+        <img *ngIf="!isVideo(lightboxMediaUrls()[lightboxIndex()])"
+             [src]="lightboxMediaUrls()[lightboxIndex()]"
+             [alt]="selectedActivite().titre"
              class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl">
 
         <!-- Right arrow -->
-        <button *ngIf="lightboxMediaUrls.length > 1"
+        <button *ngIf="lightboxMediaUrls().length > 1"
                 (click)="nextMedia()"
                 aria-label="Image ou vidéo suivante"
                 class="absolute right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/25 text-white rounded-full flex items-center justify-center border border-white/20 transition-all hover:scale-110">
@@ -160,10 +160,10 @@
 
     <!-- Bottom: counter + title -->
     <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
-        <p class="text-white font-bold text-base">{{ selectedActivite.titre }}</p>
-        <span *ngIf="lightboxMediaUrls.length > 1"
+        <p class="text-white font-bold text-base">{{ selectedActivite().titre }}</p>
+        <span *ngIf="lightboxMediaUrls().length > 1"
               class="bg-black/60 backdrop-blur-sm text-white text-sm font-bold px-5 py-2 rounded-full border border-white/20">
-            {{ lightboxIndex + 1 }} / {{ lightboxMediaUrls.length }}
+            {{ lightboxIndex() + 1 }} / {{ lightboxMediaUrls().length }}
         </span>
     </div>
 

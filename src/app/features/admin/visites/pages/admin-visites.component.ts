@@ -14,7 +14,8 @@ import {
   AdminDataService,
   Option,
 } from '../../../../core/services/admin-data.service';
-import { ConfirmDialogComponent, AlertPopupComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertPopupComponent } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -537,8 +538,8 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
   }
 
   getFirstMedia(v: any): string | null {
-    if (!v.mediaUrls || !Array.isArray(v.mediaUrls) || v.mediaUrls.length === 0) return null;
-    return v.mediaUrls[0];
+    if (!v.mediaUrl) return null;
+    return v.mediaUrl.split(',')[0].trim();
   }
 
   playVideo(v: any) {
@@ -574,8 +575,8 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
       typeMedia: v.typeMedia || 'PHOTOS',
     };
 
-    this.existingMediaUrls = v.mediaUrls && Array.isArray(v.mediaUrls)
-      ? [...v.mediaUrls]
+    this.existingMediaUrls = v.mediaUrl
+      ? v.mediaUrl.split(',').filter((u: string) => u.trim())
       : [];
     this.mediaFiles = [];
     this.mediaError = '';
@@ -596,7 +597,7 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
         img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('22d')!;
+          const ctx = canvas.getContext('2d')!;
           const MAX_WIDTH = 1200;
           const MAX_HEIGHT = 1200;
           let width = img.width;
@@ -730,6 +731,7 @@ export class AdminVisitesComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
         this.isUploadingFiles = false;
         this.showModal = false;
+        this.adminData.invalidate('visites');
         this.refreshData();
         this.showAlertPopup('success', 'Succès', 'Visite enregistrée avec succès');
       } else {
