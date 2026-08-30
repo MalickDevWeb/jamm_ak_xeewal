@@ -425,12 +425,12 @@ import { environment } from '../../../../../environments/environment';
                     class="relative group rounded-xl overflow-hidden border-2 border-gray-200 bg-black h-24"
                   >
                     <img
-                      *ngIf="formData.typeMedia === 'PHOTOS'"
+                      *ngIf="!url.match('\\.(mp4|webm|mov|avi)($|\\?)')"
                       [src]="url"
                       class="w-full h-full object-cover"
                     />
                     <video
-                      *ngIf="formData.typeMedia === 'VIDEOS'"
+                      *ngIf="url.match('\\.(mp4|webm|mov|avi)($|\\?)') || url.includes('/video/upload')"
                       [src]="url"
                       class="w-full h-full object-cover"
                       muted
@@ -796,7 +796,10 @@ export class AdminactivitesComponent implements OnInit {
 
       if (totalMedia > 0) {
         data.mediaUrl = allMediaUrls.join(',');
-        data.typeMedia = this.formData.typeMedia;
+        const hasVideo = allMediaUrls.some((url) =>
+          url.match('\\.(mp4|webm|mov|avi)($|\\?)') || url.includes('/video/upload')
+        );
+        data.typeMedia = hasVideo ? 'VIDEOS' : 'PHOTOS';
       }
 
       if (this.isCreating()) {
