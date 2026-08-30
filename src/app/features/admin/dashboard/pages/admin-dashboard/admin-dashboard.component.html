@@ -2,11 +2,11 @@
   <!-- Page Header -->
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h2 class="text-2xl font-black text-gray-900 tracking-tight">Vue d'ensemble</h2>
-      <p class="text-sm text-gray-500 mt-1">Gérez le contenu, les médias et les membres de l'association.</p>
+      <h2 class="text-2xl font-black text-white tracking-tight">Vue d'ensemble</h2>
+      <p class="text-sm text-gray-400 mt-1">Gérez le contenu, les médias et les membres de l'association.</p>
     </div>
     <div class="flex gap-3">
-      <button (click)="openExportModal()" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0">
+      <button (click)="openExportModal()" class="px-5 py-2.5 bg-white border border-white/20 bg-brand-dark text-white text-gray-200 rounded-xl text-sm font-bold shadow-sm hover:bg-white/10 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0">
         <i class="fa-solid fa-file-export"></i> Exporter
       </button>
       <button aria-label="Créer un nouveau contenu" class="px-5 py-2.5 bg-brand-green text-white rounded-xl text-sm font-bold shadow-lg shadow-brand-green/30 hover:bg-brand-greenLight transition-all flex items-center gap-2 whitespace-nowrap shrink-0">
@@ -18,19 +18,19 @@
   <!-- Stats Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Adhérents</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalAdherents }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Adhérents</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalAdherents }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center">
           <i class="fa-solid fa-users text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentAdherents >= 0 ? 'text-green-500' : 'text-red-500'" class="flex items-center gap-1">
+        <span [ngClass]="percentAdherents >= 0 ? 'text-brand-green' : 'text-red-400'" class="flex items-center gap-1">
           <i class="fa-solid" [ngClass]="percentAdherents >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
           {{ percentAdherents > 0 ? '+' : '' }}{{ percentAdherents }}%
         </span>
@@ -39,19 +39,19 @@
     </div>
 
     <!-- Stat Card 2 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Membres Actifs</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalActifs }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Membres Actifs</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalActifs }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
           <i class="fa-solid fa-handshake-angle text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentActifs >= 0 ? 'text-green-500' : 'text-red-500'" class="flex items-center gap-1">
+        <span [ngClass]="percentActifs >= 0 ? 'text-brand-green' : 'text-red-400'" class="flex items-center gap-1">
           <i class="fa-solid" [ngClass]="percentActifs >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
           {{ percentActifs > 0 ? '+' : '' }}{{ percentActifs }}%
         </span>
@@ -60,19 +60,19 @@
     </div>
 
     <!-- Stat Card 3 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Besoins déclarés</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalBesoins }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Besoins déclarés</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalBesoins }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">
           <i class="fa-solid fa-hand-holding-heart text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentBesoins >= 0 ? 'text-brand-green' : 'text-gray-500'" class="flex items-center gap-1">
+        <span [ngClass]="percentBesoins >= 0 ? 'text-brand-green' : 'text-gray-400'" class="flex items-center gap-1">
           <i class="fa-solid" [ngClass]="percentBesoins >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
           {{ percentBesoins > 0 ? '+' : '' }}{{ percentBesoins }}%
         </span>
@@ -81,19 +81,19 @@
     </div>
 
     <!-- Stat Card 4 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Idées proposées</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalIdees }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Idées proposées</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalIdees }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
           <i class="fa-regular fa-lightbulb text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentIdees >= 0 ? 'text-brand-yellow' : 'text-gray-500'" class="flex items-center gap-1">
+        <span [ngClass]="percentIdees >= 0 ? 'text-brand-yellow' : 'text-gray-400'" class="flex items-center gap-1">
           <i class="fa-solid" [ngClass]="percentIdees >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
           {{ percentIdees > 0 ? '+' : '' }}{{ percentIdees }}%
         </span>
@@ -102,19 +102,19 @@
     </div>
 
     <!-- Stat Card 5 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-[#022c16]/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-brand-green/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Publications (Activités)</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalActivites }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Publications (Activités)</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalActivites }}</h3>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-[#022c16]/10 text-[#022c16] flex items-center justify-center">
+        <div class="w-10 h-10 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">
           <i class="fa-solid fa-newspaper text-lg"></i>
         </div>
       </div>
       <div class="flex items-center text-xs font-bold">
-        <span [ngClass]="percentActivites >= 0 ? 'text-[#022c16]' : 'text-gray-500'" class="flex items-center gap-1">
+        <span [ngClass]="percentActivites >= 0 ? 'text-brand-green' : 'text-gray-400'" class="flex items-center gap-1">
           <i class="fa-solid" [ngClass]="percentActivites >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i> 
           {{ percentActivites > 0 ? '+' : '' }}{{ percentActivites }}%
         </span>
@@ -123,12 +123,12 @@
     </div>
 
     <!-- Stat Card 6 -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+    <div class="bg-white/5 p-6 rounded-2xl shadow-sm border border-white/10 hover:shadow-md transition-shadow relative overflow-hidden group">
       <div class="absolute right-0 top-0 w-24 h-24 bg-brand-yellow/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Médias (Photos/Vidéos)</p>
-          <h3 class="text-3xl font-black text-gray-900 mt-1">{{ totalMedias }}</h3>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Médias (Photos/Vidéos)</p>
+          <h3 class="text-3xl font-black text-white mt-1">{{ totalMedias }}</h3>
         </div>
         <div class="w-10 h-10 rounded-lg bg-brand-yellow/20 text-brand-yellow flex items-center justify-center">
           <i class="fa-solid fa-images text-lg"></i>
@@ -145,20 +145,20 @@
 
   <!-- Export report dialog -->
   <div *ngIf="showExportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+    <div class="bg-brand-dark rounded-3xl border border-white/10 text-white w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
+      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-black/20">
         <div>
-          <h3 class="font-black text-gray-900 text-lg">Exporter un rapport</h3>
-          <p class="text-xs text-gray-500 mt-1">Synthèse détaillée des données de l’association</p>
+          <h3 class="font-black text-white text-lg">Exporter un rapport</h3>
+          <p class="text-xs text-gray-400 mt-1">Synthèse détaillée des données de l’association</p>
         </div>
-        <button (click)="showExportModal = false" aria-label="Fermer" class="text-gray-400 hover:text-red-500 transition-colors">
+        <button (click)="showExportModal = false" aria-label="Fermer" class="text-gray-400 hover:text-red-400 transition-colors">
           <i class="fa-solid fa-xmark text-xl" aria-hidden="true"></i>
         </button>
       </div>
       <div class="p-6 space-y-5">
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Période du rapport</label>
-          <select [(ngModel)]="exportPeriod" (ngModelChange)="updateExportDates()" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20">
+          <label class="block text-sm font-bold text-gray-200 mb-2">Période du rapport</label>
+          <select [(ngModel)]="exportPeriod" (ngModelChange)="updateExportDates()" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20">
             <option value="day">Aujourd’hui</option>
             <option value="week">Cette semaine</option>
             <option value="month">Ce mois</option>
@@ -168,28 +168,28 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1">Du</label>
-            <input [(ngModel)]="exportFrom" type="date" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-brand-green">
+            <label class="block text-xs font-bold text-gray-400 mb-1">Du</label>
+            <input [(ngModel)]="exportFrom" type="date" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1">Au</label>
-            <input [(ngModel)]="exportTo" type="date" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-brand-green">
+            <label class="block text-xs font-bold text-gray-400 mb-1">Au</label>
+            <input [(ngModel)]="exportTo" type="date" class="w-full px-4 py-2.5 border border-white/20 bg-brand-dark text-white rounded-xl text-sm outline-none focus:border-brand-green">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Format du téléchargement</label>
+          <label class="block text-sm font-bold text-gray-200 mb-2">Format du téléchargement</label>
           <div class="grid grid-cols-2 gap-3">
-            <button (click)="exportFormat = 'pdf'" [class]="exportFormat === 'pdf' ? 'px-4 py-3 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold' : 'px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50'">
+            <button (click)="exportFormat = 'pdf'" [class]="exportFormat === 'pdf' ? 'px-4 py-3 rounded-xl border-2 border-red-500 bg-red-500/10 text-red-400 font-bold' : 'px-4 py-3 rounded-xl border border-white/20 bg-brand-dark text-white text-gray-300 font-bold hover:bg-white/10'">
               <i class="fa-solid fa-file-pdf mr-2"></i> PDF
             </button>
-            <button (click)="exportFormat = 'xlsx'" [class]="exportFormat === 'xlsx' ? 'px-4 py-3 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 font-bold' : 'px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50'">
+            <button (click)="exportFormat = 'xlsx'" [class]="exportFormat === 'xlsx' ? 'px-4 py-3 rounded-xl border-2 border-green-600 bg-brand-green/10 text-brand-green font-bold' : 'px-4 py-3 rounded-xl border border-white/20 bg-brand-dark text-white text-gray-300 font-bold hover:bg-white/10'">
               <i class="fa-solid fa-file-excel mr-2"></i> Excel
             </button>
           </div>
         </div>
-        <p *ngIf="exportError" class="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{{ exportError }}</p>
+        <p *ngIf="exportError" class="text-sm text-red-600 bg-red-500/10 rounded-xl px-4 py-3">{{ exportError }}</p>
         <div class="flex justify-end gap-3 pt-2">
-          <button (click)="showExportModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl">Annuler</button>
+          <button (click)="showExportModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-300 bg-white/10 hover:bg-white/20 rounded-xl">Annuler</button>
           <button (click)="generateExport()" [disabled]="isExporting" class="px-5 py-2.5 text-sm font-bold text-white bg-brand-green hover:bg-brand-greenLight disabled:opacity-60 rounded-xl shadow-lg flex items-center gap-2">
             <i [class]="isExporting ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-download'"></i>
             {{ isExporting ? 'Génération...' : 'Télécharger le rapport' }}
