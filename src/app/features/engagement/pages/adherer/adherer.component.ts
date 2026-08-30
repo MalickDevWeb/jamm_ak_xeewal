@@ -108,7 +108,8 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   async onSubmit() {
     if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
-      alert('Veuillez remplir tous les champs obligatoires.');
+      this.errorMsg = 'Veuillez remplir tous les champs obligatoires.';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -153,14 +154,24 @@ export class AdhererComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.isSubmitting = false;
-          alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+          this.errorMsg = "Une erreur est survenue lors de l'envoi. Veuillez réessayer.";
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           this.cdr.markForCheck();
         }
       });
     } catch (err: any) {
       this.isSubmitting = false;
       this.isUploadingFiles = false;
-      alert(err.message || "Erreur réseau. Veuillez réessayer.");
+      
+      let friendlyError = "Une erreur est survenue lors de l'envoi des fichiers.";
+      if (err.status === 0) {
+        friendlyError = "Impossible de joindre le serveur. Veuillez vérifier votre connexion internet.";
+      } else if (err.error && err.error.message) {
+        friendlyError = err.error.message;
+      }
+      
+      this.errorMsg = friendlyError;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.cdr.markForCheck();
     }
   }

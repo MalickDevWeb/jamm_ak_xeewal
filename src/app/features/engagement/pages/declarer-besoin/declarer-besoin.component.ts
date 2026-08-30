@@ -471,7 +471,15 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
       this.isUploadingVocal = false;
       this.isUploadingImage = false;
       this.isSubmitting = false;
-      this.showError(err.message || "Erreur réseau lors de l'envoi des fichiers.");
+      
+      let friendlyError = "Une erreur est survenue lors de l'envoi des fichiers.";
+      if (err.status === 0) {
+        friendlyError = "Impossible de joindre le serveur. Veuillez vérifier votre connexion internet.";
+      } else if (err.error && err.error.message) {
+        friendlyError = err.error.message;
+      }
+      
+      this.showError(friendlyError);
       this.cdr.markForCheck();
     }
   }
