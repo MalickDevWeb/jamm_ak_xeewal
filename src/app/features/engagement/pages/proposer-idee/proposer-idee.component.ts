@@ -63,7 +63,8 @@ export class ProposerIdeeComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (!this.formData.titre || !this.formData.description) {
-      alert("Veuillez remplir le titre et la description.");
+      this.errorMsg = "Veuillez remplir le titre et la description.";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -84,11 +85,16 @@ export class ProposerIdeeComponent implements OnInit, OnDestroy {
         this.success = true;
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err: any) => {
         this.isSubmitting = false;
-        this.errorMsg = "Erreur lors de l'envoi de la proposition.";
-        setTimeout(() => this.errorMsg = '', 5000);
-        this.cdr.markForCheck();
+        let friendlyError = "Une erreur est survenue lors de l'envoi de la proposition.";
+        if (err.status === 0) {
+          friendlyError = "Impossible de joindre le serveur. Veuillez vérifier votre connexion internet.";
+        } else if (err.error && err.error.message) {
+          friendlyError = err.error.message;
+        }
+        this.errorMsg = friendlyError;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.cdr.markForCheck();
       }
     });

@@ -52,9 +52,15 @@ export class ContactComponent {
         this.isSubmitting = false;
         this.success = true;
       },
-      error: () => {
+      error: (err: any) => {
         this.isSubmitting = false;
-        this.showError("Erreur d'envoi. Veuillez réessayer.");
+        let friendlyError = "Une erreur est survenue lors de l'envoi de votre message.";
+        if (err.status === 0) {
+          friendlyError = "Impossible de joindre le serveur. Veuillez vérifier votre connexion internet.";
+        } else if (err.error && err.error.message) {
+          friendlyError = err.error.message;
+        }
+        this.showError(friendlyError);
       }
     });
   }
