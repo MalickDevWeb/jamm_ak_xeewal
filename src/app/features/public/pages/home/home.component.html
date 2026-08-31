@@ -258,10 +258,10 @@
                                     <img [src]="getMediaUrl(activite)" (error)="onImageError(activite.id)" [alt]="activite.titre" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out">
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent opacity-90 group-hover/card:opacity-100 transition-opacity duration-500"></div>
 
-                                    <div *ngIf="activite.typeMedia === 'VIDEO'" class="absolute top-6 right-6 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg group-hover/card:bg-red-600 transition-colors duration-300 z-20">
+                                    <div *ngIf="activite.typeMedia === 'VIDEO'" class="absolute top-6 right-6 bg-black/60 px-4 py-2 rounded-full text-white text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg group-hover/card:bg-red-600 transition-colors duration-300 z-20">
                                         <i class="fa-solid fa-play"></i> Vidéo
                                     </div>
-                                    <div *ngIf="activite.typeMedia !== 'VIDEO'" class="absolute top-6 right-6 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg group-hover/card:bg-brand-yellow group-hover/card:text-brand-dark transition-colors duration-300 z-20">
+                                    <div *ngIf="activite.typeMedia !== 'VIDEO'" class="absolute top-6 right-6 bg-black/60 px-4 py-2 rounded-full text-white text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg group-hover/card:bg-brand-yellow group-hover/card:text-brand-dark transition-colors duration-300 z-20">
                                         <i class="fa-regular fa-images"></i> Photos
                                     </div>
 

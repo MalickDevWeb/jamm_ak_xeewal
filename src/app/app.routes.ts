@@ -65,6 +65,11 @@ export const routes: Routes = [
           .then(m => m.AdminSettingsComponent)
       },
       { 
+        path: 'options', 
+        loadComponent: () => import('./features/admin/options/pages/admin-options.component')
+          .then(m => m.AdminOptionsComponent)
+      },
+      { 
         path: 'editorial', 
         loadComponent: () => import('./features/admin/editorial/pages/admin-editorial.component')
           .then(m => m.AdminEditorialComponent)
