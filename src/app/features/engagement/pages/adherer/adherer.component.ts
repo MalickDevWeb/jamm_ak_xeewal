@@ -163,7 +163,8 @@ export class AdhererComponent implements OnInit, OnDestroy {
               prenom: this.formData.prenom,
               nom: this.formData.nom,
               quartier: this.formData.quartier,
-              photo: this.formData.carteRectoUrl || null
+              photo: this.formData.carteRectoUrl || null,
+              statut: res?.data?.statut || res?.statut || 'EN_ATTENTE'
           };
           localStorage.setItem('current_adherent', JSON.stringify(adherentData));
           

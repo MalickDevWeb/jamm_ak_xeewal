@@ -1,7 +1,7 @@
 
-<header class="relative overflow-hidden pt-12 pb-16 lg:pt-24 lg:pb-32">
+<header class="relative overflow-hidden w-full" [ngClass]="currentAdherent ? 'pt-12 pb-8 min-h-[50vh] bg-gradient-to-b from-[#e8f7ed] to-white' : 'pt-12 pb-16 lg:pt-24 lg:pb-32 bg-brand-dark min-h-screen flex items-center'">
             <!-- CAPTIVATING BACKGROUND: Real Photo + Cinematic Overlay -->
-            <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 z-0" *ngIf="!currentAdherent">
                 <!-- Fallback background color -->
                 <div class="absolute inset-0 bg-brand-dark"></div>
                 <!-- Real high-impact photo of the movement / crowd / action -->
@@ -113,124 +113,118 @@
                 </div>
             </div>
 
-            <!-- Carte Numérique d'Adhérent (Affichée si un compte est reconnu) -->
-            <div *ngIf="currentAdherent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex justify-center items-center w-full py-10 md:py-20 min-h-[500px]">
+            <!-- Carte Numérique d'Adhérent -->
+            <div *ngIf="currentAdherent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center items-center w-full py-4 md:py-10">
                 
-                <div class="relative w-full max-w-[900px] rounded-[2rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.6)] border-2 md:border-4 border-brand-green bg-gradient-to-br from-[#022c16] via-[#04592d] to-[#011a0d] p-0 aspect-[1.6/1]">
+                <div class="relative w-full max-w-[900px] rounded-[1.5rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl border-0 p-0 transition-all duration-500" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'bg-gradient-to-br from-[#024c26] to-[#01a646]' : 'bg-gradient-to-br from-gray-500 to-gray-400 grayscale'">
                     
-                    <!-- Formes et textures de fond (Modern & Elegant) -->
-                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
-                    <!-- Glow en haut à gauche -->
-                    <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-brand-greenLight/30 rounded-full blur-[100px] pointer-events-none"></div>
-                    <!-- Symbole feuille géant stylisé en fond (comme la couronne de laurier) -->
-                    <div class="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.05] text-[350px] md:text-[450px] leading-none pointer-events-none transform translate-x-1/4 text-white">
+                    <!-- Formes et textures de fond -->
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.08] text-[200px] md:text-[450px] leading-none pointer-events-none transform translate-x-1/4 text-brand-dark">
                         <i class="fa-brands fa-pagelines"></i>
                     </div>
 
                     <!-- En-tête de la carte -->
-                    <div class="p-6 md:p-10 flex justify-between items-start relative z-10">
+                    <div class="p-5 md:p-10 flex justify-between items-start relative z-10">
                         <!-- Logo + Nom -->
                         <div class="flex items-center gap-3 md:gap-5">
-                            <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex flex-col items-center justify-center p-2 shadow-xl border-2 border-brand-yellow text-center leading-none">
-                                <i class="fa-solid fa-landmark-dome text-brand-green text-xl md:text-2xl mb-1"></i>
-                                <span class="text-brand-green font-black text-[8px] md:text-[10px]">JÀMM<br/>XÉEWAL</span>
+                            <div class="w-10 h-10 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center p-1 md:p-2 shadow-sm border border-brand-green/20">
+                                <!-- Placeholder text if no logo -->
+                                <div class="flex flex-col items-center leading-none">
+                                    <i class="fa-solid fa-landmark-dome text-brand-green text-[10px] md:text-2xl"></i>
+                                    <span class="text-brand-green font-black text-[5px] md:text-[10px] mt-0.5">JÀMM<br/>XÉEWAL</span>
+                                </div>
                             </div>
-                            <div class="text-white drop-shadow-md">
-                                <h2 class="text-2xl md:text-4xl font-black uppercase tracking-wider leading-none">JÀMM AK</h2>
-                                <h2 class="text-2xl md:text-4xl font-black uppercase tracking-wider leading-none mt-1">XÉEWAL</h2>
+                            <div class="text-white drop-shadow-sm">
+                                <h2 class="text-[14px] md:text-3xl font-black uppercase tracking-wide leading-tight">JÀMM AK</h2>
+                                <h2 class="text-[14px] md:text-3xl font-black uppercase tracking-wide leading-tight mt-0">XÉEWAL</h2>
                             </div>
                         </div>
                         
                         <!-- Badge Membre -->
-                        <div class="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-brand-dark font-black px-4 py-2 md:px-6 md:py-3 rounded-full text-xs md:text-base uppercase tracking-widest shadow-lg flex items-center gap-2 transform hover:scale-105 transition-transform border border-yellow-200">
-                            <i class="fa-solid fa-crown text-lg"></i> Membre Officiel
+                        <div class="font-bold px-3 py-1.5 md:px-6 md:py-3 rounded-full text-[10px] md:text-base flex items-center gap-1.5 shadow-sm" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'bg-brand-yellow text-brand-dark' : 'bg-gray-100 text-gray-700'">
+                            <i class="fa-solid" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'fa-crown text-[10px] md:text-lg' : 'fa-hourglass-half text-[10px] md:text-lg'"></i> 
+                            <span>{{ currentAdherent?.statut === 'ACTIF' ? 'Membre Officiel' : 'En attente' }}</span>
                         </div>
                     </div>
 
                     <!-- Contenu Central : Identité & QR Code -->
-                    <div class="px-6 md:px-12 flex justify-between items-center relative z-10 h-[38%] md:h-[45%] w-full">
+                    <div class="px-5 md:px-12 flex justify-between items-center relative z-10 pb-20 md:pb-32 pt-2 md:pt-4 w-full">
                         
                         <!-- Bloc Identité (Gauche) -->
                         <div class="flex items-center gap-4 md:gap-8 flex-1 min-w-0">
                             <!-- Photo de l'adhérent -->
-                            <div class="w-24 h-24 md:w-36 md:h-36 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center border-4 border-[#022c16] shadow-2xl overflow-hidden shrink-0 relative">
-                                <div class="absolute inset-0 bg-white/20"></div>
-                                <i *ngIf="!currentAdherent?.photo" class="fa-solid fa-user text-5xl md:text-[5.5rem] text-[#022c16] mt-4"></i>
+                            <div class="w-16 h-16 md:w-36 md:h-36 rounded-full flex items-center justify-center shrink-0 relative overflow-hidden border-2 md:border-4 border-transparent shadow-md" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'bg-brand-yellow' : 'bg-gray-300'">
+                                <i *ngIf="!currentAdherent?.photo" class="fa-solid fa-user text-4xl md:text-[5.5rem] mt-3 md:mt-6" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-[#024c26]' : 'text-gray-500'"></i>
                                 <img *ngIf="currentAdherent?.photo" [src]="currentAdherent.photo" alt="Photo Adhérent" class="w-full h-full object-cover relative z-10">
                             </div>
                             
                             <!-- Informations -->
                             <div class="text-white truncate">
-                                <p class="text-white/70 text-xs md:text-sm uppercase tracking-[0.2em] mb-1 font-semibold">Nom & Prénom</p>
-                                <h3 class="text-2xl md:text-5xl font-black uppercase drop-shadow-lg truncate tracking-tight">{{ currentAdherent?.prenom || 'XÉEWAL' }} {{ currentAdherent?.nom || 'JÀMM AK' }}</h3>
+                                <p class="text-white/80 text-[10px] md:text-sm tracking-wide mb-0.5 md:mb-1 font-medium">Nom & Prénom</p>
+                                <h3 class="text-[17px] md:text-4xl font-black uppercase truncate tracking-tight">{{ currentAdherent?.prenom || 'XÉEWAL' }} {{ currentAdherent?.nom || 'JÀMM AK' }}</h3>
                                 
-                                <div class="flex items-center gap-2 mt-4 text-brand-yellow">
-                                    <i class="fa-solid fa-location-dot text-xl md:text-3xl drop-shadow-md"></i>
+                                <div class="flex items-center gap-1.5 md:gap-2 mt-1 md:mt-4" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-brand-yellow' : 'text-gray-200'">
+                                    <i class="fa-solid fa-location-dot text-[14px] md:text-2xl mt-0.5"></i>
                                     <div>
-                                        <p class="text-white/70 text-[10px] md:text-xs uppercase tracking-[0.2em] leading-none font-semibold">Quartier</p>
-                                        <p class="text-white font-bold text-sm md:text-xl leading-none mt-1">{{ currentAdherent?.quartier || 'Thiès-Nord' }}</p>
+                                        <p class="text-white/80 text-[8px] md:text-xs tracking-wide leading-none font-medium">Quartier</p>
+                                        <p class="text-white font-bold text-[11px] md:text-lg leading-none mt-1">{{ currentAdherent?.quartier || 'Thiès-Nord' }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Bloc QR Code (Droite) -->
-                        <div class="hidden sm:flex flex-col items-center justify-center shrink-0 ml-4">
-                            <div class="bg-white p-3 md:p-4 rounded-2xl shadow-2xl relative overflow-hidden group">
-                                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-yellow/10 to-transparent pointer-events-none"></div>
-                                <img [src]="qrImageUrl || 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&data=membre'" class="w-24 h-24 md:w-36 md:h-36 object-contain relative z-10 group-hover:scale-105 transition-transform" alt="QR Code d'identité">
+                        <div class="flex flex-col items-center justify-center shrink-0 ml-2 md:ml-8 relative group">
+                            <div class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg relative overflow-hidden border-2" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'border-brand-yellow' : 'border-gray-300 opacity-60'">
+                                <img [src]="qrImageUrl || 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&data=membre'" class="w-[72px] h-[72px] md:w-32 md:h-32 object-contain relative z-10" alt="QR Code d'identité" [ngClass]="currentAdherent?.statut !== 'ACTIF' ? 'blur-sm' : ''">
+                                <!-- Lock icon if inactive -->
+                                <div *ngIf="currentAdherent?.statut !== 'ACTIF'" class="absolute inset-0 z-20 flex items-center justify-center bg-white/40">
+                                    <i class="fa-solid fa-lock text-gray-700 text-3xl"></i>
+                                </div>
                             </div>
-                            <p class="text-white/90 text-xs md:text-sm mt-3 font-medium tracking-wide flex items-center gap-2 drop-shadow-md">
-                                Carte Électronique <i class="fa-solid fa-wifi rotate-45 text-brand-yellow"></i>
+                            <p class="text-white/90 text-[7.5px] md:text-xs mt-1.5 md:mt-2 font-medium tracking-wide flex items-center gap-1">
+                                Carte Électronique <i class="fa-solid fa-wifi rotate-45" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-brand-yellow' : 'text-gray-300'"></i>
                             </p>
                         </div>
                     </div>
-                    
-                    <!-- Bloc QR Code pour Mobile (Si écran très petit) -->
-                    <div class="sm:hidden px-6 mt-2 flex items-center justify-between relative z-10 w-full">
-                         <div class="bg-white p-2 rounded-xl shadow-lg">
-                             <img [src]="qrImageUrl || 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&color=022c16&data=membre'" class="w-14 h-14 object-contain" alt="QR Code d'identité">
-                         </div>
-                         <p class="text-white/90 text-[10px] font-medium tracking-wide flex items-center gap-1">Carte Électronique <i class="fa-solid fa-wifi rotate-45 text-brand-yellow"></i></p>
-                    </div>
 
-                    <!-- Pied de la Carte : Vague Dorée & Informations Supplémentaires -->
-                    <div class="absolute bottom-0 left-0 w-full h-[25%] md:h-[28%] bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 rounded-t-[1.5rem] md:rounded-t-[2.5rem] shadow-[0_-15px_30px_rgba(0,0,0,0.3)] z-20 flex justify-around items-center px-4 md:px-12 text-[#022c16]">
+                    <!-- Pied de la Carte : Vague Dorée ou Grise -->
+                    <div class="absolute bottom-0 left-0 w-full z-20 flex justify-between items-center px-2 md:px-12 py-3 md:py-6 rounded-t-[1.5rem] md:rounded-t-[3rem] shadow-[0_-5px_20px_rgba(0,0,0,0.2)]" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'bg-gradient-to-b from-brand-yellow via-yellow-400 to-yellow-500 text-brand-dark' : 'bg-gradient-to-b from-gray-300 via-gray-200 to-gray-300 text-gray-600'">
                         
-                        <!-- Overlay de brillance -->
-                        <div class="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent rounded-t-[1.5rem] md:rounded-t-[2.5rem] pointer-events-none"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-t-[1.5rem] md:rounded-t-[3rem] pointer-events-none"></div>
 
                         <!-- Adhésion -->
-                        <div class="flex items-center gap-3 relative z-10">
-                            <i class="fa-regular fa-calendar-days text-3xl md:text-4xl opacity-90 drop-shadow-sm"></i>
-                            <div class="hidden xs:block">
-                                <p class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-80">Adhésion</p>
-                                <p class="font-black text-sm md:text-xl leading-none mt-1 tracking-tight">2024 – 2026</p>
+                        <div class="flex items-center gap-2 md:gap-4 relative z-20 flex-1 justify-center border-r" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'border-brand-dark/10' : 'border-gray-400/30'">
+                            <i class="fa-regular fa-calendar-days text-[18px] md:text-3xl" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-brand-dark/80' : 'text-gray-600'"></i>
+                            <div class="text-left">
+                                <p class="text-[8px] md:text-xs font-semibold tracking-wide">Adhésion</p>
+                                <p class="font-black text-[10px] md:text-lg leading-tight mt-0.5">2024 – 2026</p>
                             </div>
                         </div>
-                        
-                        <div class="w-px h-10 md:h-14 bg-[#022c16]/20 relative z-10"></div>
                         
                         <!-- Statut -->
-                        <div class="flex items-center gap-3 relative z-10">
-                            <i class="fa-solid fa-user-check text-3xl md:text-4xl opacity-90 drop-shadow-sm"></i>
-                            <div class="hidden xs:block">
-                                <p class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-80">Statut</p>
-                                <p class="font-black text-sm md:text-xl leading-none mt-1 tracking-tight">Membre Actif</p>
+                        <div class="flex items-center gap-2 md:gap-4 relative z-20 flex-1 justify-center border-r" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'border-brand-dark/10' : 'border-gray-400/30'">
+                            <i class="fa-regular fa-user text-[18px] md:text-3xl" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-brand-dark/80' : 'text-gray-600'"></i>
+                            <div class="text-left">
+                                <p class="text-[8px] md:text-xs font-semibold tracking-wide">Statut</p>
+                                <p class="font-black text-[10px] md:text-lg leading-tight mt-0.5">{{ currentAdherent?.statut === 'ACTIF' ? 'Membre Actif' : 'En attente' }}</p>
                             </div>
                         </div>
                         
-                        <div class="w-px h-10 md:h-14 bg-[#022c16]/20 relative z-10 hidden sm:block"></div>
-                        
                         <!-- N° Membre -->
-                        <div class="hidden sm:flex items-center gap-3 relative z-10">
-                            <i class="fa-regular fa-star text-3xl md:text-4xl opacity-90 drop-shadow-sm"></i>
-                            <div>
-                                <p class="text-[10px] md:text-xs font-black uppercase tracking-widest opacity-80">N° Membre</p>
-                                <p class="font-black text-sm md:text-xl leading-none mt-1 tracking-tight">JA-{{ currentAdherent?.id ? currentAdherent.id.toString().substring(0,4) : '4587' }}</p>
+                        <div class="flex items-center gap-2 md:gap-4 relative z-20 flex-1 justify-center">
+                            <i class="fa-regular fa-star text-[18px] md:text-3xl" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'text-brand-dark/80' : 'text-gray-600'"></i>
+                            <div class="text-left">
+                                <p class="text-[8px] md:text-xs font-semibold tracking-wide">N° Membre</p>
+                                <p class="font-black text-[10px] md:text-lg leading-tight mt-0.5">JA-{{ currentAdherent?.id ? currentAdherent.id.toString().substring(0,4) : '4587' }}</p>
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Notice Activation -->
+                <div *ngIf="currentAdherent?.statut !== 'ACTIF'" class="mt-6 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full text-brand-dark font-medium text-xs md:text-sm flex items-center gap-3 shadow-lg border border-gray-200 animate-pulse">
+                    <i class="fa-solid fa-circle-info text-blue-500"></i> Votre carte sera activée après validation par un administrateur.
                 </div>
             </div>
         </header>
