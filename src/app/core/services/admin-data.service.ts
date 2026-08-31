@@ -99,6 +99,23 @@ export class AdminDataService {
     return this.http.post(`${this.apiUrl}/auth/change-password`, { currentPassword, newPassword });
   }
 
+  // --- Maintenance Super Admin ---
+  maintenanceLogin(credentials: { email: string, password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/maintenance_sat/login`, credentials);
+  }
+
+  maintenanceGetConfig(token: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/maintenance_sat/config`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  maintenanceSetConfig(token: string, config: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/maintenance_sat/config`, config, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
   // --- Editorial ---
   getEditorial(page: string): Observable<any> { return this.getCached(`editorial_${page}`, this.http.get(`${this.apiUrl}/editorial?page=${page}`)); }
   saveEditorial(page: string, content: any): Observable<any> {

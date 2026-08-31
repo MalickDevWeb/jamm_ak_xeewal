@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { AdminDataService } from '../../../../core/services/admin-data.service';
 
 @Component({
   selector: 'app-maintenance-sat',
@@ -210,7 +211,7 @@ export class MaintenanceSatComponent implements OnInit {
     this.showConfirmDialog = true;
   }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private adminData: AdminDataService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     const storedToken = localStorage.getItem('maintenance_sat_token');
@@ -225,7 +226,7 @@ export class MaintenanceSatComponent implements OnInit {
     this.isLoggingIn = true;
     this.loginError = '';
     
-    this.http.post<any>(`${this.baseUrl}/maintenance_sat/login`, {
+    this.adminData.maintenanceLogin({
       email: this.email,
       password: this.password
     }).subscribe({
@@ -255,16 +256,9 @@ export class MaintenanceSatComponent implements OnInit {
     this.password = '';
   }
 
-  getHeaders() {
-    return new HttpHeaders({
-      'Authorization': `Bearer ${this.token}`,
-      'Content-Type': 'application/json'
-    });
-  }
-
   loadConfig() {
     this.isLoading = true;
-    this.http.get<any>(`${this.baseUrl}/maintenance_sat/config`, { headers: this.getHeaders() })
+    this.adminData.maintenanceGetConfig(this.token)
       .subscribe({
         next: (res) => {
           this.isLoading = false;
@@ -290,7 +284,7 @@ export class MaintenanceSatComponent implements OnInit {
 
   saveConfig() {
     this.isSaving = true;
-    this.http.post<any>(`${this.baseUrl}/maintenance_sat/config`, this.config, { headers: this.getHeaders() })
+    this.adminData.maintenanceSetConfig(this.token, this.config)
       .subscribe({
         next: (res) => {
           this.isSaving = false;
