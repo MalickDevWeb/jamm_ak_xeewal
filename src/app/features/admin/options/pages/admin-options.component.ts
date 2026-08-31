@@ -33,7 +33,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
           <i class="fa-solid fa-list-ul text-[#008d36] text-2xl"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Listes & Catégories</h2>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Quartiers & Catégories</h2>
           <p class="text-[13px] text-gray-500 font-medium mt-0.5">Gérez dynamiquement les quartiers, catégories d'activités, etc.</p>
         </div>
       </div>
