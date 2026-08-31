@@ -171,19 +171,26 @@ export class AdhererComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           this.isSubmitting = false;
+          console.error("Erreur postAdherent:", err);
           
           let friendlyError = "Une erreur est survenue lors de l'envoi. Veuillez réessayer.";
           const serverMsg = err?.error?.message || err?.error?.error || err?.message || '';
           const serverMsgLower = serverMsg.toLowerCase();
           
-          if (err.status === 409 || err.status === 500 && (serverMsgLower.includes('unique') || serverMsgLower.includes('duplicate') || serverMsgLower.includes('exist'))) {
+          // Si on suspecte un problème d'unicité (409, 400, CORS 0, ou 500 avec "unique")
+          if (
+            err.status === 409 || 
+            err.status === 400 || 
+            err.status === 0 || 
+            (err.status === 500 && (serverMsgLower.includes('unique') || serverMsgLower.includes('duplicate') || serverMsgLower.includes('exist')))
+          ) {
              friendlyError = "Cet utilisateur (numéro de téléphone) existe déjà.";
-          } else if (serverMsg && !serverMsgLower.includes('http')) {
+          } 
+          // Si on a un vrai message du serveur (sans "http" générique)
+          else if (serverMsg && !serverMsgLower.includes('http')) {
              friendlyError = serverMsgLower.includes('unique') || serverMsgLower.includes('duplicate') || serverMsgLower.includes('exist') 
                ? "Cet utilisateur (numéro de téléphone) existe déjà." 
                : serverMsg;
-          } else if (err.status === 500) {
-             friendlyError = "Erreur serveur : Cet utilisateur (numéro de téléphone) existe probablement déjà.";
           }
           
           this.errorMsg = friendlyError;
