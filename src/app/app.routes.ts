@@ -160,6 +160,11 @@ export const routes: Routes = [
         path: 'maintenance', 
         loadComponent: () => import('./features/public/pages/maintenance/maintenance.component')
           .then(m => m.MaintenanceComponent)
+      },
+      {
+        path: '**',
+        loadComponent: () => import('./features/public/pages/not-found/not-found.component')
+          .then(m => m.NotFoundComponent)
       }
     ]
   },
@@ -168,6 +173,5 @@ export const routes: Routes = [
     path: 'maintenance_sat',
     loadComponent: () => import('./features/admin/maintenance/pages/maintenance-sat.component')
       .then(m => m.MaintenanceSatComponent)
-  },
-  { path: '**', redirectTo: '' }
+  }
 ];
