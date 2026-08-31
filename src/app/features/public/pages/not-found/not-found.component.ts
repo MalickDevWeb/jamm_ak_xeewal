@@ -66,32 +66,32 @@ import { RouterLink } from '@angular/router';
       </div>
     </div>
   `,
-  styles: [\`
+  styles: [`
+    .animate-bounce-slow {
+      animation: bounce-slow 3s ease-in-out infinite;
+    }
     @keyframes bounce-slow {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-20px); }
+    }
+    .animate-wink {
+      animation: wink 4s infinite;
     }
     @keyframes wink {
       0%, 45%, 55%, 100% { d: path('M 30 40 Q 35 30 40 40'); }
       50% { d: path('M 30 40 Q 35 45 40 40'); }
     }
+    .animate-spin-slow {
+      animation: spin-slow 6s linear infinite;
+    }
     @keyframes spin-slow {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .animate-bounce-slow {
-      animation: bounce-slow 3s ease-in-out infinite;
-    }
-    .animate-wink {
-      animation: wink 4s infinite;
-    }
-    .animate-spin-slow {
-      animation: spin-slow 6s linear infinite;
-    }
     .animation-delay-200 {
       animation-delay: 200ms;
     }
-  \`]
+  `]
 })
 export class NotFoundComponent {
 }
