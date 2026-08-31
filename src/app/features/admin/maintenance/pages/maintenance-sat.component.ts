@@ -141,6 +141,50 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
         </div>
 
+        <!-- Custom Variables -->
+        <div class="bg-white/5 border border-white/10 rounded-2xl shadow-sm p-6 relative overflow-hidden border-l-[6px] border-l-purple-500">
+          <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-xs"><i class="fa-solid fa-key"></i></div>
+            Variables d'Environnement (Secrets)
+          </h3>
+          <p class="text-[11px] font-medium text-gray-400 mb-6 ml-9">Gérez dynamiquement n'importe quelle autre clé (ex: SMTP_USER, JWT_SECRET...). Les changements s'appliquent immédiatement.</p>
+          
+          <!-- Liste des variables existantes -->
+          <div class="space-y-3 mb-6 ml-9">
+            <ng-container *ngFor="let key of getCustomKeys()">
+              <div class="flex items-center gap-3">
+                <input [value]="key" disabled class="w-1/3 px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-xs font-mono text-gray-400 cursor-not-allowed">
+                <div class="relative flex-1">
+                  <input [type]="visibleSecrets[key] ? 'text' : 'password'" [(ngModel)]="config[key]"
+                    class="w-full px-3 py-2 bg-brand-dark border border-white/20 rounded-lg text-xs font-medium text-white focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all outline-none font-mono pr-10">
+                  <button type="button" (click)="toggleSecret(key)" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-200">
+                    <i class="fa-solid" [ngClass]="visibleSecrets[key] ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                </div>
+                <button (click)="removeCustomKey(key)" title="Supprimer" class="w-9 h-9 flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-colors">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </ng-container>
+            <div *ngIf="getCustomKeys().length === 0" class="text-xs text-gray-500 font-medium italic">Aucune variable personnalisée définie.</div>
+          </div>
+
+          <!-- Ajouter une nouvelle variable -->
+          <div class="ml-9 p-4 bg-black/20 rounded-xl border border-white/5">
+            <label class="block text-[11px] font-bold text-gray-300 mb-2 uppercase tracking-wider">Ajouter une nouvelle clé</label>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input [(ngModel)]="newKeyName" placeholder="NOM_DE_LA_CLE (ex: SMTP_PASSWORD)" type="text"
+                class="w-full sm:w-1/3 px-3 py-2 bg-brand-dark border border-white/20 rounded-lg text-xs font-medium text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none font-mono uppercase">
+              <input [(ngModel)]="newKeyValue" placeholder="Valeur secrète..." type="text"
+                class="flex-1 px-3 py-2 bg-brand-dark border border-white/20 rounded-lg text-xs font-medium text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none font-mono">
+              <button (click)="addCustomKey()" [disabled]="!newKeyName || !newKeyValue"
+                class="px-4 py-2 bg-purple-500 text-white text-xs font-bold rounded-lg hover:bg-purple-600 transition-colors disabled:opacity-50">
+                Ajouter
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="pt-4 flex items-center justify-between">
           <div *ngIf="saved" class="bg-brand-green/20 border border-brand-green/20 text-brand-green rounded-xl px-4 py-3 text-sm flex items-center gap-2 animate-fade-in-up">
             <i class="fa-solid fa-circle-check"></i>
@@ -173,6 +217,10 @@ export class MaintenanceSatComponent implements OnInit {
   isSaving = false;
   saved = false;
   showSecret = false;
+  visibleSecrets: { [key: string]: boolean } = {};
+  
+  newKeyName = '';
+  newKeyValue = '';
 
   config: any = {
     'MAINTENANCE_MODE': 'false',
@@ -180,6 +228,41 @@ export class MaintenanceSatComponent implements OnInit {
     'SECRET_CLOUDINARY_API_KEY': '',
     'SECRET_CLOUDINARY_API_SECRET': ''
   };
+
+  // Les clés de base qu'on affiche séparément
+  private baseKeys = ['MAINTENANCE_MODE', 'SECRET_CLOUDINARY_CLOUD_NAME', 'SECRET_CLOUDINARY_API_KEY', 'SECRET_CLOUDINARY_API_SECRET'];
+
+  getCustomKeys(): string[] {
+    return Object.keys(this.config).filter(key => !this.baseKeys.includes(key));
+  }
+
+  toggleSecret(key: string) {
+    this.visibleSecrets[key] = !this.visibleSecrets[key];
+  }
+
+  addCustomKey() {
+    if (this.newKeyName && this.newKeyValue) {
+      const key = this.newKeyName.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+      this.config[key] = this.newKeyValue;
+      this.newKeyName = '';
+      this.newKeyValue = '';
+    }
+  }
+
+  removeCustomKey(key: string) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer la clé ${key} ?`)) {
+      this.adminData.maintenanceDeleteConfigKey(this.token, key).subscribe({
+        next: () => {
+          delete this.config[key];
+          this.cdr.detectChanges();
+          this.showAlert(`Clé ${key} supprimée`, 'success');
+        },
+        error: () => {
+          this.showAlert('Erreur lors de la suppression', 'error');
+        }
+      });
+    }
+  }
 
   private baseUrl = environment.apiUrl; // e.g. /api/v1
 

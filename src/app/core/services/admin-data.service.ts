@@ -116,6 +116,12 @@ export class AdminDataService {
     });
   }
 
+  maintenanceDeleteConfigKey(token: string, key: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/maintenance_sat/config?key=${key}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
   // --- Editorial ---
   getEditorial(page: string): Observable<any> { return this.getCached(`editorial_${page}`, this.http.get(`${this.apiUrl}/editorial?page=${page}`)); }
   saveEditorial(page: string, content: any): Observable<any> {
