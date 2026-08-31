@@ -100,7 +100,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             </div>
             
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" [(ngModel)]="config['MAINTENANCE_MODE']" (change)="toggleMaintenance()" class="sr-only peer">
+              <input type="checkbox" [checked]="config['MAINTENANCE_MODE'] === 'true'" (change)="toggleMaintenance()" class="sr-only peer">
               <div class="w-14 h-7 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/5 border border-white/10 after:border-transparent after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500/100"></div>
               <span class="ml-3 text-sm font-black" [ngClass]="config['MAINTENANCE_MODE'] === 'true' ? 'text-red-400' : 'text-gray-400'">
                 {{ config['MAINTENANCE_MODE'] === 'true' ? 'ACTIVÉ' : 'INACTIF' }}
