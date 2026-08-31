@@ -36,8 +36,6 @@ export class AdminLoginComponent {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading = false;
-        // Précharger toutes les données en arrière-plan pour que le dashboard soit instantané
-        this.prefetchAllData();
         this.router.navigate(['/admin/dashboard']);
       },
       error: (err: any) => {
@@ -45,29 +43,5 @@ export class AdminLoginComponent {
         this.errorMessage = err.message || 'Erreur de connexion';
       }
     });
-  }
-
-  private async prefetchAllData() {
-    // Appels séquentiels pour ne pas saturer le pool de connexions (Prisma/Neon)
-    const requests = [
-      this.adminData.getAdherents(),
-      this.adminData.getBesoins(),
-      this.adminData.getIdees(),
-      this.adminData.getMessages(),
-      this.adminData.getCommissions(),
-      this.adminData.getSondages(),
-      this.adminData.getActivites(),
-      this.adminData.getComptesRendus(),
-      this.adminData.getSettings(),
-    ];
-    
-    for (const req$ of requests) {
-      await new Promise<void>(resolve => {
-        req$.subscribe({ 
-          next: () => resolve(),
-          error: () => resolve() 
-        });
-      });
-    }
   }
 }

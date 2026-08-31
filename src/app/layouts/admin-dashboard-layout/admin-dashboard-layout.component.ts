@@ -254,41 +254,43 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     return item?.label || 'Dashboard';
   }
 
-  refreshNotifications() {
+  async refreshNotifications() {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.cdr.markForCheck();
 
-    forkJoin({
-      adherents: this.adminData.getAdherents(),
-      besoins: this.adminData.getBesoins(),
-      idees: this.adminData.getIdees(),
-      messages: this.adminData.getMessages(),
-      commissions: this.adminData.getCommissions(),
-      sondages: this.adminData.getSondages(),
-      activites: this.adminData.getActivites(),
-      evenements: this.adminData.getEvenements(),
-      comptesRendus: this.adminData.getComptesRendus()
-    }).pipe(
-      takeUntil(this.destroy$),
-      finalize(() => {
-        this.isLoading = false;
-      })
-    ).subscribe({
-      next: (response: any) => {
-        const items: AdminNotification[] = [];
-        this.addNotifications(items, response.adherents?.data, 'Nouvel adhérent', item => `${item.prenom} ${item.nom}`, 'fa-solid fa-user-plus', 'green', '/admin/adherents');
-        this.addNotifications(items, response.besoins?.data, 'Nouveau besoin', item => item.description || `Quartier ${item.quartier}`, 'fa-solid fa-hand-holding-heart', 'red', '/admin/besoins');
-        this.addNotifications(items, response.idees?.data, 'Nouvelle idée', item => item.titre, 'fa-solid fa-lightbulb', 'yellow', '/admin/idees');
-        this.addNotifications(items, response.messages?.data, 'Nouveau message', item => item.sujet || item.nom, 'fa-solid fa-envelope', 'blue', '/admin/messages');
-        this.addNotifications(items, response.commissions?.data, 'Nouvelle commission', item => item.nom, 'fa-solid fa-sitemap', 'purple', '/admin/commissions');
-        this.addNotifications(items, response.sondages?.data, 'Nouveau sondage', item => item.question, 'fa-solid fa-square-poll-vertical', 'teal', '/admin/sondages');
-        this.addNotifications(items, response.activites?.data, 'Nouvelle activité', item => item.titre, 'fa-solid fa-calendar-days', 'purple', '/admin/activites');
-        this.addNotifications(items, response.evenements?.data, 'Nouvel événement', item => item.titre, 'fa-solid fa-calendar-days', 'indigo', '/admin/evenements');
-        this.addNotifications(items, response.comptesRendus?.data, 'Nouveau compte-rendu', item => item.titre, 'fa-solid fa-file-lines', 'teal', '/admin/comptes-rendus');
-        this.notifications = items.sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()).slice(0, 40);
-        this.cdr.markForCheck();
-      }
-    });
+    try {
+      const { firstValueFrom } = await import('rxjs');
+      
+      // Fetch sequentially to prevent backend connection pool exhaustion (ECONNRESET)
+      const adherents = await firstValueFrom(this.adminData.getAdherents().pipe(takeUntil(this.destroy$)));
+      const besoins = await firstValueFrom(this.adminData.getBesoins().pipe(takeUntil(this.destroy$)));
+      const idees = await firstValueFrom(this.adminData.getIdees().pipe(takeUntil(this.destroy$)));
+      const messages = await firstValueFrom(this.adminData.getMessages().pipe(takeUntil(this.destroy$)));
+      const commissions = await firstValueFrom(this.adminData.getCommissions().pipe(takeUntil(this.destroy$)));
+      const sondages = await firstValueFrom(this.adminData.getSondages().pipe(takeUntil(this.destroy$)));
+      const activites = await firstValueFrom(this.adminData.getActivites().pipe(takeUntil(this.destroy$)));
+      const evenements = await firstValueFrom(this.adminData.getEvenements().pipe(takeUntil(this.destroy$)));
+      const comptesRendus = await firstValueFrom(this.adminData.getComptesRendus().pipe(takeUntil(this.destroy$)));
+
+      const items: AdminNotification[] = [];
+      this.addNotifications(items, adherents?.data, 'Nouvel adhérent', (item: any) => `${item.prenom} ${item.nom}`, 'fa-solid fa-user-plus', 'green', '/admin/adherents');
+      this.addNotifications(items, besoins?.data, 'Nouveau besoin', (item: any) => item.description || `Quartier ${item.quartier}`, 'fa-solid fa-hand-holding-heart', 'red', '/admin/besoins');
+      this.addNotifications(items, idees?.data, 'Nouvelle idée', (item: any) => item.titre, 'fa-solid fa-lightbulb', 'yellow', '/admin/idees');
+      this.addNotifications(items, messages?.data, 'Nouveau message', (item: any) => item.sujet || item.nom, 'fa-solid fa-envelope', 'blue', '/admin/messages');
+      this.addNotifications(items, commissions?.data, 'Nouvelle commission', (item: any) => item.nom, 'fa-solid fa-sitemap', 'purple', '/admin/commissions');
+      this.addNotifications(items, sondages?.data, 'Nouveau sondage', (item: any) => item.question, 'fa-solid fa-square-poll-vertical', 'teal', '/admin/sondages');
+      this.addNotifications(items, activites?.data, 'Nouvelle activité', (item: any) => item.titre, 'fa-solid fa-calendar-days', 'purple', '/admin/activites');
+      this.addNotifications(items, evenements?.data, 'Nouvel événement', (item: any) => item.titre, 'fa-solid fa-calendar-days', 'indigo', '/admin/evenements');
+      this.addNotifications(items, comptesRendus?.data, 'Nouveau compte-rendu', (item: any) => item.titre, 'fa-solid fa-file-lines', 'teal', '/admin/comptes-rendus');
+      
+      this.notifications = items.sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()).slice(0, 40);
+    } catch (err) {
+      console.error('Erreur lors de la récupération des notifications', err);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
   }
 
   private addNotifications(target: AdminNotification[], records: any[], title: string, detail: (item: any) => string, icon: string, color: string, route: string) {
