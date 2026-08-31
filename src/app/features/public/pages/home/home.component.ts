@@ -12,6 +12,8 @@ import { RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PublicDataService } from '../../../../core/services/public-data.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -64,7 +66,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const adherentData = localStorage.getItem('current_adherent');
     if (adherentData) {
       try {
-        this.currentAdherent = JSON.parse(adherentData);
+        const parsed = JSON.parse(adherentData);
+        this.currentAdherent = parsed;
+        
+        // Rafraîchir le statut depuis le backend si on a un ID
+        if (parsed.id) {
+          this.http.get<any>(`${environment.apiUrl}/adherents/${parsed.id}`).subscribe({
+            next: (res) => {
+              if (res.success && res.data) {
+                this.currentAdherent = res.data;
+                localStorage.setItem('current_adherent', JSON.stringify(res.data));
+                this.cdr.markForCheck();
+              }
+            }
+          });
+        }
       } catch (e) {
         console.error('Error parsing adherent data');
       }
