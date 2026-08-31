@@ -221,6 +221,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines' },
     { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib' },
     { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear' },
+    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul' },
   ];
 
   constructor(
