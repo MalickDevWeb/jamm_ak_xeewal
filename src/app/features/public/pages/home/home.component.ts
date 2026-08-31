@@ -13,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PublicDataService } from '../../../../core/services/public-data.service';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -54,7 +54,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private publicData: PublicDataService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -72,7 +73,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         // Rafraîchir le statut depuis le backend si on a un ID
         if (parsed.id) {
           this.http.get<any>(`${environment.apiUrl}/adherents/${parsed.id}`).subscribe({
-            next: (res) => {
+            next: (res: any) => {
               if (res.success && res.data) {
                 this.currentAdherent = res.data;
                 localStorage.setItem('current_adherent', JSON.stringify(res.data));
