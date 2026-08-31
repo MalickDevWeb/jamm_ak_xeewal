@@ -108,12 +108,12 @@
                     <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
                         <p class="text-sm text-gray-500 font-medium mt-4 mb-5 flex items-center gap-2">
                             <i class="fa-solid fa-shield-halved text-brand-green"></i>
-                            Photographiez les deux faces de votre pièce d'identité nationale. Données chiffrées et sécurisées.
+                            Prenez en photo ou uploadez les deux faces de votre pièce d'identité nationale. Données sécurisées.
                         </p>
 
                         <!-- Inputs fichiers cachés -->
-                        <input #rectoInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-upload" (change)="onRectoSelected($event)">
-                        <input #versoInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-upload" (change)="onVersoSelected($event)">
+                        <input #rectoInput type="file" accept="image/*" class="hidden" id="recto-upload" (change)="onRectoSelected($event)">
+                        <input #versoInput type="file" accept="image/*" class="hidden" id="verso-upload" (change)="onVersoSelected($event)">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -132,11 +132,11 @@
                                         <i class="fa-regular fa-id-card"></i>
                                     </div>
                                     <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Recto</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Face avant · JPG, PNG · max 5 Mo</p>
+                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Ajouter le Recto</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Appareil photo ou Galerie (max 5 Mo)</p>
                                     </div>
                                     <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
+                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir / Prendre
                                     </span>
                                 </div>
 
@@ -184,11 +184,11 @@
                                         <i class="fa-solid fa-id-card-clip"></i>
                                     </div>
                                     <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Scanner le Verso</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Face arrière · JPG, PNG · max 5 Mo</p>
+                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Ajouter le Verso</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Appareil photo ou Galerie (max 5 Mo)</p>
                                     </div>
                                     <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir une photo
+                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir / Prendre
                                     </span>
                                 </div>
 
