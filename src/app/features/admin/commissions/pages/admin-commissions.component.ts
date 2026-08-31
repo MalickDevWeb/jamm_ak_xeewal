@@ -1,3 +1,5 @@
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -8,9 +10,28 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-commissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+
+    <!-- Alert Popup -->
+    <app-alert-popup 
+      [message]="alertMessage" 
+      [type]="alertType" 
+      [visible]="showAlertPopup" 
+      (close)="showAlertPopup = false">
+    </app-alert-popup>
+
+    <!-- Confirm Dialog -->
+    <app-confirm-dialog
+      [title]="confirmTitle"
+      [message]="confirmMessage"
+      [visible]="showConfirmDialog"
+      (confirm)="onConfirmAction()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
+
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
@@ -98,9 +119,10 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
              <div class="w-10 h-10 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
-               <i class="fa-solid fa-plus text-[#008d36]"></i>
+               <i class="fa-solid fa-plus text-[#008d36]" *ngIf="!isEditing"></i>
+               <i class="fa-solid fa-pen text-[#008d36]" *ngIf="isEditing"></i>
              </div>
-             Nouvelle Commission
+             {{ isEditing ? 'Modifier la commission' : 'Nouvelle Commission' }}
           </h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
             <i class="fa-solid fa-xmark text-lg"></i>
@@ -114,7 +136,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           <div class="flex justify-end gap-3 pt-2">
             <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
             <button (click)="submitForm()" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2">
-              <i class="fa-solid fa-check"></i> Créer
+              <i class="fa-solid fa-check"></i> {{ isEditing ? 'Enregistrer' : 'Créer' }}
             </button>
           </div>
         </div>
@@ -130,9 +152,57 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
+  isEditing = false;
+  editingId: string | null = null;
   formData = {
     nom: ''
   };
+
+  
+  // Alert State
+  alertMessage = '';
+  alertType: AlertType = 'success';
+  showAlertPopup = false;
+
+  showAlert(message: string, type: AlertType = 'success') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertPopup = true;
+    setTimeout(() => this.showAlertPopup = false, 3000);
+  }
+
+  // Confirm State
+  showConfirmDialog = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
+
+  openConfirm(title: string, message: string, actionType: string, id: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = id;
+    this.showConfirmDialog = true;
+  }
+
+  onConfirmAction() {
+    this.showConfirmDialog = false;
+    if (this.confirmActionType === 'delete' && this.confirmActionId) {
+      this.isLoading = true;
+      this.adminData.deleteEntity('commissions', this.confirmActionId).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlert('Commission supprimée avec succès');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+          this.showAlert('Erreur lors de la suppression', 'error');
+        }
+      });
+    }
+  }
 
   constructor(private adminData: AdminDataService,
     private cdr: ChangeDetectorRef) {}
@@ -148,32 +218,58 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
 
   action(type: string, id?: string) {
     if (type === 'Nouvelle commission') {
+      this.isEditing = false;
+      this.editingId = null;
       this.formData = { nom: '' };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
-      if (confirm('Voulez-vous vraiment supprimer cette commission ?')) {
-        this.isLoading = true;
-        this.adminData.deleteEntity('commissions', id).subscribe(() => this.refreshData());
-      }
+      this.openConfirm('Supprimer la commission ?', 'Voulez-vous vraiment supprimer définitivement cette commission ?', 'delete', id);
     } else if (type === 'Éditer' && id) {
-      const nouveauNom = prompt('Nouveau nom ?');
-      if (nouveauNom) {
-        this.isLoading = true;
-        this.adminData.updateEntity('commissions', id, { nom: nouveauNom }).subscribe(() => this.refreshData());
+      const commission = this.commissions.find(c => c.id === id);
+      if (commission) {
+        this.isEditing = true;
+        this.editingId = id;
+        this.formData = { nom: commission.nom };
+        this.showModal = true;
       }
     } else {
-      alert(type + ' : Formulaire en cours de développement.');
+      this.showAlert(type + ' : Formulaire en cours de développement.', 'info');
     }
   }
 
   submitForm() {
     if (!this.formData.nom) {
-      alert('Veuillez saisir un nom');
+      this.showAlert('Veuillez saisir un nom', 'info');
       return;
     }
-      this.isLoading = true;
+    this.isLoading = true;
     this.showModal = false;
-    this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe(() => this.refreshData());
+    
+    if (this.isEditing && this.editingId) {
+      this.adminData.updateEntity('commissions', this.editingId, { nom: this.formData.nom }).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlert('Commission modifiée avec succès');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+          this.showAlert('Erreur lors de la modification', 'error');
+        }
+      });
+    } else {
+      this.adminData.createEntity('commissions', { nom: this.formData.nom, responsable: 'Non assigné' }).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlert('Commission créée avec succès');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+          this.showAlert('Erreur lors de la création', 'error');
+        }
+      });
+    }
   }
 
   ngOnDestroy() {

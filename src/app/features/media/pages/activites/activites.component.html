@@ -115,39 +115,39 @@
 
 <!-- ============================= LIGHTBOX ============================= -->
 <div *ngIf="selectedActivite()"
-     class="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center"
+     class="fixed inset-0 z-[999999] bg-black flex flex-col items-center justify-center transition-opacity duration-300"
      (click)="closeLightbox()">
 
     <!-- Close button -->
     <button (click)="closeLightbox()"
             aria-label="Fermer la vue en plein écran"
-            class="absolute top-5 right-5 z-10 w-11 h-11 bg-white/10 hover:bg-white/25 text-white rounded-full flex items-center justify-center border border-white/20 transition-colors">
-        <i class="fa-solid fa-xmark text-lg"></i>
+            class="absolute top-6 right-6 md:top-10 md:right-10 bg-[#222] hover:bg-[#333] text-white text-lg md:text-xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full transition-colors z-[999999]">
+        <i class="fa-solid fa-xmark"></i>
     </button>
-
+    
     <!-- Main media viewer -->
-    <div class="relative flex items-center justify-center w-full h-full px-16"
+    <div class="relative flex items-center justify-center w-full h-full"
          (click)="$event.stopPropagation()">
 
         <!-- Left arrow -->
         <button *ngIf="lightboxMediaUrls().length > 1"
                 (click)="prevMedia()"
                 aria-label="Image ou vidéo précédente"
-                class="absolute left-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/25 text-white rounded-full flex items-center justify-center border border-white/20 transition-all hover:scale-110">
-            <i class="fa-solid fa-chevron-left text-lg"></i>
+                class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-4xl md:text-6xl w-16 h-16 flex items-center justify-center transition-colors focus:outline-none z-50 drop-shadow-lg">
+            <i class="fa-solid fa-angle-left"></i>
         </button>
 
         <!-- Video -->
         <video *ngIf="isDirectVideo(lightboxMediaUrls()[lightboxIndex()])"
                [src]="lightboxMediaUrls()[lightboxIndex()]"
-               class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl"
+               class="w-[95vw] md:w-[80vw] max-w-5xl h-[60vh] md:h-[80vh] object-cover rounded-2xl shadow-2xl"
                controls autoplay muted loop playsinline>
         </video>
 
         <iframe *ngIf="isEmbedVideo(lightboxMediaUrls()[lightboxIndex()])"
                 [src]="getSafeVideoUrl(lightboxMediaUrls()[lightboxIndex()])"
                 title="Lecteur vidéo de l'activité" 
-                class="w-full max-w-4xl h-[60vh] rounded-xl shadow-2xl scale-100 transition-transform duration-300" 
+                class="w-[95vw] md:w-[80vw] max-w-5xl h-[60vh] md:h-[80vh] rounded-2xl shadow-2xl" 
                 frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen>
@@ -158,24 +158,24 @@
              [src]="brokenLightboxImages.has(lightboxMediaUrls()[lightboxIndex()]) ? 'assets/president-photo.jpeg' : lightboxMediaUrls()[lightboxIndex()]"
              (error)="onLightboxImageError(lightboxMediaUrls()[lightboxIndex()])"
              [alt]="selectedActivite().titre"
-             class="max-h-[80vh] max-w-[70vw] rounded-2xl object-contain shadow-2xl">
+             class="w-[95vw] md:w-[80vw] max-w-5xl h-[60vh] md:h-[80vh] object-cover rounded-2xl shadow-2xl">
 
         <!-- Right arrow -->
         <button *ngIf="lightboxMediaUrls().length > 1"
                 (click)="nextMedia()"
                 aria-label="Image ou vidéo suivante"
-                class="absolute right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/25 text-white rounded-full flex items-center justify-center border border-white/20 transition-all hover:scale-110">
-            <i class="fa-solid fa-chevron-right text-lg"></i>
+                class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-4xl md:text-6xl w-16 h-16 flex items-center justify-center transition-colors focus:outline-none z-50 drop-shadow-lg">
+            <i class="fa-solid fa-angle-right"></i>
         </button>
     </div>
 
-    <!-- Bottom: counter + title -->
-    <div class="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none">
-        <p class="text-white font-bold text-base">{{ selectedActivite().titre }}</p>
-        <span *ngIf="lightboxMediaUrls().length > 1"
-              class="bg-black/60 backdrop-blur-sm text-white text-sm font-bold px-5 py-2 rounded-full border border-white/20">
+    <!-- Bottom Container (Title + Counter) -->
+    <div class="absolute bottom-8 left-4 right-4 flex flex-col items-center gap-4 pointer-events-none z-[999999]">
+        <p class="text-white/80 font-medium text-sm md:text-base text-center max-w-3xl">{{ selectedActivite().titre }}</p>
+        <div *ngIf="lightboxMediaUrls().length > 1"
+              class="text-white font-medium bg-[#222] px-6 py-2 rounded-full tracking-widest text-sm shadow-xl">
             {{ lightboxIndex() + 1 }} / {{ lightboxMediaUrls().length }}
-        </span>
+        </div>
     </div>
 
 </div>

@@ -1,3 +1,4 @@
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-maintenance-sat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AlertPopupComponent],
   template: `
   <div class="min-h-screen bg-brand-dark flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
     
@@ -181,6 +182,34 @@ export class MaintenanceSatComponent implements OnInit {
 
   private baseUrl = environment.apiUrl; // e.g. /api/v1
 
+  
+  // Alert State
+  alertMessage = '';
+  alertType: AlertType = 'success';
+  showAlertPopup = false;
+
+  showAlert(message: string, type: AlertType = 'success') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertPopup = true;
+    setTimeout(() => this.showAlertPopup = false, 3000);
+  }
+
+  // Confirm State
+  showConfirmDialog = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
+
+  openConfirm(title: string, message: string, actionType: string, id: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = id;
+    this.showConfirmDialog = true;
+  }
+
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -276,7 +305,7 @@ export class MaintenanceSatComponent implements OnInit {
         },
         error: (err) => {
           this.isSaving = false;
-          alert('Erreur lors de la sauvegarde');
+          this.showAlert('Erreur lors de la sauvegarde', 'error');
           if (err.status === 401 || err.status === 403) {
             this.logout();
           }

@@ -1,3 +1,5 @@
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -8,9 +10,28 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-idees',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+
+    <!-- Alert Popup -->
+    <app-alert-popup 
+      [message]="alertMessage" 
+      [type]="alertType" 
+      [visible]="showAlertPopup" 
+      (close)="showAlertPopup = false">
+    </app-alert-popup>
+
+    <!-- Confirm Dialog -->
+    <app-confirm-dialog
+      [title]="confirmTitle"
+      [message]="confirmMessage"
+      [visible]="showConfirmDialog"
+      (confirm)="onConfirmAction()"
+      (cancel)="showConfirmDialog = false">
+    </app-confirm-dialog>
+
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
@@ -154,6 +175,52 @@ export class AdminideesComponent implements OnInit, OnDestroy {
     description: ''
   };
 
+  
+  // Alert State
+  alertMessage = '';
+  alertType: AlertType = 'success';
+  showAlertPopup = false;
+
+  showAlert(message: string, type: AlertType = 'success') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertPopup = true;
+    setTimeout(() => this.showAlertPopup = false, 3000);
+  }
+
+  // Confirm State
+  showConfirmDialog = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
+
+  openConfirm(title: string, message: string, actionType: string, id: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = id;
+    this.showConfirmDialog = true;
+  }
+
+  onConfirmAction() {
+    this.showConfirmDialog = false;
+    if (this.confirmActionType === 'delete' && this.confirmActionId) {
+      this.isLoading = true;
+      this.adminData.deleteEntity('idees', this.confirmActionId).subscribe({
+        next: () => {
+          this.refreshData();
+          this.showAlert('Idée supprimée avec succès');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+          this.showAlert('Erreur lors de la suppression', 'error');
+        }
+      });
+    }
+  }
+
   constructor(private adminData: AdminDataService,
     private cdr: ChangeDetectorRef) {}
 
@@ -187,16 +254,13 @@ export class AdminideesComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.adminData.updateEntity('idees', id, { statut: 'REJETEE' }).subscribe(() => this.refreshData());
     } else if (id && type === 'Supprimer') {
-      if (confirm('Voulez-vous vraiment supprimer cette idée ?')) {
-        this.isLoading = true;
-        this.adminData.deleteEntity('idees', id).subscribe(() => this.refreshData());
-      }
+      this.openConfirm('Supprimer cette idée ?', 'Voulez-vous vraiment supprimer définitivement cette idée ?', 'delete', id);
     }
   }
 
   submitForm() {
     if (!this.formData.titre) {
-      alert('Veuillez saisir un titre');
+      this.showAlert('Veuillez saisir un titre', 'info');
       return;
     }
       this.isLoading = true;

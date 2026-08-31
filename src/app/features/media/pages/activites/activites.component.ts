@@ -24,10 +24,16 @@ export class ActivitesComponent implements OnInit {
   brokenImages = new Set<string>();
   brokenLightboxImages = new Set<string>();
 
+  private autoplayInterval: any;
+
   constructor(
     private publicData: PublicDataService,
     private sanitizer: DomSanitizer
   ) {}
+
+  ngOnDestroy() {
+    this.stopAutoplay();
+  }
 
   ngOnInit() {
     this.publicData.getActivites().subscribe({
@@ -137,22 +143,52 @@ export class ActivitesComponent implements OnInit {
     this.selectedActivite.set(activite);
     this.lightboxMediaUrls.set(this.getMediaUrls(activite.mediaUrl));
     this.lightboxIndex.set(0);
+    this.startAutoplay();
   }
 
   closeLightbox() {
     this.selectedActivite.set(null);
     this.lightboxMediaUrls.set([]);
     this.lightboxIndex.set(0);
+    this.stopAutoplay();
   }
 
   nextMedia() {
     const max = this.lightboxMediaUrls().length - 1;
     this.lightboxIndex.update(i => (i < max ? i + 1 : 0));
+    this.resetAutoplay();
   }
 
   prevMedia() {
     const max = this.lightboxMediaUrls().length - 1;
     this.lightboxIndex.update(i => (i > 0 ? i - 1 : max));
+    this.resetAutoplay();
+  }
+
+  startAutoplay() {
+    this.stopAutoplay();
+    this.autoplayInterval = setInterval(() => {
+        const urls = this.lightboxMediaUrls();
+        if (urls.length <= 1) return;
+        const currentUrl = urls[this.lightboxIndex()];
+        if (this.isVideo(currentUrl)) return;
+        
+        this.lightboxIndex.update(i => {
+           const max = urls.length - 1;
+           return (i < max ? i + 1 : 0);
+        });
+    }, 4000);
+  }
+
+  stopAutoplay() {
+    if (this.autoplayInterval) {
+      clearInterval(this.autoplayInterval);
+      this.autoplayInterval = null;
+    }
+  }
+
+  resetAutoplay() {
+    this.startAutoplay();
   }
 
   @HostListener('document:keydown', ['$event'])

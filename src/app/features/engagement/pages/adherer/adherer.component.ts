@@ -153,14 +153,40 @@ export class AdhererComponent implements OnInit, OnDestroy {
       this.publicData.postAdherent(this.formData).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
-        next: () => {
+        next: (res: any) => {
           this.isSubmitting = false;
           this.success = true;
+          
+          // Sauvegarde automatique du compte pour la page d'accueil
+          const adherentData = {
+              id: res?.data?.id || res?.id || Math.floor(1000 + Math.random() * 9000),
+              prenom: this.formData.prenom,
+              nom: this.formData.nom,
+              quartier: this.formData.quartier,
+              photo: this.formData.carteRectoUrl || null
+          };
+          localStorage.setItem('current_adherent', JSON.stringify(adherentData));
+          
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: any) => {
           this.isSubmitting = false;
-          this.errorMsg = "Une erreur est survenue lors de l'envoi. Veuillez réessayer.";
+          
+          let friendlyError = "Une erreur est survenue lors de l'envoi. Veuillez réessayer.";
+          const serverMsg = err?.error?.message || err?.error?.error || err?.message || '';
+          const serverMsgLower = serverMsg.toLowerCase();
+          
+          if (err.status === 409 || err.status === 500 && (serverMsgLower.includes('unique') || serverMsgLower.includes('duplicate') || serverMsgLower.includes('exist'))) {
+             friendlyError = "Cet utilisateur (numéro de téléphone) existe déjà.";
+          } else if (serverMsg && !serverMsgLower.includes('http')) {
+             friendlyError = serverMsgLower.includes('unique') || serverMsgLower.includes('duplicate') || serverMsgLower.includes('exist') 
+               ? "Cet utilisateur (numéro de téléphone) existe déjà." 
+               : serverMsg;
+          } else if (err.status === 500) {
+             friendlyError = "Erreur serveur : Cet utilisateur (numéro de téléphone) existe probablement déjà.";
+          }
+          
+          this.errorMsg = friendlyError;
           window.scrollTo({ top: 0, behavior: 'smooth' });
           this.cdr.markForCheck();
         }

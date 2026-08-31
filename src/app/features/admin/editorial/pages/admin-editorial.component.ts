@@ -15,8 +15,8 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     <app-alert-popup 
       [message]="alertMessage" 
       [type]="alertType" 
-      [show]="showAlertPopup" 
-      (closed)="showAlertPopup = false">
+      [visible]="showAlertPopup" 
+      (close)="showAlertPopup = false">
     </app-alert-popup>
 
     <!-- Header -->

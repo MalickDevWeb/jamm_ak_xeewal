@@ -46,6 +46,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   brokenImages = new Set<string>();
   brokenLightboxImages = new Set<string>();
 
+  currentAdherent: any = null;
+
   constructor(
     private publicData: PublicDataService,
     private cdr: ChangeDetectorRef,
@@ -54,7 +56,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.checkAdherentStatus();
     this.loadData();
+  }
+
+  private checkAdherentStatus() {
+    const adherentData = localStorage.getItem('current_adherent');
+    if (adherentData) {
+      try {
+        this.currentAdherent = JSON.parse(adherentData);
+      } catch (e) {
+        console.error('Error parsing adherent data');
+      }
+    }
   }
 
   private loadData() {
@@ -184,30 +198,59 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return item.id || index;
   }
 
+  private lightboxInterval: any;
+
   openGallery(images: string[]): void {
     if (!images || images.length === 0) return;
     this.currentGallery = images;
     this.currentIndex = 0;
     this.isGalleryOpen = true;
+    this.startLightboxAutoplay();
     this.cdr.markForCheck();
   }
 
   closeGallery(): void {
     this.isGalleryOpen = false;
     this.currentGallery = [];
+    this.stopLightboxAutoplay();
     this.cdr.markForCheck();
   }
 
   prevGalleryImage(event?: Event): void {
     if (event) event.stopPropagation();
     this.currentIndex = (this.currentIndex - 1 + this.currentGallery.length) % this.currentGallery.length;
+    this.resetLightboxAutoplay();
     this.cdr.markForCheck();
   }
 
   nextGalleryImage(event?: Event): void {
     if (event) event.stopPropagation();
     this.currentIndex = (this.currentIndex + 1) % this.currentGallery.length;
+    this.resetLightboxAutoplay();
     this.cdr.markForCheck();
+  }
+
+  startLightboxAutoplay() {
+    this.stopLightboxAutoplay();
+    this.lightboxInterval = setInterval(() => {
+        if (this.currentGallery.length <= 1) return;
+        const currentUrl = this.currentGallery[this.currentIndex];
+        if (this.isVideo(currentUrl)) return;
+        
+        this.currentIndex = (this.currentIndex + 1) % this.currentGallery.length;
+        this.cdr.markForCheck();
+    }, 4000);
+  }
+
+  stopLightboxAutoplay() {
+    if (this.lightboxInterval) {
+      clearInterval(this.lightboxInterval);
+      this.lightboxInterval = null;
+    }
+  }
+
+  resetLightboxAutoplay() {
+    this.startLightboxAutoplay();
   }
 
   isVideo(url: string): boolean {
@@ -260,44 +303,57 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     if (this.scrollInterval) clearInterval(this.scrollInterval);
+    this.stopLightboxAutoplay();
   }
 
   private initCarousel() {
+    if (!this.activites || this.activites.length === 0) return;
+    
     const carousel = document.getElementById('activities-carousel');
     if (!carousel) return;
-    const originalCards = Array.from(carousel.children) as HTMLElement[];
-    if (originalCards.length === 0) return;
 
-    for (let i = 0; i < 2; i++) {
-      originalCards.forEach(card => carousel.appendChild(card.cloneNode(true)));
-    }
+    // Use setTimeout to ensure the view has rendered the ngFor elements before calculating widths
+    setTimeout(() => {
+        const firstCard = carousel.children[0] as HTMLElement;
+        if (!firstCard) return;
 
-    const cardWidth = originalCards[0].offsetWidth + 24;
+        // Gap is 32px (gap-8 in tailwind)
+        const cardWidth = firstCard.offsetWidth + 32; 
 
-    const scroll = () => {
-      const lightbox = document.getElementById('gallery-lightbox');
-      if (lightbox && !lightbox.classList.contains('hidden')) return;
-      if (carousel.scrollLeft >= cardWidth * originalCards.length) {
-        carousel.style.scrollBehavior = 'auto';
-        carousel.scrollLeft = 0;
-        void carousel.offsetWidth;
-      }
-      carousel.style.scrollBehavior = 'smooth';
-      carousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
-    };
+        const scroll = () => {
+            if (this.isGalleryOpen) return;
+            
+            // maxScroll defines the exact end of the first set of items
+            const maxScroll = cardWidth * this.activites.length;
+            
+            if (carousel.scrollLeft >= maxScroll) {
+                // Silently reset back to 0 without animation to create infinite effect
+                carousel.style.scrollBehavior = 'auto';
+                carousel.scrollLeft = 0;
+                void carousel.offsetWidth; // force reflow
+            }
+            
+            carousel.style.scrollBehavior = 'smooth';
+            carousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        };
 
-    const startScroll = () => {
-      if (!this.scrollInterval) this.scrollInterval = setInterval(scroll, 8000);
-    };
-    const stopScroll = () => {
-      if (this.scrollInterval) { clearInterval(this.scrollInterval); this.scrollInterval = null; }
-    };
+        const startScroll = () => {
+            if (!this.scrollInterval) this.scrollInterval = setInterval(scroll, 3000);
+        };
+        const stopScroll = () => {
+            if (this.scrollInterval) { 
+                clearInterval(this.scrollInterval); 
+                this.scrollInterval = null; 
+            }
+        };
 
-    carousel.addEventListener('mouseenter', stopScroll, { passive: true });
-    carousel.addEventListener('mouseleave', startScroll, { passive: true });
-    carousel.addEventListener('touchstart', stopScroll, { passive: true });
-    carousel.addEventListener('touchend', startScroll, { passive: true });
-    startScroll();
+        carousel.addEventListener('mouseenter', stopScroll, { passive: true });
+        carousel.addEventListener('mouseleave', startScroll, { passive: true });
+        carousel.addEventListener('touchstart', stopScroll, { passive: true });
+        carousel.addEventListener('touchend', startScroll, { passive: true });
+        
+        startScroll();
+    }, 100);
   }
 
 

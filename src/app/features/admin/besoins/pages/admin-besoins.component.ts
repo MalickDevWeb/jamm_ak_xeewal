@@ -1,4 +1,5 @@
 
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -14,9 +15,18 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   selector: 'app-admin-besoins',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
+
+    <!-- Alert Popup -->
+    <app-alert-popup 
+      [message]="alertMessage" 
+      [type]="alertType" 
+      [visible]="showAlertPopup" 
+      (close)="showAlertPopup = false">
+    </app-alert-popup>
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
@@ -326,6 +336,21 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
               this.searchQuery || this.activeType !== 'ALL');
   }
 
+  
+  // Alert State
+  alertMessage = '';
+  alertType: AlertType = 'success';
+  showAlertPopup = false;
+
+  showAlert(message: string, type: AlertType = 'success') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertPopup = true;
+    setTimeout(() => this.showAlertPopup = false, 3000);
+  }
+
+
+
   constructor(
     private adminData: AdminDataService,
     private http: HttpClient,
@@ -492,7 +517,7 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
 
   submitForm() {
     if (!this.formData.quartier || !this.formData.description) {
-      alert('Veuillez remplir le quartier et la description');
+      this.showAlert('Veuillez remplir le quartier et la description', 'info');
       return;
     }
       this.isLoading = true;
