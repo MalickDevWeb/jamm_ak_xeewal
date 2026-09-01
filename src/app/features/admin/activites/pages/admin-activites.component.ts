@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   AdminDataService,
   Option,
@@ -18,6 +19,7 @@ import {
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-activites',
@@ -219,15 +221,16 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
                 </td>
                 <td class="p-4 text-gray-500 text-[13px]">Admin</td>
                 <td class="p-4 pr-6">
-                   <div class="flex items-center justify-center gap-3">
-                     <button class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors"><i class="fa-solid fa-eye text-xs"></i></button>
-                     <div class="relative group/menu">
-                        <button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                        <div class="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 opacity-0 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:pointer-events-auto transition-opacity z-10">
-                          <button (click)="openEditModal(a)" class="w-full text-left px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-[#008d36] flex items-center gap-2"><i class="fa-solid fa-pen w-4"></i> Modifier</button>
-                          <button (click)="deleteActivite(a.id)" class="w-full text-left px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash w-4"></i> Supprimer</button>
-                        </div>
-                     </div>
+                   <div class="flex items-center justify-center gap-2">
+                     <button class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 flex items-center justify-center transition-colors" title="Voir">
+                        <i class="fa-solid fa-eye text-[11px]"></i>
+                     </button>
+                     <button (click)="openEditModal(a)" class="w-8 h-8 rounded-lg bg-[#e6f3eb] hover:bg-[#d1e8d9] text-[#008d36] flex items-center justify-center transition-colors" title="Modifier">
+                        <i class="fa-solid fa-pen text-[11px]"></i>
+                     </button>
+                     <button (click)="deleteActivite(a.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors" title="Supprimer">
+                        <i class="fa-solid fa-trash text-[11px]"></i>
+                     </button>
                    </div>
                 </td>
               </tr>
@@ -258,7 +261,7 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
 
       <!-- Modal: Créer / Modifier -->
       <div *ngIf="showModal()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl animate-fade-in-up my-4 overflow-hidden">
+        <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl animate-fade-in-up my-4 overflow-hidden">
           <!-- Modal Header -->
           <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
             <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
@@ -521,7 +524,7 @@ export class AdminactivitesComponent implements OnInit {
     this.openConfirm('Supprimer TOUS les activite(s) ?', 'ATTENTION: Cette action supprimera TOUS les activite(s) de la base.', 'bulk_delete_all');
   }
 
-constructor(private adminData: AdminDataService, private cloudinaryUpload: CloudinaryUploadService) {}
+constructor(private adminData: AdminDataService, private cloudinaryUpload: CloudinaryUploadService, private http: HttpClient) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -785,6 +788,10 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
             this.mediaFiles.set([]);
             this.existingMediaUrls.set([]);
             this.activites.update((list) => [res.data, ...list]);
+            // Push notification si publiée
+            if (data.statut === 'PUBLIE') {
+              this.sendPushNotification(res?.data || data, true);
+            }
           },
           error: () => {
             this.isSubmitting.set(false);
@@ -804,6 +811,10 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
               this.activites.update((list) =>
                 list.map((item) => (item.id === res.data.id ? res.data : item)),
               );
+              // Push notification si publiée
+              if (data.statut === 'PUBLIE') {
+                this.sendPushNotification(res?.data || data, false);
+              }
             },
             error: () => {
               this.isSubmitting.set(false);
@@ -816,6 +827,26 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
       this.isUploadingFiles.set(false);
       this.mediaError.set(err.message || 'Erreur réseau.');
     }
+  }
+
+  private sendPushNotification(activite: any, isNew: boolean) {
+    const titre = activite?.titre || this.formData.titre || 'Nouvelle activité';
+    const categorie = activite?.categorie || this.formData.categorie || '';
+    const dateStr = activite?.date
+      ? new Date(activite.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+
+    const pushPayload = {
+      title: `📸 ${isNew ? 'Nouvelle activité' : 'Activité mise à jour'} : ${titre}`,
+      body: `${categorie ? `[${categorie}] ` : ''}${isNew ? 'Publiée' : 'Mise à jour'} le ${dateStr}. Découvrez-la sur notre site !`,
+      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      url: '/activites'
+    };
+
+    this.http.post(`${environment.bacOfficeUrl}/api/v1/push/send`, pushPayload).subscribe({
+      next: (res: any) => console.log(`[Push Activité] Notifié: ${res?.sent ?? 0} abonné(s)`),
+      error: (err) => console.warn('[Push Activité] Erreur:', err?.message)
+    });
   }
 
   deleteActivite(id: string) {

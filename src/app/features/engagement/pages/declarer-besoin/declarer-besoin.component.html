@@ -150,8 +150,8 @@
               Ajoutez des photos <span class="text-gray-400 font-semibold normal-case tracking-normal lowercase">(max 3, optionnel)</span>
             </label>
             
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <!-- Uploaded Images -->
+            <!-- Miniatures des photos ajoutées -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3" *ngIf="imagePreviewUrls.length > 0">
               <div *ngFor="let url of imagePreviewUrls; let i = index" class="relative w-full h-24 rounded-2xl overflow-hidden shadow-sm border border-gray-200">
                 <img [src]="url" alt="Photo jointe" class="w-full h-full object-cover">
                 <button (click)="removeImage(i, $event)" 
@@ -160,26 +160,38 @@
                   <i class="fa-solid fa-times text-sm"></i>
                 </button>
               </div>
-
-              <!-- Add Photo Button -->
-              <div *ngIf="imagePreviewUrls.length < 3" 
-                   class="border-[1.5px] border-dashed border-gray-300 rounded-2xl bg-white hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden flex flex-col items-center justify-center h-24" 
-                   [class.opacity-60]="isUploadingImage"
-                   onclick="document.getElementById('photoUpload').click()">
-                
-                <div *ngIf="!isUploadingImage" class="flex flex-col items-center gap-1 text-gray-400">
-                  <i class="fa-solid fa-camera text-xl"></i>
-                  <span class="text-xs font-semibold">{{ imagePreviewUrls.length > 0 ? 'Ajouter autre' : 'Joindre photo' }}</span>
-                </div>
-
-                <div *ngIf="isUploadingImage" class="flex flex-col items-center gap-1 text-[#00a651]">
-                  <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
-                  <span class="text-xs font-bold">Envoi...</span>
-                </div>
-              </div>
             </div>
-            
+
+            <!-- Inputs cachés : caméra et galerie -->
+            <input type="file" id="photoCameraCapture" class="hidden" accept="image/*" capture="environment" (change)="onImageSelected($event)">
             <input type="file" id="photoUpload" class="hidden" accept="image/*" multiple (change)="onImageSelected($event)">
+
+            <!-- Boutons d'action photos (visibles si < 3 photos) -->
+            <div *ngIf="imagePreviewUrls.length < 3" class="flex flex-col sm:flex-row gap-2">
+              <!-- Bouton Caméra -->
+              <button type="button"
+                      [disabled]="isUploadingImage"
+                      onclick="document.getElementById('photoCameraCapture').click()"
+                      class="flex-1 flex items-center justify-center gap-2 bg-[#022c16] text-white font-bold text-sm py-3 px-4 rounded-2xl shadow hover:bg-[#034020] active:scale-95 transition-all disabled:opacity-60">
+                <i class="fa-solid fa-camera text-base"></i>
+                Prendre en photo
+              </button>
+              <!-- Bouton Galerie -->
+              <button type="button"
+                      [disabled]="isUploadingImage"
+                      onclick="document.getElementById('photoUpload').click()"
+                      class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-bold text-sm py-3 px-4 rounded-2xl hover:bg-gray-200 active:scale-95 transition-all border border-gray-200 disabled:opacity-60">
+                <i class="fa-solid fa-images text-base"></i>
+                Galerie
+                <span class="text-xs font-normal text-gray-400">(max 3)</span>
+              </button>
+            </div>
+
+            <!-- Spinner upload en cours -->
+            <div *ngIf="isUploadingImage" class="flex items-center gap-2 mt-2 text-[#00a651]">
+              <i class="fa-solid fa-circle-notch fa-spin"></i>
+              <span class="text-xs font-bold">Envoi en cours...</span>
+            </div>
             
             <p *ngIf="imageError" class="text-red-500 text-xs mt-2 flex items-center gap-1.5 font-bold">
               <i class="fa-solid fa-circle-exclamation"></i> {{ imageError }}

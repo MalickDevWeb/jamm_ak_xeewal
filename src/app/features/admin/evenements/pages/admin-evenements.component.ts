@@ -4,9 +4,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-evenements',
@@ -235,8 +237,12 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
     statut: 'A_VENIR'
   };
 
-  constructor(private adminData: AdminDataService,
-    private bulkDelete: BulkDeleteService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private adminData: AdminDataService,
+    private bulkDelete: BulkDeleteService,
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() { this.loadEvenements(); }
 
@@ -306,15 +312,59 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
 
     if (this.isEditing && this.editingId) {
       this.adminData.updateEntity('evenements', this.editingId, data).subscribe({
-        next: () => { this.isSubmitting = false; this.closeModal(); this.loadEvenements(); },
+        next: (res: any) => {
+          this.isSubmitting = false;
+          this.closeModal();
+          this.loadEvenements();
+          // Push si événement visible
+          if (['A_VENIR', 'EN_COURS'].includes(this.formData.statut)) {
+            this.sendPushNotification(res?.data || data, false);
+          }
+        },
         error: () => { this.isSubmitting = false; this.showAlertMethod('error', 'Erreur', 'Impossible de modifier.'); }
       });
     } else {
       this.adminData.createEntity('evenements', data).subscribe({
-        next: () => { this.isSubmitting = false; this.closeModal(); this.loadEvenements(); },
+        next: (res: any) => {
+          this.isSubmitting = false;
+          this.closeModal();
+          this.loadEvenements();
+          // Push si événement visible
+          if (['A_VENIR', 'EN_COURS'].includes(this.formData.statut)) {
+            this.sendPushNotification(res?.data || data, true);
+          }
+        },
         error: () => { this.isSubmitting = false; this.showAlertMethod('error', 'Erreur', 'Impossible de créer.'); }
       });
     }
+  }
+
+  private sendPushNotification(event: any, isNew: boolean) {
+    const titre = event?.titre || this.formData.titre || 'Nouvel événement';
+    const dateStr = event?.date
+      ? new Date(event.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+      : '';
+    const lieu = event?.lieu || this.formData.lieu || '';
+    const heure = (event?.heureDebut || this.formData.heureDebut) || '';
+
+    let body = isNew ? `📅 ${dateStr}` : `✅ Mis à jour — ${dateStr}`;
+    if (heure) body += ` à ${heure}`;
+    if (lieu) body += ` — ${lieu}`;
+
+    const pushPayload = {
+      title: `🚨 ${isNew ? 'Nouvel événement' : 'Événement mis à jour'} : ${titre}`,
+      body,
+      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      url: '/'
+    };
+
+    const token = localStorage.getItem('admin_token') || '';
+    this.http.post(`${environment.bacOfficeUrl}/api/v1/push/send`, pushPayload, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: (res: any) => console.log(`[Push Agenda] Notifié: ${res?.sent ?? 0} abonné(s)`),
+      error: (err) => console.warn('[Push Agenda] Erreur:', err?.message)
+    });
   }
 
   deleteItem(id: string) {

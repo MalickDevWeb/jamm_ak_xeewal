@@ -166,6 +166,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/public/pages/maintenance/maintenance.component')
           .then(m => m.MaintenanceComponent)
       },
+      { 
+        path: 'membre/:id', 
+        loadComponent: () => import('./features/public/pages/membre-verification/membre-verification.component')
+          .then(m => m.MembreVerificationComponent)
+      },
       {
         path: '**',
         loadComponent: () => import('./features/public/pages/not-found/not-found.component')

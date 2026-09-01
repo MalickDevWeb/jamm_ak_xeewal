@@ -23,7 +23,7 @@
                     </span>
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tight mb-6 leading-[1.1] drop-shadow-xl" [innerHTML]="formatHeroTitle(homeContent?.heroTitle)">
                     </h1>
-                    <div class="text-lg sm:text-xl text-gray-200 mb-10 mt-6 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed" [innerHTML]="formatHeroParagraph(homeContent?.heroParagraph)"></div>
+                    <div class="text-xl sm:text-2xl text-gray-200 mb-10 mt-6 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed" [innerHTML]="formatHeroParagraph(homeContent?.heroParagraph)"></div>
 
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                         <a routerLink="/mouvement" class="bg-gradient-to-r from-brand-yellow to-yellow-500 hover:from-yellow-400 hover:to-yellow-400 text-brand-dark px-6 py-3.5 md:px-8 md:py-4 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-[0_15px_30px_-10px_rgba(245,158,11,0.6)] flex items-center gap-3 transform hover:-translate-y-1 hover:scale-105 border border-yellow-300">
@@ -176,7 +176,10 @@
                         <!-- Bloc QR Code (Droite) -->
                         <div class="flex flex-col items-center justify-center shrink-0 ml-2 md:ml-8 relative group">
                             <div class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg relative overflow-hidden border-2" [ngClass]="currentAdherent?.statut === 'ACTIF' ? 'border-brand-yellow' : 'border-gray-300 opacity-60'">
-                                <img [src]="qrImageUrl || 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&data=membre'" class="w-[72px] h-[72px] md:w-32 md:h-32 object-contain relative z-10" alt="QR Code d'identité" [ngClass]="currentAdherent?.statut !== 'ACTIF' ? 'blur-sm' : ''">
+                                <img [src]="currentAdherent?.id 
+                                        ? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&bgcolor=ffffff&margin=8&data=' + encodeURIComponent((siteSettings?.siteUrl || 'https://jammakxeewal.sn') + '/membre/' + currentAdherent.id)
+                                        : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&data=membre'" 
+                                     class="w-[72px] h-[72px] md:w-32 md:h-32 object-contain relative z-10" alt="QR Code d'identité" [ngClass]="currentAdherent?.statut !== 'ACTIF' ? 'blur-sm' : ''">
                                 <!-- Lock icon if inactive -->
                                 <div *ngIf="currentAdherent?.statut !== 'ACTIF'" class="absolute inset-0 z-20 flex items-center justify-center bg-white/40">
                                     <i class="fa-solid fa-lock text-gray-700 text-3xl"></i>

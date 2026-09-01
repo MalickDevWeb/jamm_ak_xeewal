@@ -36,8 +36,63 @@
 <div class="bg-gray-100 min-h-[60vh]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        <!-- Skeletons -->
-        <div *ngIf="isLoading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Tabs -->
+        <div class="flex justify-center mb-10">
+            <div class="bg-white p-1.5 rounded-full inline-flex border border-gray-200 shadow-sm">
+                <button (click)="setTab('AGENDA')"
+                        [class]="activeTab() === 'AGENDA' ? 'bg-[#022c16] text-white shadow-md' : 'text-gray-500 hover:text-[#022c16]'"
+                        class="px-6 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
+                    <i class="fa-regular fa-calendar-days"></i> Agenda & Événements
+                </button>
+                <button (click)="setTab('GALERIE')"
+                        [class]="activeTab() === 'GALERIE' ? 'bg-[#022c16] text-white shadow-md' : 'text-gray-500 hover:text-[#022c16]'"
+                        class="px-6 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-photo-film"></i> Galerie Réalisations
+                </button>
+            </div>
+        </div>
+
+        <!-- AGENDA VIEW -->
+        <div *ngIf="activeTab() === 'AGENDA'">
+            <div *ngIf="!isLoading() && evenements().length === 0" class="text-center py-24">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-calendar-xmark text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">Aucun événement à venir</h3>
+                <p class="text-gray-400 text-sm">Le calendrier est actuellement vide.</p>
+            </div>
+
+            <div *ngIf="evenements().length > 0" class="max-w-4xl mx-auto flex flex-col gap-5">
+                <div *ngFor="let e of evenements()" class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-2 bg-[#ffb000]"></div>
+                    <div class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-center min-w-[90px] ml-2">
+                        <div class="text-xs font-bold uppercase tracking-wider mb-1 text-gray-500">{{ e.date | date:'MMM' }}</div>
+                        <div class="text-3xl font-black leading-none text-[#022c16]">{{ e.date | date:'dd' }}</div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-[#e6f3eb] text-[#022c16] text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider border border-[#022c16]/20">À venir</span>
+                        </div>
+                        <h4 class="font-black text-2xl text-gray-900 mb-2">{{ e.titre }}</h4>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 font-medium">
+                            <span class="flex items-center gap-2" *ngIf="e.heureDebut"><i class="fa-solid fa-clock text-[#ffb000]"></i> {{ e.heureDebut }} <ng-container *ngIf="e.heureFin">- {{ e.heureFin }}</ng-container></span>
+                            <span class="flex items-center gap-2" *ngIf="e.lieu"><i class="fa-solid fa-location-dot text-[#ffb000]"></i> {{ e.lieu }}</span>
+                        </div>
+                        <p *ngIf="e.description" class="text-gray-500 mt-3 text-sm line-clamp-2">{{ e.description }}</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0 flex-shrink-0">
+                        <button (click)="addToCalendar(e)" class="bg-white border border-gray-200 text-[#022c16] hover:bg-[#022c16] hover:text-white hover:border-[#022c16] px-5 py-2.5 rounded-full font-bold text-sm shadow-sm transition-colors flex items-center gap-2">
+                            <i class="fa-regular fa-calendar-check"></i> Ajouter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GALERIE VIEW -->
+        <div *ngIf="activeTab() === 'GALERIE'">
+            <!-- Skeletons -->
+            <div *ngIf="isLoading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <div *ngFor="let _ of [1,2,3,4,5,6]" class="h-[280px] rounded-3xl bg-gray-300 animate-pulse"></div>
         </div>
 
@@ -107,6 +162,8 @@
                         {{ activite.date | date:'d MMMM yyyy' }}
                     </div>
                 </div>
+            </div>
+
             </div>
 
         </div>

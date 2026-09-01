@@ -26,6 +26,7 @@ export class PublicDataService {
   
   // --- Sondages ---
   getSondages(): Observable<any> { return this.http.get(`${this.apiUrl}/sondages`); }
+  postSondageVote(sondageId: string, optionId: string): Observable<any> { return this.http.post(`${this.apiUrl}/sondages/${sondageId}/vote`, { optionId }); }
 
   // --- Settings publics (qr_code_url, etc.) ---
   getSettings(): Observable<any> { return this.http.get(`${this.apiUrl}/settings`); }

@@ -216,6 +216,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb' },
     { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', badge: 8 },
     { path: '/admin/activites', label: 'Activités', icon: 'fa-solid fa-calendar-days' },
+    { path: '/admin/evenements', label: 'Agenda (Événements)', icon: 'fa-solid fa-calendar-check' },
     { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical' },
     { path: '/admin/commissions', label: 'Commissions', icon: 'fa-solid fa-sitemap' },
     { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines' },

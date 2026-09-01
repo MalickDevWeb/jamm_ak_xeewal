@@ -1,29 +1,104 @@
+<div class="bg-[#f8faf9] min-h-screen pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center gap-2 mb-4 py-1.5 px-5 rounded-full bg-brand-yellow/10 text-brand-yellow font-bold text-xs border border-brand-yellow/20 uppercase tracking-[0.2em]">
+                <i class="fa-solid fa-chart-pie"></i> Sondages Citoyens
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-brand-dark mb-4 tracking-tight">Votre avis compte</h1>
+            <p class="text-lg text-gray-500 font-medium">Participez aux décisions qui concernent notre localité en répondant aux sondages en cours.</p>
+        </div>
 
-        
-        <div class="max-w-2xl mx-auto px-4 py-16">
-            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                <div class="text-brand-yellow font-bold text-sm uppercase tracking-wide mb-2"><i class="fa-solid fa-chart-pie mr-1"></i> Sondage citoyen</div>
-                <h1 class="text-2xl font-black text-gray-900 mb-6">Quelles infrastructures sportives prioritaires pour la jeunesse de Thiès-Nord ?</h1>
-                
-                <form class="space-y-4">
-                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="sondage" class="w-5 h-5 text-brand-green border-gray-300 focus:ring-brand-green">
-                        <span class="ml-3 font-medium text-gray-700">Terrains de football de proximité (gazon synthétique)</span>
-                    </label>
-                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="sondage" class="w-5 h-5 text-brand-green border-gray-300 focus:ring-brand-green">
-                        <span class="ml-3 font-medium text-gray-700">Plateaux multifonctionnels (Basket, Hand, Volley)</span>
-                    </label>
-                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="sondage" class="w-5 h-5 text-brand-green border-gray-300 focus:ring-brand-green">
-                        <span class="ml-3 font-medium text-gray-700">Parcours sportifs et de santé publics</span>
-                    </label>
-                    
-                    <button type="button" class="w-full bg-brand-green text-white font-bold py-4 rounded-lg mt-6 hover:bg-brand-dark transition-colors shadow-md">
-                        Voter
-                    </button>
-                </form>
+        <!-- Skeletons -->
+        <div *ngIf="isLoading()" class="space-y-8">
+            <div *ngFor="let _ of [1, 2]" class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 animate-pulse">
+                <div class="h-6 w-1/4 bg-gray-200 rounded mb-4"></div>
+                <div class="h-8 w-3/4 bg-gray-200 rounded mb-8"></div>
+                <div class="space-y-4">
+                    <div class="h-16 w-full bg-gray-100 rounded-xl"></div>
+                    <div class="h-16 w-full bg-gray-100 rounded-xl"></div>
+                </div>
             </div>
         </div>
-    
-    
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoading() && sondages().length === 0" class="text-center py-20 bg-white rounded-[2rem] border border-gray-100 shadow-sm">
+            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-clipboard-question text-3xl text-gray-400"></i>
+            </div>
+            <h3 class="text-2xl font-black text-brand-dark mb-2">Aucun sondage en cours</h3>
+            <p class="text-gray-500 font-medium">De nouveaux sondages seront publiés prochainement.</p>
+        </div>
+
+        <!-- Sondages List -->
+        <div *ngIf="!isLoading() && sondages().length > 0" class="space-y-8">
+            <div *ngFor="let sondage of sondages()" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-100 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
+                
+                <div class="flex items-center justify-between mb-6">
+                    <div class="text-brand-yellow font-black text-xs uppercase tracking-widest bg-brand-yellow/10 px-4 py-1.5 rounded-full border border-brand-yellow/20">
+                        Sondage Actif
+                    </div>
+                    <div class="text-gray-400 text-sm font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-users"></i> {{ sondage.participants }} participant(s)
+                    </div>
+                </div>
+                
+                <h2 class="text-2xl md:text-3xl font-black text-brand-dark mb-8 leading-snug">{{ sondage.question }}</h2>
+                
+                <!-- Options -->
+                <div class="space-y-4">
+                    <div *ngFor="let option of sondage.options" 
+                         (click)="selectOption(sondage.id, option.id)"
+                         class="relative p-4 md:p-5 border-2 rounded-2xl transition-all overflow-hidden"
+                         [ngClass]="{
+                           'cursor-pointer': !hasVoted()[sondage.id],
+                           'border-brand-green bg-brand-green/5': !hasVoted()[sondage.id] && selectedOptions()[sondage.id] === option.id,
+                           'border-gray-200 hover:bg-gray-50': !hasVoted()[sondage.id] && selectedOptions()[sondage.id] !== option.id,
+                           'border-gray-100 bg-gray-50': hasVoted()[sondage.id]
+                         }">
+                        
+                        <!-- Progress bar (only visible if voted) -->
+                        <div *ngIf="hasVoted()[sondage.id]" 
+                             class="absolute top-0 left-0 bottom-0 bg-brand-green/10 transition-all duration-1000"
+                             [style.width.%]="calculatePercentage(option.votes, sondage.participants)">
+                        </div>
+
+                        <div class="relative z-10 flex items-center justify-between gap-4">
+                            <label class="flex items-center flex-1 gap-4" [class.cursor-pointer]="!hasVoted()[sondage.id]">
+                                <!-- Radio button (only if not voted) -->
+                                <div *ngIf="!hasVoted()[sondage.id]" class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
+                                     [ngClass]="selectedOptions()[sondage.id] === option.id ? 'border-brand-green' : 'border-gray-300'">
+                                    <div *ngIf="selectedOptions()[sondage.id] === option.id" class="w-3 h-3 bg-brand-green rounded-full"></div>
+                                </div>
+                                
+                                <span class="font-bold text-gray-800" [ngClass]="hasVoted()[sondage.id] ? 'text-lg' : 'text-base'">
+                                    {{ option.texte }}
+                                </span>
+                            </label>
+
+                            <!-- Results (only if voted) -->
+                            <div *ngIf="hasVoted()[sondage.id]" class="flex flex-col items-end shrink-0">
+                                <span class="font-black text-xl text-brand-dark">{{ calculatePercentage(option.votes, sondage.participants) }}%</span>
+                                <span class="text-xs text-gray-500 font-bold uppercase">{{ option.votes }} vote(s)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action button -->
+                <button *ngIf="!hasVoted()[sondage.id]" 
+                        (click)="voter(sondage.id)"
+                        [disabled]="!selectedOptions()[sondage.id]"
+                        class="w-full mt-8 font-black text-sm uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300"
+                        [ngClass]="selectedOptions()[sondage.id] ? 'bg-brand-green text-white hover:bg-brand-dark shadow-lg hover:shadow-xl hover:-translate-y-1' : 'bg-gray-100 text-gray-400 cursor-not-allowed'">
+                    <i class="fa-solid fa-check-to-slot"></i> Valider mon vote
+                </button>
+
+                <!-- Thanks message -->
+                <div *ngIf="hasVoted()[sondage.id]" class="mt-8 text-center bg-brand-green/10 text-brand-green font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 border border-brand-green/20">
+                    <i class="fa-solid fa-circle-check"></i> Merci pour votre participation à ce sondage !
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

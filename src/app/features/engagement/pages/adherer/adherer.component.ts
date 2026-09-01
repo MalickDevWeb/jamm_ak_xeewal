@@ -20,6 +20,8 @@ import { QuartierSelectComponent } from '../../../../shared/components/quartier-
 export class AdhererComponent implements OnInit, OnDestroy {
   @ViewChild('rectoInput') rectoInput!: ElementRef;
   @ViewChild('versoInput') versoInput!: ElementRef;
+  @ViewChild('rectoCameraInput') rectoCameraInput!: ElementRef;
+  @ViewChild('versoCameraInput') versoCameraInput!: ElementRef;
 
   private destroy$ = new Subject<void>();
 
@@ -359,6 +361,14 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   triggerVersoUpload() {
     this.versoInput?.nativeElement?.click();
+  }
+
+  triggerRectoCamera() {
+    this.rectoCameraInput?.nativeElement?.click();
+  }
+
+  triggerVersoCamera() {
+    this.versoCameraInput?.nativeElement?.click();
   }
 
   ngOnDestroy() {

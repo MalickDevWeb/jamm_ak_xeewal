@@ -13,6 +13,8 @@ import { PublicDataService } from '../../../../core/services/public-data.service
 })
 export class ActivitesComponent implements OnInit {
   activites = signal<any[]>([]);
+  evenements = signal<any[]>([]);
+  activeTab = signal<'AGENDA' | 'GALERIE'>('AGENDA');
   isLoading = signal(true);
 
   // Lightbox state
@@ -45,6 +47,87 @@ export class ActivitesComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+
+    this.publicData.getEvenements().subscribe({
+      next: (res: any) => {
+        if (res.data) {
+          const upcoming = res.data.filter((e: any) => e.statut === 'A_VENIR' || e.statut === 'EN_COURS');
+          this.evenements.set(upcoming);
+        }
+      }
+    });
+  }
+
+  setTab(tab: 'AGENDA' | 'GALERIE') {
+    this.activeTab.set(tab);
+  }
+
+  addToCalendar(event: any): void {
+    if (!event) return;
+
+    const formatDate = (dateStr: string, timeStr: string | null): string => {
+      const date = new Date(dateStr);
+      if (timeStr) {
+        const parts = timeStr.split(":");
+        date.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+      } else {
+        date.setHours(9, 0, 0, 0);
+      }
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+
+    const formatDateEnd = (dateStr: string, timeStr: string | null): string => {
+      const date = new Date(dateStr);
+      if (timeStr) {
+        const parts = timeStr.split(":");
+        date.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+      } else {
+        date.setHours(17, 0, 0, 0);
+      }
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+
+    const uid = event.id + "@jammakxeewal.sn";
+    const now = new Date();
+    const nowStr = now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const start = formatDate(event.date, event.heureDebut);
+    const end = formatDateEnd(event.date, event.heureFin);
+
+    const title = event.titre || "Événement JÀMM AK XÉEWAL";
+    const location = event.lieu || "";
+    const description = (event.description || "").replace(/\n/g, "\\n");
+
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//JAMM AK XEEWAL//FR",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:" + uid,
+      "DTSTAMP:" + nowStr,
+      "DTSTART:" + start,
+      "DTEND:" + end,
+      "SUMMARY:" + title
+    ];
+
+    if (location) lines.push("LOCATION:" + location);
+    if (description) lines.push("DESCRIPTION:" + description);
+    lines.push("STATUS:CONFIRMED");
+    lines.push("END:VEVENT");
+    lines.push("END:VCALENDAR");
+
+    const icsContent = lines.join("\r\n");
+
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = title.replace(/[^a-zA-Z0-9À-ÿ\s]/g, "").replace(/\s+/g, "_") + ".ics";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   getMediaUrls(url: any): string[] {

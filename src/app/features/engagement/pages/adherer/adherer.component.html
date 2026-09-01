@@ -111,9 +111,12 @@
                             Prenez en photo ou uploadez les deux faces de votre pièce d'identité nationale. Données sécurisées.
                         </p>
 
-                        <!-- Inputs fichiers cachés -->
+                        <!-- Inputs fichiers cachés : galerie -->
                         <input #rectoInput type="file" accept="image/*" class="hidden" id="recto-upload" (change)="onRectoSelected($event)">
                         <input #versoInput type="file" accept="image/*" class="hidden" id="verso-upload" (change)="onVersoSelected($event)">
+                        <!-- Inputs caméra directe (mobile) -->
+                        <input #rectoCameraInput type="file" accept="image/*" capture="environment" class="hidden" id="recto-camera" (change)="onRectoSelected($event)">
+                        <input #versoCameraInput type="file" accept="image/*" capture="environment" class="hidden" id="verso-camera" (change)="onVersoSelected($event)">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -123,21 +126,27 @@
                                     <i class="fa-regular fa-id-card mr-1 text-brand-green"></i> Face Avant (Recto)
                                 </label>
 
-                                <!-- Zone de drop / upload (sans preview) -->
+                                <!-- Zone de capture / upload (sans preview) -->
                                 <div *ngIf="!carteRectoBase64"
-                                     (click)="triggerRectoUpload()"
-                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
+                                     class="relative border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all min-h-[170px]"
                                      [ngClass]="rectoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
-                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
+                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300">
                                         <i class="fa-regular fa-id-card"></i>
                                     </div>
-                                    <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Ajouter le Recto</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Appareil photo ou Galerie (max 5 Mo)</p>
+                                    <p class="font-black text-gray-700 text-sm text-center">Face Avant de votre CNI</p>
+                                    <!-- Boutons d'action -->
+                                    <div class="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                                        <button type="button" (click)="triggerRectoCamera()"
+                                                class="flex-1 flex items-center justify-center gap-2 bg-brand-green text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow hover:bg-brand-green/90 active:scale-95 transition-all">
+                                            <i class="fa-solid fa-camera text-sm"></i>
+                                            Prendre en photo
+                                        </button>
+                                        <button type="button" (click)="triggerRectoUpload()"
+                                                class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs py-2.5 px-3 rounded-xl hover:bg-gray-200 active:scale-95 transition-all border border-gray-200">
+                                            <i class="fa-solid fa-images text-sm"></i>
+                                            Galerie
+                                        </button>
                                     </div>
-                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir / Prendre
-                                    </span>
                                 </div>
 
                                 <!-- Aperçu après sélection -->
@@ -175,21 +184,27 @@
                                     <i class="fa-solid fa-rotate-180 mr-1 text-brand-green"></i> Face Arrière (Verso)
                                 </label>
 
-                                <!-- Zone de drop / upload (sans preview) -->
+                                <!-- Zone de capture / upload (sans preview) -->
                                 <div *ngIf="!carteVersoBase64"
-                                     (click)="triggerVersoUpload()"
-                                     class="relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all min-h-[160px] hover:border-brand-green hover:bg-brand-green/5 group"
+                                     class="relative border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all min-h-[170px]"
                                      [ngClass]="versoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
-                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300 group-hover:text-brand-green group-hover:scale-110 transition-all">
+                                    <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300">
                                         <i class="fa-solid fa-id-card-clip"></i>
                                     </div>
-                                    <div class="text-center">
-                                        <p class="font-black text-gray-700 text-sm group-hover:text-brand-green transition-colors">Ajouter le Verso</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Appareil photo ou Galerie (max 5 Mo)</p>
+                                    <p class="font-black text-gray-700 text-sm text-center">Face Arrière de votre CNI</p>
+                                    <!-- Boutons d'action -->
+                                    <div class="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                                        <button type="button" (click)="triggerVersoCamera()"
+                                                class="flex-1 flex items-center justify-center gap-2 bg-brand-green text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow hover:bg-brand-green/90 active:scale-95 transition-all">
+                                            <i class="fa-solid fa-camera text-sm"></i>
+                                            Prendre en photo
+                                        </button>
+                                        <button type="button" (click)="triggerVersoUpload()"
+                                                class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs py-2.5 px-3 rounded-xl hover:bg-gray-200 active:scale-95 transition-all border border-gray-200">
+                                            <i class="fa-solid fa-images text-sm"></i>
+                                            Galerie
+                                        </button>
                                     </div>
-                                    <span class="mt-1 inline-block bg-brand-green/10 text-brand-green font-bold text-xs px-3 py-1 rounded-full group-hover:bg-brand-green group-hover:text-white transition-all">
-                                        <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i>Choisir / Prendre
-                                    </span>
                                 </div>
 
                                 <!-- Aperçu après sélection -->

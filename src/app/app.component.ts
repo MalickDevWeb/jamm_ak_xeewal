@@ -5,11 +5,11 @@ import {
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { PwaInstallBannerComponent } from './shared/components/pwa-install-banner/pwa-install-banner.component';
-
+import { PushNotificationPromptComponent } from './shared/components/push-notification-prompt/push-notification-prompt.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, PwaInstallBannerComponent],
+  imports: [RouterOutlet, PwaInstallBannerComponent, PushNotificationPromptComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

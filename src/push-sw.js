@@ -26,7 +26,25 @@ self.addEventListener('push', (event) => {
     ]
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration.showNotification(title, options).then(() => {
+      // Envoyer au client Angular pour mettre à jour la cloche / badge
+      return clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+        for (const client of windowClients) {
+          client.postMessage({
+            type: 'NEW_NOTIFICATION',
+            notification: {
+              title,
+              body: options.body,
+              url: options.data?.url || '/',
+              timestamp: new Date().getTime(),
+              read: false
+            }
+          });
+        }
+      });
+    })
+  );
 });
 
 // Écouter les clics sur la notification

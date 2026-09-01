@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   evenements: any[] = [];
   qrTargetUrl = '';
   qrImageUrl = '';
+  readonly encodeURIComponent = encodeURIComponent;
 
   readonly defaultHeroTitle = `Écouter les besoins, <br/>\n<span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none'>Construire Ensemble.</span>`;
   readonly defaultHeroParagraph = `JÀMM AK XÉEWAL n'est pas qu'une idée, c'est <strong class="text-white">une force en action sur le terrain</strong>.<br/><br/>Rejoignez des centaines de citoyens engagés pour transformer notre quartier, rue par rue.`;

@@ -542,12 +542,36 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
         this.success = true;
         this.cdr.markForCheck();
+        // Envoyer une notification push à tous les abonnés
+        this.sendPushNotification(payload);
       },
       error: () => {
         this.isSubmitting = false;
         this.showError("Une erreur est survenue lors de l'envoi de votre signalement. Veuillez réessayer.");
         this.cdr.markForCheck();
       }
+    });
+  }
+
+  private sendPushNotification(payload: any) {
+    const quartier = payload.quartier || 'Quartier inconnu';
+    const description = payload.description
+      ? payload.description.substring(0, 80) + (payload.description.length > 80 ? '...' : '')
+      : 'Message vocal joint';
+    const nom = payload.nom ? `par ${payload.nom}` : 'par un citoyen';
+
+    const pushPayload = {
+      title: `🚨 Nouveau signalement — ${quartier}`,
+      body: `${nom} : "${description}"`,
+      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      url: '/admin/besoins'
+    };
+
+    this.http.post(`${environment.bacOfficeUrl}/api/v1/push/send`, pushPayload).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => console.log(`[Push] Signalement notifié: ${res?.sent ?? 0} abonné(s)`),
+      error: (err) => console.warn('[Push] Erreur envoi notification:', err?.message)
     });
   }
 
