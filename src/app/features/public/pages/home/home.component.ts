@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   evenements: any[] = [];
   qrTargetUrl = '';
   qrImageUrl = '';
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
   readonly encodeURIComponent = encodeURIComponent;
 
   readonly defaultHeroTitle = `Écouter les besoins, <br/>\n<span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none'>Construire Ensemble.</span>`;

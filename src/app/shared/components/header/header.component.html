@@ -61,19 +61,58 @@
             <!-- Desktop CTAs -->
             <div class="hidden lg:flex items-center gap-3">
                 <div class="relative">
-                    <button (click)="toggleNotifications()" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 text-gray-400 hover:text-brand-green hover:bg-brand-green/10 flex items-center justify-center transition-all shadow-sm relative" aria-label="Notifications">
+                    <button (click)="toggleNotifications()"
+                            class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center transition-all shadow-sm relative"
+                            [ngClass]="isSubscribed() ? 'text-brand-yellow hover:text-yellow-500 hover:bg-yellow-50' : 'text-gray-400 hover:text-brand-green hover:bg-brand-green/10'"
+                            aria-label="Notifications">
                         <i class="fa-regular fa-bell text-lg"></i>
                         <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse">{{unreadCount}}</span>
                     </button>
-                    <!-- Popup notifications -->
-                    <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[60] origin-top-right transform transition ease-out duration-200">
+                    <!-- Popup notifications Desktop -->
+                    <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[60] origin-top-right">
+                        <div *ngIf="showSubscribeSuccess()" class="absolute inset-0 z-10 bg-gradient-to-br from-brand-dark to-brand-green flex flex-col items-center justify-center gap-3 rounded-2xl">
+                            <div class="relative">
+                                <div class="absolute inset-0 rounded-full bg-brand-yellow animate-ping opacity-40"></div>
+                                <div class="w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center relative z-10 shadow-lg">
+                                    <i class="fa-solid fa-bell text-2xl text-brand-dark"></i>
+                                </div>
+                            </div>
+                            <p class="font-black text-white text-base">🎉 Abonné(e) !</p>
+                            <p class="text-white/70 text-xs text-center px-4">Vous recevrez toutes les actualités.</p>
+                        </div>
                         <div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 class="font-bold text-gray-800">Notifications</h3>
-                            <button (click)="subscribeToPush()" class="text-xs text-brand-green font-bold hover:underline">S'abonner</button>
+                            <button *ngIf="!isSubscribed()" (click)="subscribeToPush()" [disabled]="isSubscribing()"
+                                    class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-brand-green/10 text-brand-green hover:bg-brand-green hover:text-white transition-all disabled:opacity-60">
+                                <i *ngIf="!isSubscribing()" class="fa-solid fa-bell text-[10px]"></i>
+                                <i *ngIf="isSubscribing()" class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
+                                {{ isSubscribing() ? 'Activation…' : "S'abonner" }}
+                            </button>
+                            <span *ngIf="isSubscribed()" class="flex items-center gap-1 text-[11px] font-bold text-brand-green bg-brand-green/10 px-3 py-1.5 rounded-full">
+                                <i class="fa-solid fa-circle-check text-[10px]"></i> Abonné(e)
+                            </span>
                         </div>
-                        <div class="max-h-80 overflow-y-auto">
-                            <div *ngIf="notifications.length === 0" class="p-6 text-center text-gray-500 text-sm">
-                                Aucune notification.
+                        <div *ngIf="!isSubscribed() && notifications.length === 0" class="p-4 bg-gradient-to-br from-brand-dark to-[#033d1e] m-3 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-bell text-brand-dark"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-bold text-sm">Activez les notifications</p>
+                                    <p class="text-white/60 text-[11px]">Ne ratez aucun événement !</p>
+                                </div>
+                            </div>
+                            <button (click)="subscribeToPush()" [disabled]="isSubscribing()"
+                                    class="w-full bg-brand-yellow text-brand-dark font-black text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-yellow-400 active:scale-95 transition-all">
+                                <i *ngIf="!isSubscribing()" class="fa-solid fa-bell-ring"></i>
+                                <i *ngIf="isSubscribing()" class="fa-solid fa-circle-notch fa-spin"></i>
+                                {{ isSubscribing() ? 'Activation…' : "S'abonner maintenant" }}
+                            </button>
+                        </div>
+                        <div class="max-h-72 overflow-y-auto">
+                            <div *ngIf="notifications.length === 0 && isSubscribed()" class="p-6 text-center text-gray-400 text-sm">
+                                <i class="fa-regular fa-bell-slash text-2xl mb-2 block"></i>
+                                Aucune notification pour l'instant.
                             </div>
                             <div *ngFor="let n of notifications" class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3" [class.bg-green-50]="!n.read">
                                 <div class="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
@@ -99,19 +138,57 @@
             <!-- Mobile: CTA bouton + Hamburger -->
             <div class="flex items-center lg:hidden gap-2 flex-shrink-0">
                 <div class="relative">
-                    <button (click)="toggleNotifications()" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-brand-green/10 text-gray-500 hover:text-brand-green transition-colors border border-gray-200 shadow-sm relative" aria-label="Notifications">
-                        <i class="fa-regular fa-bell text-base"></i>
+                    <button (click)="toggleNotifications()"
+                            class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-brand-green/10 text-gray-500 hover:text-brand-green transition-colors border border-gray-200 shadow-sm relative"
+                            aria-label="Notifications">
+                        <i class="fa-regular fa-bell text-base" [class.text-brand-yellow]="isSubscribed()"></i>
                         <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse">{{unreadCount}}</span>
                     </button>
+
                     <!-- Popup notifications Mobile -->
-                    <div *ngIf="showNotifications" class="fixed top-[calc(env(safe-area-inset-top,0px)+85px)] left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-3 sm:w-[320px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70] transform transition ease-out duration-200">
+                    <div *ngIf="showNotifications" class="fixed top-[calc(env(safe-area-inset-top,0px)+85px)] left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-3 sm:w-[320px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
+
+                        <!-- Success overlay mobile -->
+                        <div *ngIf="showSubscribeSuccess()" class="absolute inset-0 z-10 bg-gradient-to-br from-brand-dark to-brand-green flex flex-col items-center justify-center gap-3 rounded-2xl">
+                            <div class="relative">
+                                <div class="absolute inset-0 rounded-full bg-brand-yellow animate-ping opacity-40"></div>
+                                <div class="w-14 h-14 bg-brand-yellow rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fa-solid fa-bell text-xl text-brand-dark"></i>
+                                </div>
+                            </div>
+                            <p class="font-black text-white">🎉 Abonné(e) !</p>
+                            <p class="text-white/70 text-xs text-center px-6">Vous recevrez toutes les actualités.</p>
+                        </div>
+
                         <div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 class="font-bold text-gray-800">Notifications</h3>
-                            <button (click)="subscribeToPush()" class="text-xs text-brand-green font-bold hover:underline">S'abonner</button>
+                            <button *ngIf="!isSubscribed()" (click)="subscribeToPush()" [disabled]="isSubscribing()"
+                                    class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-brand-green/10 text-brand-green hover:bg-brand-green hover:text-white transition-all disabled:opacity-60">
+                                <i *ngIf="!isSubscribing()" class="fa-solid fa-bell text-[10px]"></i>
+                                <i *ngIf="isSubscribing()" class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
+                                {{ isSubscribing() ? '…' : "S'abonner" }}
+                            </button>
+                            <span *ngIf="isSubscribed()" class="flex items-center gap-1 text-[11px] font-bold text-brand-green bg-brand-green/10 px-3 py-1.5 rounded-full">
+                                <i class="fa-solid fa-circle-check text-[10px]"></i> Abonné(e)
+                            </span>
                         </div>
-                        <div class="max-h-80 overflow-y-auto">
-                            <div *ngIf="notifications.length === 0" class="p-6 text-center text-gray-500 text-sm">
-                                Aucune notification.
+
+                        <!-- Invite if not subscribed -->
+                        <div *ngIf="!isSubscribed() && notifications.length === 0" class="p-3 bg-gradient-to-br from-brand-dark to-[#033d1e] m-3 rounded-xl">
+                            <p class="text-white font-bold text-sm mb-1">🔔 Activez les notifications</p>
+                            <p class="text-white/60 text-[11px] mb-3">Ne ratez aucun événement du mouvement !</p>
+                            <button (click)="subscribeToPush()" [disabled]="isSubscribing()"
+                                    class="w-full bg-brand-yellow text-brand-dark font-black text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-yellow-400 active:scale-95 transition-all">
+                                <i *ngIf="!isSubscribing()" class="fa-solid fa-bell-ring"></i>
+                                <i *ngIf="isSubscribing()" class="fa-solid fa-circle-notch fa-spin"></i>
+                                {{ isSubscribing() ? 'Activation…' : "S'abonner" }}
+                            </button>
+                        </div>
+
+                        <div class="max-h-72 overflow-y-auto">
+                            <div *ngIf="notifications.length === 0 && isSubscribed()" class="p-6 text-center text-gray-400 text-sm">
+                                <i class="fa-regular fa-bell-slash text-2xl mb-2 block"></i>
+                                Aucune notification pour l'instant.
                             </div>
                             <div *ngFor="let n of notifications" class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3" [class.bg-green-50]="!n.read">
                                 <div class="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">

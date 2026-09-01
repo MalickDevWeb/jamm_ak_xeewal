@@ -1,33 +1,73 @@
-<div *ngIf="showPrompt" @slideDown class="fixed top-0 left-0 w-full z-[100] p-4 pointer-events-none">
-  <div class="max-w-3xl mx-auto bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl p-5 md:p-6 border border-gray-100 flex flex-col md:flex-row items-center gap-4 md:gap-6 pointer-events-auto transform transition-all relative overflow-hidden">
-    
-    <!-- Effet de brillance/décoration -->
-    <div class="absolute top-0 left-0 w-1 h-full bg-[#E5B50A]"></div>
-    
-    <!-- Icône -->
-    <div class="w-12 h-12 rounded-full bg-[#022c16]/10 flex items-center justify-center shrink-0">
-      <i class="fa-solid fa-bell text-2xl text-[#E5B50A]"></i>
-    </div>
+<!-- ✅ SUCCESS ANIMATION (style YouTube) -->
+<div *ngIf="showSuccess()" [@successPop]
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-3 pointer-events-none">
 
-    <!-- Texte -->
-    <div class="flex-grow text-center md:text-left">
-      <h3 class="text-lg font-bold text-[#022c16] mb-1">Restez connecté(e) au mouvement !</h3>
-      <p class="text-gray-600 text-sm">Activez les notifications pour recevoir les dernières alertes, activités et urgences de JÀMM AK XÉEWAL en temps réel.</p>
-    </div>
+  <!-- Confetti burst effect (CSS rings) -->
+  <div class="relative flex items-center justify-center">
+    <div class="absolute w-24 h-24 rounded-full border-4 border-brand-yellow animate-ping opacity-30"></div>
+    <div class="absolute w-16 h-16 rounded-full border-4 border-brand-green animate-ping opacity-40" style="animation-delay:0.15s"></div>
 
-    <!-- Boutons -->
-    <div class="flex items-center gap-3 w-full md:w-auto shrink-0 mt-2 md:mt-0">
-      <button 
-        (click)="dismiss()"
-        class="flex-1 md:flex-none px-4 py-2.5 rounded-xl font-medium text-gray-500 hover:bg-gray-100 transition-colors text-sm">
-        Plus tard
+    <!-- Bell icon animated -->
+    <div [@bellRing] class="w-20 h-20 bg-gradient-to-br from-brand-yellow to-yellow-400 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,176,0,0.6)]">
+      <i class="fa-solid fa-bell text-3xl text-brand-dark"></i>
+    </div>
+  </div>
+
+  <!-- Success message card -->
+  <div class="bg-white rounded-2xl shadow-2xl px-7 py-4 text-center border border-gray-100 backdrop-blur-sm">
+    <p class="font-black text-brand-dark text-base">🎉 Vous êtes abonné(e) !</p>
+    <p class="text-gray-500 text-sm mt-0.5 font-medium">Vous recevrez toutes les actualités du mouvement.</p>
+  </div>
+</div>
+
+<!-- 🔔 SUBSCRIBE PROMPT BANNER -->
+<div *ngIf="showPrompt" [@slideUp]
+     class="fixed bottom-5 left-4 right-4 sm:left-auto sm:right-6 sm:w-[360px] z-[998] bg-gradient-to-br from-[#022c16] to-[#033d1e] rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+
+  <!-- Gold accent bar -->
+  <div class="h-1 bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow"></div>
+
+  <div class="p-5">
+    <div class="flex gap-4 items-start">
+      <!-- Animated bell -->
+      <div class="relative flex-shrink-0">
+        <div class="absolute inset-0 bg-brand-yellow rounded-full animate-ping opacity-30"></div>
+        <div class="w-12 h-12 bg-brand-yellow rounded-full flex items-center justify-center relative z-10 shadow-md">
+          <i class="fa-solid fa-bell text-brand-dark text-xl animate-[wiggle_1s_ease-in-out_infinite]"></i>
+        </div>
+      </div>
+      <!-- Text -->
+      <div class="flex-1 min-w-0">
+        <h4 class="font-black text-white text-[15px] leading-tight mb-1">Restez informé(e) !</h4>
+        <p class="text-white/60 text-[12px] font-medium leading-relaxed">
+          Recevez les actualités et événements de <span class="text-brand-yellow font-bold">JÀMM AK XÉEWAL</span> directement sur votre téléphone.
+        </p>
+      </div>
+      <!-- Close -->
+      <button (click)="dismiss()" class="text-white/30 hover:text-white/70 transition-colors flex-shrink-0 mt-0.5">
+        <i class="fa-solid fa-xmark text-lg"></i>
       </button>
-      <button 
-        (click)="subscribe()"
-        class="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-medium text-white bg-[#022c16] hover:bg-[#034020] transition-colors shadow-lg shadow-[#022c16]/20 text-sm flex items-center justify-center gap-2">
-        <i class="fa-solid fa-check"></i>
-        Activer
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="flex gap-3 mt-4">
+      <button (click)="subscribe()" [disabled]="isSubscribing()"
+              class="flex-1 bg-brand-yellow text-brand-dark font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-yellow-400 active:scale-95 transition-all shadow-md disabled:opacity-70">
+        <i *ngIf="!isSubscribing()" class="fa-solid fa-bell-ring text-base"></i>
+        <i *ngIf="isSubscribing()" class="fa-solid fa-circle-notch fa-spin"></i>
+        {{ isSubscribing() ? 'Activation…' : "S'abonner" }}
+      </button>
+      <button (click)="dismiss()"
+              class="px-4 py-3 text-white/50 hover:text-white/80 font-bold text-sm rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+        Plus tard
       </button>
     </div>
   </div>
 </div>
+
+<style>
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+}
+</style>

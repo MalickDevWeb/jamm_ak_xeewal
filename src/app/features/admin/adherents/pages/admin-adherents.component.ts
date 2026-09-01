@@ -23,9 +23,15 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       <h2 class="text-[28px] font-black text-gray-900 tracking-tight">Adhérents</h2>
       <p class="text-[15px] text-gray-500 mt-1"><span class="font-bold text-[#008d36]">{{ total }}</span> membres inscrits au mouvement.</p>
     </div>
-    <button (click)="openCreateModal()" class="px-5 py-3 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-[0_4px_12px_rgba(2,44,22,0.15)] hover:bg-[#008d36] transition-all flex items-center gap-2 shrink-0">
-      <i class="fa-solid fa-user-plus"></i> Ajouter un adhérent
-    </button>
+    <div class="flex items-center gap-3 flex-wrap justify-end">
+      <button (click)="downloadSelectedBadges()" [disabled]="selectedIds.size === 0 || isDownloading"
+        class="px-4 py-3 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-amber-600 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+        <i class="fa-solid fa-id-badge"></i> Badges sélectionnés ({{ selectedIds.size }})
+      </button>
+      <button (click)="openCreateModal()" class="px-5 py-3 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-[0_4px_12px_rgba(2,44,22,0.15)] hover:bg-[#008d36] transition-all flex items-center gap-2 shrink-0">
+        <i class="fa-solid fa-user-plus"></i> Ajouter un adhérent
+      </button>
+    </div>
   </div>
 
   <!-- Stats Grid -->
@@ -189,6 +195,10 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
                 <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1">
                   <i class="fa-solid fa-check"></i> Activer
                 </button>
+                <button (click)="downloadBadge(a)" [disabled]="isDownloading" title="Télécharger le badge PNG"
+                  class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors disabled:opacity-50" >
+                  <i class="fa-solid fa-id-badge text-xs"></i>
+                </button>
                 <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Détails">
                   <i class="fa-regular fa-eye text-xs"></i>
                 </button>
@@ -339,17 +349,30 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
         </div>
       </div>
       <div class="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
-        <div class="flex gap-3">
+        <div class="flex gap-3 flex-wrap">
           <button (click)="downloadIdCard('png')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-[#008d36] hover:bg-[#022c16] rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
             <i class="fa-solid fa-image" *ngIf="!isDownloading"></i>
             <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
-            Télécharger PNG
+            Pièce identité PNG
           </button>
           <button (click)="downloadIdCard('pdf')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-[#008d36] bg-[#e6f3eb] hover:bg-[#d1e8d9] rounded-xl transition-all flex items-center gap-2 disabled:opacity-50">
             <i class="fa-solid fa-file-pdf" *ngIf="!isDownloading"></i>
             <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
-            Télécharger PDF
+            Pièce identité PDF
           </button>
+          <button (click)="downloadBadge(selectedAdherent)" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
+            <i class="fa-solid fa-id-badge" *ngIf="!isDownloading"></i>
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
+            Badge PNG
+          </button>
+          <div class="flex gap-2">
+            <button *ngIf="selectedAdherent?.carteRectoUrl" (click)="downloadImageDirect(selectedAdherent.carteRectoUrl, 'recto_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
+              <i class="fa-solid fa-download"></i> Recto
+            </button>
+            <button *ngIf="selectedAdherent?.carteVersoUrl" (click)="downloadImageDirect(selectedAdherent.carteVersoUrl, 'verso_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
+              <i class="fa-solid fa-download"></i> Verso
+            </button>
+          </div>
         </div>
         <button (click)="closeIdCard()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">Fermer</button>
       </div>
@@ -409,6 +432,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   total = 0;
   isLoading = true;
   isDownloading = false;
+  badgeAdherent: any = null;
 
   showModal = false;
   isEditing = false;
@@ -777,6 +801,195 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     } finally {
       this.isDownloading = false;
       this.cdr.markForCheck();
+    }
+  }
+
+  async downloadBadge(adherent: any) {
+    if (!adherent) return;
+    this.isDownloading = true;
+    this.cdr.markForCheck();
+
+    try {
+      const W = 400, H = 640;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d')!;
+      const isActif = adherent.statut === 'ACTIF';
+
+      // 1. Background (Rounded rect)
+      ctx.beginPath();
+      const radius = 40;
+      ctx.moveTo(radius, 0); ctx.lineTo(W - radius, 0); ctx.quadraticCurveTo(W, 0, W, radius);
+      ctx.lineTo(W, H - radius); ctx.quadraticCurveTo(W, H, W - radius, H);
+      ctx.lineTo(radius, H); ctx.quadraticCurveTo(0, H, 0, H - radius);
+      ctx.lineTo(0, radius); ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.clip(); // Clip everything to rounded corners
+
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      if (isActif) {
+        bgGrad.addColorStop(0, '#024c26'); bgGrad.addColorStop(1, '#01a646');
+      } else {
+        bgGrad.addColorStop(0, '#4b5563'); bgGrad.addColorStop(1, '#6b7280'); // gray-600 to gray-500
+      }
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Top bar (yellow gradient)
+      const topBar = ctx.createLinearGradient(0, 0, W, 0);
+      topBar.addColorStop(0, '#ffb000'); topBar.addColorStop(0.5, '#fde047'); topBar.addColorStop(1, '#ffb000');
+      ctx.fillStyle = topBar;
+      ctx.fillRect(0, 0, W, 6);
+
+      // 3. Header section
+      // Logo background (white circle)
+      ctx.beginPath(); ctx.arc(50, 50, 24, 0, Math.PI * 2);
+      ctx.fillStyle = 'white'; ctx.fill();
+      // Logo text
+      ctx.fillStyle = '#008d36';
+      ctx.font = '900 10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('JÀMM', 50, 48); ctx.fillText('XÉEWAL', 50, 58);
+      
+      // Header Title
+      ctx.textAlign = 'left'; ctx.fillStyle = 'white';
+      ctx.font = '900 16px sans-serif';
+      ctx.fillText('JÀMM AK', 84, 44);
+      ctx.fillText('XÉEWAL', 84, 62);
+
+      // Status pill
+      ctx.fillStyle = isActif ? '#ffb000' : '#e5e7eb';
+      this.roundRect(ctx, W - 140, 36, 110, 28, 14); ctx.fill();
+      ctx.fillStyle = isActif ? '#022c16' : '#374151';
+      ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(isActif ? '★ Membre Officiel' : '⏳ En attente', W - 85, 54);
+
+      // 4. Identity section
+      // Avatar circle
+      ctx.beginPath(); ctx.arc(70, 150, 40, 0, Math.PI * 2);
+      ctx.fillStyle = isActif ? '#ffb000' : '#d1d5db'; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = isActif ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.2)';
+      ctx.stroke();
+      // Avatar initials
+      ctx.fillStyle = isActif ? '#024c26' : '#6b7280';
+      ctx.font = '900 36px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText((adherent.prenom?.charAt(0) || '') + (adherent.nom?.charAt(0) || ''), 70, 162);
+
+      // Name & details
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '800 11px sans-serif';
+      ctx.fillText('MEMBRE', 130, 130);
+      
+      ctx.fillStyle = 'white';
+      ctx.font = '900 24px sans-serif';
+      const fullName = (adherent.prenom + ' ' + adherent.nom).toUpperCase();
+      // Auto-wrap name if too long
+      if (fullName.length > 15) {
+        ctx.font = '900 20px sans-serif';
+        const parts = fullName.split(' ');
+        ctx.fillText(parts[0], 130, 156);
+        ctx.fillText(parts.slice(1).join(' '), 130, 178);
+      } else {
+        ctx.fillText(fullName, 130, 156);
+      }
+      
+      // Location
+      ctx.fillStyle = '#ffb000';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('📍 ' + (adherent.quartier || 'Thiès-Nord'), 130, fullName.length > 15 ? 200 : 180);
+
+      // 5. Details grid
+      const by = 240;
+      // Box 1 (N° Membre)
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+      this.roundRect(ctx, 30, by, 160, 60, 16); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('N° MEMBRE', 42, by + 22);
+      ctx.fillStyle = 'white'; ctx.font = '900 15px sans-serif';
+      ctx.fillText('JA-' + (adherent.id || 'XXXXXX').substring(0,6).toUpperCase(), 42, by + 45);
+
+      // Box 2 (Statut)
+      this.roundRect(ctx, 200, by, 170, 60, 16); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('STATUT', 212, by + 22);
+      ctx.fillStyle = isActif ? '#ffb000' : '#d1d5db'; ctx.font = '900 15px sans-serif';
+      ctx.fillText(isActif ? '✅ Actif' : '⏳ En attente', 212, by + 45);
+
+      // 6. Status Message (below grid)
+      ctx.textAlign = 'center';
+      if (isActif) {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = 'bold 13px sans-serif';
+        ctx.fillText('✅ Ce membre est officiellement enregistré et actif.', W/2, 450);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = 'bold 13px sans-serif';
+        ctx.fillText('⏳ Ce membre est en attente de validation.', W/2, 450);
+      }
+
+      // 7. Footer
+      ctx.fillStyle = isActif ? 'rgba(255,176,0,0.2)' : 'rgba(255,255,255,0.1)';
+      ctx.fillRect(0, H - 50, W, 50);
+      // Top border of footer
+      ctx.fillStyle = isActif ? 'rgba(255,176,0,0.2)' : 'rgba(255,255,255,0.1)';
+      ctx.fillRect(0, H - 51, W, 1);
+      
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('🛡 CARTE OFFICIELLE · JÀMM AK XÉEWAL · THIÈS-NORD', W/2, H - 22);
+
+      // Optional: Add small URL text at the very bottom
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText('JAMMAKXEEWAL.SN', W/2, H - 6);
+
+      // Download
+      const link = document.createElement('a');
+      link.download = `carte_membre_${adherent.prenom}_${adherent.nom}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      this.showAlertMethod('error', 'Erreur', 'Impossible de générer le badge.');
+    } finally {
+      this.isDownloading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  async downloadSelectedBadges() {
+    if (this.selectedIds.size === 0) return;
+    const selected = this.adherents.filter(a => this.selectedIds.has(a.id));
+    this.showAlertMethod('info', 'Téléchargement', `Génération de ${selected.length} badge(s) en cours…`);
+    for (const adherent of selected) {
+      await this.downloadBadge(adherent);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    this.showAlertMethod('success', 'Succès', `${selected.length} badge(s) téléchargé(s).`);
+  }
+
+  async downloadImageDirect(url: string, filename: string) {
+    try {
+      const response = await fetch(url, { mode: 'cors' });
+      const blob = await response.blob();
+      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = `${filename}.${ext}`;
+      link.click();
+      URL.revokeObjectURL(objectUrl);
+    } catch (e) {
+      // Fallback: open in new tab
+      window.open(url, '_blank');
     }
   }
 
