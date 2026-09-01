@@ -57,6 +57,9 @@
 
             <!-- Desktop CTAs -->
             <div class="hidden lg:flex items-center gap-3">
+                <button (click)="subscribeToPush()" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 text-gray-400 hover:text-brand-green hover:bg-brand-green/10 flex items-center justify-center transition-all shadow-sm" aria-label="Activer les notifications">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                </button>
                 <a routerLink="/declarer-besoin" class="text-gray-600 hover:text-brand-dark font-semibold transition-all text-sm flex items-center gap-2 bg-gray-50 hover:bg-gray-100 px-4 py-2.5 rounded-full border border-gray-200">
                     <i class="fa-solid fa-bullhorn text-brand-yellow"></i> Signaler
                 </a>
@@ -67,6 +70,9 @@
 
             <!-- Mobile: CTA bouton + Hamburger -->
             <div class="flex items-center lg:hidden gap-2 flex-shrink-0">
+                <button (click)="subscribeToPush()" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-brand-green/10 text-gray-500 hover:text-brand-green transition-colors border border-gray-200 shadow-sm" aria-label="Notifications">
+                    <i class="fa-regular fa-bell text-base"></i>
+                </button>
                 <a routerLink="/adherer"
                    class="bg-brand-green text-white px-3 py-2 rounded-full font-bold text-xs shadow-md active:scale-95 transition-transform whitespace-nowrap">
                     Adhérer

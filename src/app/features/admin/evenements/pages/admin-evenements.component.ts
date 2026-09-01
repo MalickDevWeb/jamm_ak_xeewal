@@ -1,3 +1,5 @@
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +12,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
   selector: 'app-admin-evenements',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent, BulkActionsBarComponent],
   template: `
     <div class="animate-fade-in-up min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div class="flex items-center justify-between mb-8">
@@ -40,8 +42,16 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
         <button (click)="openCreateModal()" class="text-[#022c16] font-bold hover:underline text-lg">Créer le premier événement →</button>
       </div>
 
+      <!-- Select All Bar -->
+      <div *ngIf="!isLoading && evenements.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+        <input type="checkbox" [checked]="selectedIds.size === evenements.length && evenements.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#022c16]">
+        <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ evenements.length }})</span>
+      </div>
+
       <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div *ngFor="let e of evenements" class="group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col">
+        <div *ngFor="let e of evenements" class="relative group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
+             [class.ring-2]="isSelected(e.id)" [class.ring-red-400]="isSelected(e.id)" [class.bg-red-50]="isSelected(e.id)">
+          <input type="checkbox" [checked]="isSelected(e.id)" (change)="toggleSelection(e.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#022c16] z-10">
           <div class="p-6 flex-1 flex flex-col">
             <div class="flex items-center gap-2 mb-3">
               <span class="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">{{ e.categorie || 'Général' }}</span>
@@ -136,7 +146,18 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
 
       <app-confirm-dialog [visible]="showConfirmDialog" [title]="confirmTitle" message="Cette action est irréversible." (confirm)="confirmDelete()" (cancel)="showConfirmDialog = false"></app-confirm-dialog>
-      <app-alert-popup [visible]="showAlert" [type]="alertType" [title]="alertTitle" [message]="alertMessage" (close)="showAlert = false"></app-alert-popup>
+      
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
+<app-alert-popup [visible]="showAlert" [type]="alertType" [title]="alertTitle" [message]="alertMessage" (close)="showAlert = false"></app-alert-popup>
     </div>
   `,
   styles: [`
@@ -159,6 +180,39 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   showModal = false;
   isEditing = false;
   editingId: string | null = null;
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.evenements.length) this.selectedIds.clear();
+    else this.evenements.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' evenement(s). Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les evenement(s) ?', 'ATTENTION: Cette action supprimera TOUS les evenement(s) de la base.', 'bulk_delete_all');
+  }
+
   showConfirmDialog = false;
   showAlert = false;
   alertType: AlertType = 'info';
@@ -166,6 +220,9 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   alertMessage = '';
   itemToDelete: string | null = null;
   confirmTitle = 'Confirmer la suppression';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
 
   formData = {
     titre: '',
@@ -178,7 +235,8 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
     statut: 'A_VENIR'
   };
 
-  constructor(private adminData: AdminDataService, private cdr: ChangeDetectorRef) {}
+  constructor(private adminData: AdminDataService,
+    private bulkDelete: BulkDeleteService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() { this.loadEvenements(); }
 
@@ -280,6 +338,33 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
       this.showConfirmDialog = false;
+    } else if (this.confirmActionType === 'bulk_delete_selected') {
+      this.showConfirmDialog = false;
+      this.loadingBulk = true;
+      const ids = Array.from(this.selectedIds);
+      Promise.all(ids.map(id => this.adminData.deleteEntity('evenements', id).toPromise()))
+        .then(() => {
+          this.evenements = this.evenements.filter((e: any) => !this.selectedIds.has(e.id));
+          this.total = this.evenements.length;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlertMethod('success', 'Succès', ids.length + ' événement(s) supprimé(s)');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.showConfirmDialog = false;
+      this.loadingBulk = true;
+      Promise.all(this.evenements.map((e: any) => this.adminData.deleteEntity('evenements', e.id).toPromise()))
+        .then(() => {
+          this.evenements = [];
+          this.total = 0;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlertMethod('success', 'Succès', 'Tous les événements supprimés');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
     }
   }
 
@@ -292,4 +377,13 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
+  openConfirm(title: string, message: string, actionType: string, actionId: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = actionId;
+    this.showConfirmDialog = true;
+  }
+
+
 }

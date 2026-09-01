@@ -19,19 +19,32 @@ export interface AuthResponse {
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
-  
-  // State management for user authentication
+
+  // --- Admin State ---
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  
+
+  // --- Citizen State ---
+  private currentCitizenSubject = new BehaviorSubject<any>(null);
+  public currentCitizen$ = this.currentCitizenSubject.asObservable();
+
   constructor(private http: HttpClient) {
-    // Load from localStorage on initialization
+    // Restaurer l'admin depuis localStorage
     const storedToken = localStorage.getItem('admin_token');
     if (storedToken) {
-      // Decode or fetch user info here (mocked for now)
       this.currentUserSubject.next({ token: storedToken });
     }
+
+    // Restaurer le citoyen depuis localStorage
+    const citizenRaw = localStorage.getItem('citizen_user');
+    if (citizenRaw) {
+      try {
+        this.currentCitizenSubject.next(JSON.parse(citizenRaw));
+      } catch {}
+    }
   }
+
+  // ===== ADMIN =====
 
   login(credentials: {email: string, password: string}): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
@@ -55,5 +68,39 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('admin_token');
+  }
+
+  // ===== CITOYEN =====
+
+  /**
+   * Appelé après une adhésion réussie — stocke le token et les données citoyen.
+   */
+  setCitizenSession(adherent: any, token: string): void {
+    localStorage.setItem('citizen_token', token);
+    localStorage.setItem('citizen_user', JSON.stringify(adherent));
+    this.currentCitizenSubject.next(adherent);
+  }
+
+  logoutCitizen() {
+    localStorage.removeItem('citizen_token');
+    localStorage.removeItem('citizen_user');
+    this.currentCitizenSubject.next(null);
+  }
+
+  isCitizenAuthenticated(): boolean {
+    return !!localStorage.getItem('citizen_token');
+  }
+
+  getCitizenToken(): string | null {
+    return localStorage.getItem('citizen_token');
+  }
+
+  /**
+   * Récupère le profil citoyen depuis le backend (vérification token live)
+   */
+  getCitizenProfile(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/citoyen/me`, {
+      headers: { Authorization: `Bearer ${this.getCitizenToken()}` }
+    });
   }
 }

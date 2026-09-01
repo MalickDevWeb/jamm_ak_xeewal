@@ -23,7 +23,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              { "glob": "push-sw.js", "input": "src", "output": "/" }
             ],
             "styles": [
               "src/styles.css"
@@ -56,7 +57,13 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "assets": [
+                "src/favicon.ico",
+                "src/assets",
+                "src/manifest.webmanifest",
+                { "glob": "push-sw.js", "input": "src", "output": "/" }
+              ]
             }
           },
           "defaultConfiguration": "production"

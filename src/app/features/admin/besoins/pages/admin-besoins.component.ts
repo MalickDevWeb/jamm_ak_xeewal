@@ -1,5 +1,7 @@
 
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -15,7 +17,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   selector: 'app-admin-besoins',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent, BulkActionsBarComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
 
@@ -146,11 +148,19 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       <p class="text-sm text-gray-500 mb-6">Modifiez vos filtres ou attendez de nouveaux signalements.</p>
     </div>
 
+    <!-- Select All Bar -->
+    <div *ngIf="!isLoading && filteredBesoins.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+      <input type="checkbox" [checked]="selectedIds.size === filteredBesoins.length && filteredBesoins.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+      <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ filteredBesoins.length }})</span>
+    </div>
+
     <!-- Grille de besoins -->
     <div *ngIf="!isLoading && filteredBesoins.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <div *ngFor="let b of filteredBesoins; trackBy: trackById" 
            class="relative bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col p-5 group hover:shadow-lg transition-shadow border-y border-r border-y-gray-100 border-r-gray-100 border-l-[6px]"
-           [ngClass]="getCardColors(b).border">
+           [class.bg-red-50]="isSelected(b.id)"
+           [ngClass]="isSelected(b.id) ? 'border-l-red-500' : getCardColors(b).border">
+        <input type="checkbox" [checked]="isSelected(b.id)" (change)="toggleSelection(b.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
         
         <!-- Header Badges -->
         <div class="flex items-center justify-between gap-2 mb-4">
@@ -287,7 +297,18 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
       (confirm)="confirmDelete()"
       (cancel)="showConfirmDialog = false">
     </app-confirm-dialog>
-  </div>
+  
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
+</div>
 
   `
 })
@@ -303,6 +324,9 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   showModal = false;
   showConfirmDialog = false;
   confirmTitle = '';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
   itemToDelete: any = null;
 
   formData = {
@@ -337,6 +361,39 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
   }
 
   
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.besoins.length) this.selectedIds.clear();
+    else this.besoins.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' besoin(s). Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les besoin(s) ?', 'ATTENTION: Cette action supprimera TOUS les besoin(s) de la base.', 'bulk_delete_all');
+  }
+
   // Alert State
   alertMessage = '';
   alertType: AlertType = 'success';
@@ -488,8 +545,51 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     this.besoins = this.besoins.filter(b => b.id !== id);
     this.applyClientFilters();
     this.adminData.deleteEntity('besoins', id).subscribe({
-      error: () => this.loadBesoins() // Reload si erreur
+      error: () => this.loadBesoins()
     });
+  }
+
+  openConfirm(title: string, message: string, actionType: string, actionId: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = actionId;
+
+    if (actionType === 'bulk_delete_selected') {
+      this.showConfirmDialog = true;
+    } else if (actionType === 'bulk_delete_all') {
+      this.showConfirmDialog = true;
+    } else {
+      this.showConfirmDialog = true;
+    }
+  }
+
+  onBulkConfirmAction() {
+    if (this.confirmActionType === 'bulk_delete_selected') {
+      this.loadingBulk = true;
+      const ids = Array.from(this.selectedIds);
+      Promise.all(ids.map(id => this.adminData.deleteEntity('besoins', id).toPromise()))
+        .then(() => {
+          this.besoins = this.besoins.filter((b: any) => !this.selectedIds.has(b.id));
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.applyClientFilters();
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.loadingBulk = true;
+      Promise.all(this.besoins.map((b: any) => this.adminData.deleteEntity('besoins', b.id).toPromise()))
+        .then(() => {
+          this.besoins = [];
+          this.filteredBesoins = [];
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
+    } else {
+      this.confirmDelete();
+    }
   }
 
   trackById(_: number, b: any) { return b.id; }
@@ -538,4 +638,5 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
 }

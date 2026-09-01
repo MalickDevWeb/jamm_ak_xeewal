@@ -1,5 +1,7 @@
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -10,7 +12,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-comptes-rendus',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent, BulkActionsBarComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
 
@@ -32,7 +34,18 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     </app-confirm-dialog>
 
 
-    <!-- Header -->
+    
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
+<!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-[#e6f3eb] flex items-center justify-center shrink-0">
@@ -66,8 +79,18 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <p class="text-sm text-gray-500">Rédigez le premier rapport pour cette instance.</p>
     </div>
 
+    <!-- Select All Bar -->
+    <div *ngIf="!isLoading && comptesRendus.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+      <input type="checkbox" [checked]="selectedIds.size === comptesRendus.length && comptesRendus.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+      <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ comptesRendus.length }})</span>
+    </div>
+
     <div *ngIf="!isLoading && comptesRendus.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div *ngFor="let cr of comptesRendus; trackBy: trackById" class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 p-5 group hover:shadow-lg transition-all relative overflow-hidden flex flex-col">
+      <div *ngFor="let cr of comptesRendus; trackBy: trackById" class="relative bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 p-5 group hover:shadow-lg transition-all relative overflow-hidden flex flex-col"
+           [class.bg-red-50]="isSelected(cr.id)"
+           [class.ring-2]="isSelected(cr.id)"
+           [class.ring-red-400]="isSelected(cr.id)">
+        <input type="checkbox" [checked]="isSelected(cr.id)" (change)="toggleSelection(cr.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
         
         <div class="flex items-start justify-between gap-4 mb-4">
           <div class="flex-1">
@@ -163,6 +186,39 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showAlertPopup = false, 3000);
   }
 
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.comptesRendus.length) this.selectedIds.clear();
+    else this.comptesRendus.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' compte(s)-rendu. Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les compte(s)-rendu ?', 'ATTENTION: Cette action supprimera TOUS les compte(s)-rendu de la base.', 'bulk_delete_all');
+  }
+
   // Confirm State
   showConfirmDialog = false;
   confirmTitle = '';
@@ -195,6 +251,31 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
           this.showAlert('Erreur lors de la suppression', 'error');
         }
       });
+    } else if (this.confirmActionType === 'bulk_delete_selected') {
+      this.loadingBulk = true;
+      const ids = Array.from(this.selectedIds);
+      Promise.all(ids.map(id => this.adminData.deleteEntity('comptes-rendus', id).toPromise()))
+        .then(() => {
+          this.comptesRendus = this.comptesRendus.filter((cr: any) => !this.selectedIds.has(cr.id));
+          this.total = this.comptesRendus.length;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlert(ids.length + ' compte(s)-rendu supprimé(s)');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert('Erreur', 'error'); });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.loadingBulk = true;
+      Promise.all(this.comptesRendus.map((cr: any) => this.adminData.deleteEntity('comptes-rendus', cr.id).toPromise()))
+        .then(() => {
+          this.comptesRendus = [];
+          this.total = 0;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlert('Tous les comptes-rendus supprimés');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert('Erreur', 'error'); });
     }
   }
 

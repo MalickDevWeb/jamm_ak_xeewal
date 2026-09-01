@@ -88,6 +88,11 @@ export const routes: Routes = [
         path: 'evenements', 
         loadComponent: () => import('./features/admin/evenements/pages/admin-evenements.component')
           .then(m => m.AdminEvenementsComponent)
+      },
+      { 
+        path: 'notifications', 
+        loadComponent: () => import('./features/admin/notifications/pages/admin-notifications.component')
+          .then(m => m.AdminNotificationsComponent)
       }
     ]
   },

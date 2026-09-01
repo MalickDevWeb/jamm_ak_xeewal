@@ -5,12 +5,14 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 
 @Component({
   selector: 'app-admin-idees',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent, BulkActionsBarComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
 
@@ -30,6 +32,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       (confirm)="onConfirmAction()"
       (cancel)="showConfirmDialog = false">
     </app-confirm-dialog>
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
 
 
     <!-- Header -->
@@ -67,9 +78,19 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <p class="text-sm text-gray-500">La boîte à idées est vide pour le moment.</p>
     </div>
 
+    <!-- Select All Bar -->
+    <div *ngIf="!isLoading && idees.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+      <input type="checkbox" [checked]="selectedIds.size === idees.length && idees.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+      <span class="text-sm font-semibold text-gray-600">Selectionner tout ({{ idees.length }})</span>
+    </div>
+
     <!-- Cards Grid -->
     <div *ngIf="!isLoading && idees.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div *ngFor="let idee of idees" class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 overflow-hidden flex flex-col p-5 group hover:shadow-lg transition-all border-l-[6px] border-l-[#008d36]">
+      <div *ngFor="let idee of idees" class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden flex flex-col p-5 group hover:shadow-lg transition-all border-l-[6px] relative"
+           [class.border-l-[#008d36]]="!isSelected(idee.id)"
+           [class.border-l-red-500]="isSelected(idee.id)"
+           [class.bg-red-50]="isSelected(idee.id)">
+        <input type="checkbox" [checked]="isSelected(idee.id)" (change)="toggleSelection(idee.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
         
         <div class="flex items-center justify-between mb-4">
           <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-[#e6f3eb] text-[#008d36] uppercase tracking-wide truncate max-w-[150px]">{{ idee.categorie }}</span>
@@ -87,7 +108,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
 
         <div class="flex items-center justify-between mt-auto mb-4">
           <div class="flex items-center gap-3 text-[11px] font-medium text-gray-400">
-            <span class="flex items-center gap-1"><i class="fa-solid fa-user"></i> Anonyme</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-user"></i> {{ idee.auteur || 'Anonyme' }}</span>
             <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> {{ idee.createdAt | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="flex items-center gap-1.5 bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full font-black text-xs border border-yellow-100">
@@ -188,6 +209,39 @@ export class AdminideesComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showAlertPopup = false, 3000);
   }
 
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.idees.length) this.selectedIds.clear();
+    else this.idees.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' idee(s).', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUTES les idees ?', 'ATTENTION: Toutes les idees seront supprimees.', 'bulk_delete_all');
+  }
+
   // Confirm State
   showConfirmDialog = false;
   confirmTitle = '';
@@ -208,20 +262,40 @@ export class AdminideesComponent implements OnInit, OnDestroy {
     if (this.confirmActionType === 'delete' && this.confirmActionId) {
       this.isLoading = true;
       this.adminData.deleteEntity('idees', this.confirmActionId).subscribe({
-        next: () => {
-          this.refreshData();
-          this.showAlert('Idée supprimée avec succès');
-        },
-        error: () => {
-          this.isLoading = false;
+        next: () => { this.refreshData(); this.showAlert('Idee supprimee'); },
+        error: () => { this.isLoading = false; this.cdr.markForCheck(); this.showAlert('Erreur', 'error'); }
+      });
+    } else if (this.confirmActionType === 'bulk_delete_selected') {
+      this.loadingBulk = true;
+      this.bulkDelete.deleteSelected('idees', Array.from(this.selectedIds)).subscribe({
+        next: (res) => {
+          this.idees = this.idees.filter((i: any) => !this.selectedIds.has(i.id));
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.total = this.idees.length;
           this.cdr.markForCheck();
-          this.showAlert('Erreur lors de la suppression', 'error');
-        }
+          this.showAlert(res.message);
+        },
+        error: (err) => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert(err.error?.message || 'Erreur', 'error'); }
+      });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.loadingBulk = true;
+      this.bulkDelete.deleteAll('idees').subscribe({
+        next: (res) => {
+          this.idees = [];
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.total = 0;
+          this.cdr.markForCheck();
+          this.showAlert(res.message);
+        },
+        error: (err) => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert(err.error?.message || 'Erreur', 'error'); }
       });
     }
   }
 
   constructor(private adminData: AdminDataService,
+    private bulkDelete: BulkDeleteService,
     private cdr: ChangeDetectorRef) {}
 
   ngOnInit() { this.refreshData(); }

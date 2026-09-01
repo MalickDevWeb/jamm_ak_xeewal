@@ -1,3 +1,5 @@
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import html2canvas from 'html2canvas';
@@ -12,7 +14,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
   selector: 'app-admin-adherents',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, AlertPopupComponent, BulkActionsBarComponent],
   template: `
 <div class="animate-fade-in-up max-w-[1600px] mx-auto">
   <!-- Page Header -->
@@ -131,13 +133,21 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     </div>
   </div>
 
+  <!-- Select All Bar -->
+  <div *ngIf="!isLoading && adherents.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+    <input type="checkbox" [checked]="selectedIds.size === adherents.length && adherents.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+    <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ adherents.length }})</span>
+    <span *ngIf="selectedIds.size > 0" class="ml-2 text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">{{ selectedIds.size }} sélectionné(s)</span>
+  </div>
+
   <!-- Data Table -->
   <div *ngIf="!isLoading" class="bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-[#e2e8f0]/60 text-[10px] font-black text-gray-500 uppercase tracking-wider">
-            <th class="p-4 py-3 pl-6">ADHÉRENT</th>
+            <th class="p-4 pl-4 w-10"><input type="checkbox" [checked]="selectedIds.size === adherents.length && adherents.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]"></th>
+            <th class="p-4 py-3 pl-2">ADHÉRENT</th>
             <th class="p-4 py-3">CONTACT</th>
             <th class="p-4 py-3">QUARTIER</th>
             <th class="p-4 py-3">DATE D'ADHÉSION</th>
@@ -147,7 +157,10 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
           </tr>
         </thead>
         <tbody class="text-sm divide-y divide-gray-100/60">
-          <tr *ngFor="let a of adherents" class="hover:bg-gray-50/70 transition-colors group">
+          <tr *ngFor="let a of adherents" class="hover:bg-gray-50/70 transition-colors group" [class.bg-red-50]="isSelected(a.id)">
+            <td class="p-4 pl-4">
+              <input type="checkbox" [checked]="isSelected(a.id)" (change)="toggleSelection(a.id)" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+            </td>
             <td class="p-4 pl-6 py-5">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-[#e6f3eb] text-[#008d36] font-bold flex items-center justify-center text-xs shrink-0">
@@ -173,7 +186,10 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </td>
             <td class="p-4 text-center pr-6">
               <div class="flex items-center justify-end gap-1.5">
-                <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors">
+                <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1">
+                  <i class="fa-solid fa-check"></i> Activer
+                </button>
+                <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Détails">
                   <i class="fa-regular fa-eye text-xs"></i>
                 </button>
                 <div class="relative group/dropdown">
@@ -181,7 +197,6 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
                     <i class="fa-solid fa-ellipsis text-xs"></i>
                   </button>
                   <div class="absolute right-0 top-full mt-1 bg-white border border-gray-100 shadow-lg rounded-xl py-2 w-32 hidden group-hover/dropdown:block z-10 text-left">
-                    <button *ngIf="a.statut === 'NOUVEAU'" (click)="action('Valider', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36]">Valider</button>
                     <button (click)="openEditModal(a)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36]">Modifier</button>
                     <button (click)="action('Supprimer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50">Supprimer</button>
                   </div>
@@ -374,6 +389,17 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
 
   <app-alert-popup [visible]="showAlert" [type]="alertType" [title]="alertTitle" [message]="alertMessage" (close)="showAlert = false"></app-alert-popup>
   <app-confirm-dialog [visible]="showConfirmDialog" [title]="confirmTitle" message="Cette action est irréversible." (confirm)="confirmDelete()" (cancel)="showConfirmDialog = false"></app-confirm-dialog>
+
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
 </div>
   `
 })
@@ -387,6 +413,39 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   showModal = false;
   isEditing = false;
   editingId: string | null = null;
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.adherents.length) this.selectedIds.clear();
+    else this.adherents.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' adherent(s). Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les adherent(s) ?', 'ATTENTION: Cette action supprimera TOUS les adherent(s) de la base.', 'bulk_delete_all');
+  }
+
   showConfirmDialog = false;
   showIdCardModal = false;
   showAlert = false;
@@ -398,6 +457,9 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   exportVersoB64 = '';
   itemToDelete: string | null = null;
   confirmTitle = 'Confirmer la suppression';
+  confirmMessage = '';
+  confirmActionType = '';
+  confirmActionId: any = null;
 
   formData = {
     prenom: '',
@@ -415,7 +477,8 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   
 
 
-  constructor(private adminData: AdminDataService, private cdr: ChangeDetectorRef) {}
+  constructor(private adminData: AdminDataService,
+    private bulkDelete: BulkDeleteService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.refreshData();
@@ -524,9 +587,28 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       this.itemToDelete = id;
       this.confirmTitle = 'Supprimer cet adhérent ?';
       this.showConfirmDialog = true;
-    } else if (type === 'Valider' && id) {
-      this.isLoading = true;
-      this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe(() => this.refreshData());
+    } else if ((type === 'Valider' || type === 'Activer') && id) {
+      const adherent = this.adherents.find((a: any) => a.id === id);
+      const prevStatut = adherent ? adherent.statut : 'NOUVEAU';
+      
+      if (adherent) {
+        adherent.statut = 'ACTIF';
+        this.cdr.markForCheck();
+        this.showAlertMethod('success', 'Succès', 'Carte activée instantanément.');
+      }
+      
+      this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe({
+        next: () => {
+          // Success background save
+        },
+        error: () => {
+          if (adherent) {
+            adherent.statut = prevStatut;
+            this.cdr.markForCheck();
+            this.showAlertMethod('error', 'Erreur', 'Échec de synchronisation avec le serveur.');
+          }
+        }
+      });
     } else if (type === 'Éditer' && id) {
       const adherent = this.adherents.find((a: any) => a.id === id);
       if (adherent) {
@@ -665,4 +747,13 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  openConfirm(title: string, message: string, actionType: string, actionId: any = null) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmActionType = actionType;
+    this.confirmActionId = actionId;
+    this.showConfirmDialog = true;
+  }
+
+
 }

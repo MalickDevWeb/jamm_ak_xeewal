@@ -1,5 +1,7 @@
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -10,7 +12,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   selector: 'app-admin-commissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent, BulkActionsBarComponent],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
 
@@ -32,7 +34,18 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     </app-confirm-dialog>
 
 
-    <!-- Header -->
+    
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
+<!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-[#e6f3eb] flex items-center justify-center shrink-0">
@@ -66,11 +79,19 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       <p class="text-sm text-gray-500">Créez votre première commission.</p>
     </div>
 
+    <!-- Select All Bar -->
+    <div *ngIf="!isLoading && commissions.length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+      <input type="checkbox" [checked]="selectedIds.size === commissions.length && commissions.length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+      <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ commissions.length }})</span>
+    </div>
+
     <!-- Cards Grid -->
     <div *ngIf="!isLoading && commissions.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
       <div *ngFor="let c of commissions" 
-           class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 p-5 group hover:shadow-lg transition-all border-l-[6px]"
-           [ngClass]="c.statut === 'ACTIVE' ? 'border-l-[#008d36]' : 'border-l-yellow-400'">
+           class="relative bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 p-5 group hover:shadow-lg transition-all border-l-[6px]"
+           [class.bg-red-50]="isSelected(c.id)"
+           [ngClass]="isSelected(c.id) ? 'border-l-red-500' : (c.statut === 'ACTIVE' ? 'border-l-[#008d36]' : 'border-l-yellow-400')">
+        <input type="checkbox" [checked]="isSelected(c.id)" (change)="toggleSelection(c.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
         
         <div class="flex items-start justify-between mb-4">
           <div class="w-12 h-12 rounded-xl bg-[#e6f3eb] text-[#008d36] flex items-center justify-center text-xl font-black shrink-0">
@@ -171,6 +192,39 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showAlertPopup = false, 3000);
   }
 
+
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.commissions.length) this.selectedIds.clear();
+    else this.commissions.forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' commission(s). Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les commission(s) ?', 'ATTENTION: Cette action supprimera TOUS les commission(s) de la base.', 'bulk_delete_all');
+  }
+
   // Confirm State
   showConfirmDialog = false;
   confirmTitle = '';
@@ -201,10 +255,36 @@ export class AdmincommissionsComponent implements OnInit, OnDestroy {
           this.showAlert('Erreur lors de la suppression', 'error');
         }
       });
+    } else if (this.confirmActionType === 'bulk_delete_selected') {
+      this.loadingBulk = true;
+      const ids = Array.from(this.selectedIds);
+      Promise.all(ids.map(id => this.adminData.deleteEntity('commissions', id).toPromise()))
+        .then(() => {
+          this.commissions = this.commissions.filter((c: any) => !this.selectedIds.has(c.id));
+          this.total = this.commissions.length;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlert(ids.length + ' commission(s) supprimée(s)');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert('Erreur', 'error'); });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.loadingBulk = true;
+      Promise.all(this.commissions.map((c: any) => this.adminData.deleteEntity('commissions', c.id).toPromise()))
+        .then(() => {
+          this.commissions = [];
+          this.total = 0;
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlert('Toutes les commissions supprimées');
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); this.showAlert('Erreur', 'error'); });
     }
   }
 
   constructor(private adminData: AdminDataService,
+    private bulkDelete: BulkDeleteService,
     private cdr: ChangeDetectorRef) {}
 
   ngOnInit() { this.refreshData(); }

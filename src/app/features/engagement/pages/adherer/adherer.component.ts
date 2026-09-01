@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { QuartierSelectComponent } from '../../../../shared/components/quartier-select/quartier-select.component';
 
 @Component({
@@ -41,6 +42,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   errorMsg = '';
   success = false;
+  private redirectTimeout: any;
 
   // Variables pour les images de carte d'identité
   carteRectoBase64: string | null = null;
@@ -56,7 +58,9 @@ export class AdhererComponent implements OnInit, OnDestroy {
   constructor(
     private publicData: PublicDataService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -156,7 +160,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
         next: (res: any) => {
           this.isSubmitting = false;
           this.success = true;
-          
+
           // Sauvegarde automatique du compte pour la page d'accueil
           const adherentData = {
               id: res?.data?.id || res?.id || Math.floor(1000 + Math.random() * 9000),
@@ -167,8 +171,18 @@ export class AdhererComponent implements OnInit, OnDestroy {
               statut: res?.data?.statut || res?.statut || 'EN_ATTENTE'
           };
           localStorage.setItem('current_adherent', JSON.stringify(adherentData));
-          
+
+          if (res?.token) {
+            // Optionnel : stocker le token au cas où on en a besoin plus tard
+            localStorage.setItem('citizen_token', res.token);
+          }
+
           this.cdr.markForCheck();
+
+          // Redirection automatique après 3 secondes pour voir la carte sur l'accueil
+          this.redirectTimeout = setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 3000);
         },
         error: (err: any) => {
           this.isSubmitting = false;
@@ -217,6 +231,10 @@ export class AdhererComponent implements OnInit, OnDestroy {
   }
 
   resetForm() {
+    if (this.redirectTimeout) {
+      clearTimeout(this.redirectTimeout);
+      this.redirectTimeout = null;
+    }
     this.success = false;
     this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '', carteRectoUrl: '', carteVersoUrl: '' };
     this.removeRecto();
@@ -344,6 +362,9 @@ export class AdhererComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.redirectTimeout) {
+      clearTimeout(this.redirectTimeout);
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }

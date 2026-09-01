@@ -4,6 +4,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   DestroyRef,
   inject
 } from '@angular/core';
@@ -15,13 +16,14 @@ import {
   Option,
 } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-activites',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, BulkActionsBarComponent],
   template: `
     <div class="animate-fade-in-up max-w-[1600px] mx-auto">
       <!-- Header -->
@@ -108,9 +110,18 @@ import { environment } from '../../../../../environments/environment';
         </button>
       </div>
 
+      <!-- Select All Bar -->
+      <div *ngIf="!isLoading() && activites().length > 0" class="mb-4 flex items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100">
+        <input type="checkbox" [checked]="selectedIds.size === activites().length && activites().length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+        <span class="text-sm font-semibold text-gray-600">Sélectionner tout ({{ activites().length }})</span>
+      </div>
+
       <!-- Activities Grid -->
       <div *ngIf="!isLoading() && activites().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div *ngFor="let a of activites().slice(0, 3)" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+        <div *ngFor="let a of activites().slice(0, 3)" class="relative bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300"
+             [class.ring-2]="isSelected(a.id)" [class.ring-red-400]="isSelected(a.id)">
+          <input type="checkbox" [checked]="isSelected(a.id)" (change)="toggleSelection(a.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-20">
+          
           <!-- Image/Video Container -->
           <div class="h-48 relative bg-gray-100 w-full overflow-hidden cursor-pointer" (click)="openEditModal(a)">
             <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
@@ -163,7 +174,8 @@ import { environment } from '../../../../../environments/environment';
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                <th class="p-4 pl-6">TITRE</th>
+                <th class="p-4 pl-4 w-10"><input type="checkbox" [checked]="selectedIds.size === activites().length && activites().length > 0" (change)="toggleAllSelection()" class="w-4 h-4 cursor-pointer accent-[#008d36]"></th>
+                <th class="p-4 pl-2">TITRE</th>
                 <th class="p-4">TYPE</th>
                 <th class="p-4">CATÉGORIE</th>
                 <th class="p-4">DATE</th>
@@ -174,8 +186,11 @@ import { environment } from '../../../../../environments/environment';
               </tr>
             </thead>
             <tbody class="text-sm divide-y divide-gray-50">
-              <tr *ngFor="let a of activites()" class="hover:bg-gray-50/50 transition-colors group">
-                <td class="p-4 pl-6 py-4">
+              <tr *ngFor="let a of activites()" class="hover:bg-gray-50/50 transition-colors group" [class.bg-red-50]="isSelected(a.id)">
+                <td class="p-4 pl-4">
+                  <input type="checkbox" [checked]="isSelected(a.id)" (change)="toggleSelection(a.id)" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+                </td>
+                <td class="p-4 pl-2 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-14 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative cursor-pointer" (click)="openEditModal(a)">
                        <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
@@ -363,7 +378,18 @@ import { environment } from '../../../../../environments/environment';
         (confirm)="confirmDelete()"
         (cancel)="showConfirmDialog.set(false)">
       </app-confirm-dialog>
-    </div>
+    
+
+    <!-- Bulk Actions Bar -->
+    <app-bulk-actions-bar
+      [selectedCount]="selectedIds.size"
+      [loading]="loadingBulk"
+      (deleteSelected)="bulkDeleteSelected()"
+      (deleteAll)="bulkDeleteAll()"
+      (clear)="clearSelection()">
+    </app-bulk-actions-bar>
+
+</div>
   `,
   styles: [
     `
@@ -397,6 +423,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class AdminactivitesComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   activites = signal<any[]>([]);
   total = computed(() => this.activites().length);
@@ -428,6 +455,8 @@ export class AdminactivitesComponent implements OnInit {
   showConfirmDialog = signal(false);
   itemToDelete = signal<string | null>(null);
   confirmTitle = signal('Confirmer la suppression');
+  confirmActionType = signal<string>('');
+  confirmActionId = signal<any>(null);
   currentActiviteId = signal<string | null>(null);
   isCreating = signal(true);
   isUploadingFiles = signal(false);
@@ -447,7 +476,40 @@ export class AdminactivitesComponent implements OnInit {
     typeMedia: 'PHOTOS' as 'PHOTOS' | 'VIDEOS',
   };
 
-  constructor(private adminData: AdminDataService) {}
+  
+  // === BULK DELETE STATE ===
+  selectedIds: Set<string> = new Set();
+  loadingBulk = false;
+
+  toggleSelection(id: string) {
+    if (this.selectedIds.has(id)) this.selectedIds.delete(id);
+    else this.selectedIds.add(id);
+    this.cdr.markForCheck();
+  }
+
+  toggleAllSelection() {
+    if (this.selectedIds.size === this.activites().length) this.selectedIds.clear();
+    else this.activites().forEach((i: any) => this.selectedIds.add(i.id));
+    this.cdr.markForCheck();
+  }
+
+  isSelected(id: string): boolean { return this.selectedIds.has(id); }
+
+  clearSelection() {
+    this.selectedIds.clear();
+    this.cdr.markForCheck();
+  }
+
+  bulkDeleteSelected() {
+    if (this.selectedIds.size === 0) return;
+    this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' activite(s). Cette action est irreversible.', 'bulk_delete_selected');
+  }
+
+  bulkDeleteAll() {
+    this.openConfirm('Supprimer TOUS les activite(s) ?', 'ATTENTION: Cette action supprimera TOUS les activite(s) de la base.', 'bulk_delete_all');
+  }
+
+constructor(private adminData: AdminDataService) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -772,12 +834,44 @@ export class AdminactivitesComponent implements OnInit {
   };
 
   confirmDelete() {
-    const id = this.itemToDelete();
-    if (id) {
-      this.deleteItem(id);
+    const actionType = this.confirmActionType();
+    if (this.itemToDelete()) {
+      const id = this.itemToDelete();
+      if (id) this.deleteItem(id);
       this.itemToDelete.set(null);
       this.showConfirmDialog.set(false);
+    } else if (actionType === 'bulk_delete_selected') {
+      this.showConfirmDialog.set(false);
+      this.loadingBulk = true;
+      const ids = Array.from(this.selectedIds);
+      Promise.all(ids.map(id => this.adminData.deleteEntity('activites', id).toPromise()))
+        .then(() => {
+          this.activites.update((list) => list.filter((a) => !this.selectedIds.has(a.id)));
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
+    } else if (actionType === 'bulk_delete_all') {
+      this.showConfirmDialog.set(false);
+      this.loadingBulk = true;
+      Promise.all(this.activites().map((a: any) => this.adminData.deleteEntity('activites', a.id).toPromise()))
+        .then(() => {
+          this.activites.set([]);
+          this.selectedIds.clear();
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.loadingBulk = false; this.cdr.markForCheck(); });
     }
   }
+
+  openConfirm(title: string, _message: string, actionType: string, actionId: any = null) {
+    this.confirmTitle.set(title);
+    this.confirmActionType.set(actionType);
+    this.confirmActionId.set(actionId);
+    this.showConfirmDialog.set(true);
+  }
+
 
 }

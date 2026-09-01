@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { ChatbotComponent } from '../../shared/components/chatbot/chatbot.component';
 import { environment } from '../../../environments/environment';
+import { PushNotificationService } from '../../core/services/push-notification.service';
 
 @Component({
   selector: 'app-public-layout',
@@ -18,7 +19,11 @@ export class PublicLayoutComponent implements OnInit {
   isMaintenance = false;
   isChecking = true;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private pushService: PushNotificationService
+  ) {}
 
   ngOnInit() {
     this.http.get<any>(`${environment.apiUrl}/settings`).subscribe({
@@ -28,7 +33,6 @@ export class PublicLayoutComponent implements OnInit {
           this.isMaintenance = true;
           this.router.navigate(['/maintenance']);
         } else if (this.router.url === '/maintenance') {
-          // If not in maintenance but on maintenance page, redirect to home
           this.router.navigate(['/']);
         }
       },
