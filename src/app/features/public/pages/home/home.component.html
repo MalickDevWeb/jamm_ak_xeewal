@@ -253,7 +253,6 @@
                 <div class="relative group">
                     <div id="activities-carousel" class="flex overflow-x-auto gap-8 pb-8 hide-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
                         <ng-container *ngIf="activites && activites.length > 0; else noActivities">
-                            <ng-container *ngFor="let loop of [0, 1, 2]">
                                 <div *ngFor="let activite of activites; trackBy: trackByActivite" class="w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-21px)] shrink-0 h-[280px] rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col group/card cursor-pointer border border-gray-200" (click)="openGallery(getAllMediaUrls(activite.mediaUrl))">
                                     <img [src]="getMediaUrl(activite)" (error)="onImageError(activite.id)" [alt]="activite.titre" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out">
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent opacity-90 group-hover/card:opacity-100 transition-opacity duration-500"></div>
@@ -279,7 +278,6 @@
                                         <p class="text-gray-300 text-xs flex items-center gap-2 font-bold tracking-wider uppercase"><i class="fa-regular fa-calendar-alt text-brand-yellow"></i> {{ activite.date | date:'dd MMM yyyy' }}</p>
                                     </div>
                                 </div>
-                            </ng-container>
                         </ng-container>
                         <ng-template #noActivities>
                             <div class="w-full flex flex-col items-center justify-center py-20 px-4 text-center">

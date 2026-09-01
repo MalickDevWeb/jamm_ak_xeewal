@@ -125,7 +125,7 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
           <!-- Image/Video Container -->
           <div class="h-48 relative bg-gray-100 w-full overflow-hidden cursor-pointer" (click)="openEditModal(a)">
             <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
-            <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getFirstMedia(a) + '?thumbnail=true'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
+            <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getVideoThumbnail(getFirstMedia(a))" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'" />
             
             <div *ngIf="!getFirstMedia(a)" class="w-full h-full flex items-center justify-center">
                <i class="fa-solid fa-image text-3xl text-gray-300"></i>
@@ -194,7 +194,7 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
                   <div class="flex items-center gap-3">
                     <div class="w-14 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative cursor-pointer" (click)="openEditModal(a)">
                        <img *ngIf="a.typeMedia === 'PHOTOS' && getFirstMedia(a)" [src]="getFirstMedia(a)" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
-                       <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getFirstMedia(a) + '?thumbnail=true'" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
+                       <img *ngIf="a.typeMedia === 'VIDEOS' && getFirstMedia(a)" [src]="getVideoThumbnail(getFirstMedia(a))" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
                        <div *ngIf="a.typeMedia === 'VIDEOS'" class="absolute inset-0 flex items-center justify-center bg-black/10">
                           <i class="fa-solid fa-play text-white text-xs opacity-80 shadow-sm"></i>
                        </div>
@@ -569,6 +569,12 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
   getFirstMedia(a: any): string | null {
     if (!a.mediaUrl) return null;
     return a.mediaUrl.split(',')[0].trim();
+  }
+
+  getVideoThumbnail(url: string | null): string | null {
+    if (!url) return null;
+    // Cloudinary: replace video extension with .jpg to get a thumbnail
+    return url.replace(/\.(mp4|webm|mov|avi)($|\?)/i, '.jpg$2');
   }
 
   playVideo(a: any) {
