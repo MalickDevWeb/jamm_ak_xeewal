@@ -17,7 +17,7 @@ import {
 } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
-import { environment } from '../../../../../environments/environment';
+import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
 
 @Component({
   selector: 'app-admin-activites',
@@ -345,6 +345,17 @@ import { environment } from '../../../../../environments/environment';
                 </div>
               </div>
 
+              <!-- Barre de progression upload -->
+              <div *ngIf="isUploadingFiles()" class="mt-3 space-y-2">
+                <div *ngFor="let p of uploadProgresses()" class="flex items-center gap-3">
+                  <span class="text-[11px] text-gray-500 font-medium truncate flex-1 max-w-[180px]">{{ p.name }}</span>
+                  <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div class="bg-[#008d36] h-2 rounded-full transition-all duration-300" [style.width]="p.percent + '%'"></div>
+                  </div>
+                  <span class="text-[11px] font-bold text-[#008d36] w-8 text-right">{{ p.percent }}%</span>
+                </div>
+              </div>
+
               <p *ngIf="mediaError()" class="text-red-500 text-xs font-bold mt-2 flex items-center gap-1.5 bg-red-50 px-3 py-2 rounded-lg">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ mediaError() }}
               </p>
@@ -467,6 +478,7 @@ export class AdminactivitesComponent implements OnInit {
   >([]);
   existingMediaUrls = signal<string[]>([]);
   mediaError = signal('');
+  uploadProgresses = signal<{ name: string; percent: number }[]>([]);
 
   formData = {
     titre: '',
@@ -509,7 +521,7 @@ export class AdminactivitesComponent implements OnInit {
     this.openConfirm('Supprimer TOUS les activite(s) ?', 'ATTENTION: Cette action supprimera TOUS les activite(s) de la base.', 'bulk_delete_all');
   }
 
-constructor(private adminData: AdminDataService) {}
+constructor(private adminData: AdminDataService, private cloudinaryUpload: CloudinaryUploadService) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -712,41 +724,31 @@ constructor(private adminData: AdminDataService) {}
 
       if (currentNew.length > 0) {
         this.isUploadingFiles.set(true);
+        // Initialiser la progression pour chaque fichier
+        this.uploadProgresses.set(currentNew.map(m => ({ name: m.name, percent: 0 })));
 
-        const uploadPromises = currentNew.map(async (media) => {
-          const fd = new FormData();
-          fd.append('file', media.blob);
-          
+        // Upload séquentiel pour éviter de saturer la bande passante
+        for (let i = 0; i < currentNew.length; i++) {
+          const media = currentNew[i];
           try {
-            const res = await fetch(`${environment.apiUrl}/upload-public`, {
-              method: 'POST',
-              body: fd,
-            });
-            
-            const text = await res.text();
-            let result;
-            try {
-              result = text ? JSON.parse(text) : {};
-            } catch (e) {
-              if (res.status === 413) throw new Error(`Le fichier ${media.name} est trop lourd pour le serveur (limite Vercel dépassée).`);
-              if (res.status === 504) throw new Error(`Le téléchargement de ${media.name} a expiré (timeout).`);
-              throw new Error(`Erreur serveur (${res.status}) lors de l'envoi de ${media.name}.`);
-            }
-            
-            if (!res.ok) {
-              throw new Error(result.message || `Erreur HTTP ${res.status} pour ${media.name}.`);
-            }
-            
-            if (result.success) return result.url;
-            else throw new Error(result.message || `Erreur serveur lors de l'upload de ${media.name}.`);
+            const url = await this.cloudinaryUpload.uploadDirect(
+              media.blob,
+              media.name,
+              (percent) => {
+                this.uploadProgresses.update(list =>
+                  list.map((p, idx) => idx === i ? { ...p, percent } : p)
+                );
+                this.cdr.markForCheck();
+              }
+            );
+            allMediaUrls.push(url.url);
           } catch (err: any) {
-             throw new Error(err.message || `Connexion échouée pour ${media.name}.`);
+            throw new Error(`Erreur upload de "${media.name}" : ${err.message}`);
           }
-        });
+        }
 
-        const newUrls = await Promise.all(uploadPromises);
-        allMediaUrls = [...allMediaUrls, ...newUrls];
         this.isUploadingFiles.set(false);
+        this.uploadProgresses.set([]);
       }
 
       const totalMedia = allMediaUrls.length;

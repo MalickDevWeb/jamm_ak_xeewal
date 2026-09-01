@@ -636,11 +636,48 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   };
 
   confirmDelete() {
-    if (this.itemToDelete) {
+    this.showConfirmDialog = false;
+
+    if (this.confirmActionType === 'bulk_delete_selected') {
+      const ids = Array.from(this.selectedIds);
+      this.loadingBulk = true;
+      this.cdr.markForCheck();
+      this.bulkDelete.deleteSelected('adherents', ids).subscribe({
+        next: (res) => {
+          this.loadingBulk = false;
+          this.clearSelection();
+          this.refreshData();
+          this.showAlertMethod('success', 'Succès', res.deleted + ' adhérent(s) supprimé(s).');
+        },
+        error: () => {
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer la sélection.');
+        }
+      });
+    } else if (this.confirmActionType === 'bulk_delete_all') {
+      this.loadingBulk = true;
+      this.cdr.markForCheck();
+      this.bulkDelete.deleteAll('adherents').subscribe({
+        next: (res) => {
+          this.loadingBulk = false;
+          this.clearSelection();
+          this.refreshData();
+          this.showAlertMethod('success', 'Succès', 'Tous les adhérents ont été supprimés.');
+        },
+        error: () => {
+          this.loadingBulk = false;
+          this.cdr.markForCheck();
+          this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer tous les adhérents.');
+        }
+      });
+    } else if (this.itemToDelete) {
       this.deleteItem(this.itemToDelete);
       this.itemToDelete = null;
-      this.showConfirmDialog = false;
     }
+
+    this.confirmActionType = '';
+    this.confirmActionId = null;
   }
 
   submitForm() {
