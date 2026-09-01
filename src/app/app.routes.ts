@@ -93,6 +93,11 @@ export const routes: Routes = [
         path: 'notifications', 
         loadComponent: () => import('./features/admin/notifications/pages/admin-notifications.component')
           .then(m => m.AdminNotificationsComponent)
+      },
+      { 
+        path: 'poles', 
+        loadComponent: () => import('./features/admin/poles/pages/admin-poles.component')
+          .then(m => m.AdminPolesComponent)
       }
     ]
   },

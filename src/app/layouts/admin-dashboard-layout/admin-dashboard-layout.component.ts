@@ -224,6 +224,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell' },
     { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear' },
     { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul' },
+    { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group' },
   ];
 
   constructor(

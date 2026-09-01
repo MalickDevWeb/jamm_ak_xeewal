@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
@@ -34,7 +34,8 @@ export class AdhererComponent implements OnInit, OnDestroy {
     pole: '',
     motivation: '',
     carteRectoUrl: '',
-    carteVersoUrl: ''
+    carteVersoUrl: '',
+    poleId: ''
   };
 
   // Options dynamiques depuis la base de données
@@ -62,11 +63,17 @@ export class AdhererComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.loadOptions();
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['pole']) {
+        this.formData.poleId = params['pole'];
+      }
+    });
   }
 
   private loadOptions() {
@@ -87,16 +94,24 @@ export class AdhererComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Charger les pôles
-    this.publicData.getOptions('pole').pipe(
+    // Charger les pôles dynamiques
+    this.publicData.getPoles().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
-        if (res.success) {
-          this.poles = res.data;
+        if (res.success && res.data) {
+          // Filtrer les pôles publiés et adapter au format option pour l'affichage
+          this.poles = res.data
+            .filter((p: any) => p.statut === 'PUBLIE')
+            .map((p: any) => ({
+              id: p.id,
+              type: 'pole',
+              value: p.titre,
+              label: p.titre,
+              ordre: 0,
+              actif: true
+            }));
           this.cdr.markForCheck();
-        } else {
-          console.error('Failed to load poles:', res);
         }
       },
       error: (err) => {
@@ -238,7 +253,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
       this.redirectTimeout = null;
     }
     this.success = false;
-    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '', carteRectoUrl: '', carteVersoUrl: '' };
+    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', pole: '', motivation: '', carteRectoUrl: '', carteVersoUrl: '', poleId: '' };
     this.removeRecto();
     this.removeVerso();
   }

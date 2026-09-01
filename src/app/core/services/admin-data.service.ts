@@ -57,7 +57,7 @@ export class AdminDataService {
   getEvenements(): Observable<any> { return this.getCached('evenements', this.http.get(`${this.apiUrl}/evenements`)); }
   getVisites(): Observable<any> { return this.getCached('visites', this.http.get(`${this.apiUrl}/visites`)); }
   getComptesRendus(): Observable<any> { return this.getCached('comptes-rendus', this.http.get(`${this.apiUrl}/comptes-rendus`)); }
-
+  getPoles(): Observable<any> { return this.getCached('poles', this.http.get(`${this.apiUrl}/poles`)); }
   // POST → invalide le cache de l'endpoint concerné
   createEntity(endpoint: string, data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${endpoint}`, data).pipe(

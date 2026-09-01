@@ -278,48 +278,23 @@
                     <div class="p-5 md:p-8 pt-0 border-t border-gray-100" id="body-step-3">
                         <div class="space-y-6 mt-6">
                             <label class="block text-gray-800 font-extrabold mb-3 text-sm uppercase tracking-wide">Choisissez votre pôle d'action <span class="text-gray-400 font-normal normal-case ml-1">(Optionnel)</span></label>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Dev Humain' ? 'border-brand-green bg-brand-green/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Dev Humain" [(ngModel)]="formData.pole" class="peer sr-only">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" *ngIf="poles && poles.length > 0">
+                                <label *ngFor="let pole of poles; trackBy: trackByOption" class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
+                                    [ngClass]="formData.poleId === pole.id ? 'border-brand-green bg-brand-green/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
+                                    <input type="radio" name="pole" [value]="pole.id" [(ngModel)]="formData.poleId" class="peer sr-only">
                                     <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-green text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Dev Humain'" [class.scale-100]="formData.pole === 'Dev Humain'">
+                                         [class.scale-0]="formData.poleId !== pole.id" [class.scale-100]="formData.poleId === pole.id">
                                         <i class="fa-solid fa-check"></i>
                                     </div>
                                     <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Dev Humain' ? 'bg-brand-green text-white scale-110' : 'bg-white text-brand-green group-hover:scale-110'">
-                                        <i class="fa-solid fa-users text-lg"></i>
+                                         [ngClass]="formData.poleId === pole.id ? 'bg-brand-green text-white scale-110' : 'bg-white text-brand-green group-hover:scale-110'">
+                                        <i class="fa-solid fa-layer-group text-lg"></i>
                                     </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Dev Humain' ? 'text-brand-green' : 'text-brand-dark'">Dév. Humain</span>
+                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.poleId === pole.id ? 'text-brand-green' : 'text-brand-dark'">{{ pole.label }}</span>
                                 </label>
-                                
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Economie' ? 'border-brand-yellow bg-brand-yellow/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Economie" [(ngModel)]="formData.pole" class="peer sr-only">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-yellow text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Economie'" [class.scale-100]="formData.pole === 'Economie'">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Economie' ? 'bg-brand-yellow text-white scale-110' : 'bg-white text-brand-yellow group-hover:scale-110'">
-                                        <i class="fa-solid fa-chart-line text-lg"></i>
-                                    </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Economie' ? 'text-brand-yellow' : 'text-brand-dark'">Éco. & Innovation</span>
-                                </label>
-
-                                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
-                                    [ngClass]="formData.pole === 'Environnement' ? 'border-brand-green bg-brand-green/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
-                                    <input type="radio" name="pole" value="Environnement" [(ngModel)]="formData.pole" class="peer sr-only">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-green text-white flex items-center justify-center text-[10px] transition-transform duration-300"
-                                         [class.scale-0]="formData.pole !== 'Environnement'" [class.scale-100]="formData.pole === 'Environnement'">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
-                                         [ngClass]="formData.pole === 'Environnement' ? 'bg-brand-green text-white scale-110' : 'bg-white text-brand-green group-hover:scale-110'">
-                                        <i class="fa-solid fa-leaf text-lg"></i>
-                                    </div>
-                                    <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.pole === 'Environnement' ? 'text-brand-green' : 'text-brand-dark'">Cadre de vie</span>
-                                </label>
+                            </div>
+                            <div *ngIf="!poles || poles.length === 0" class="text-sm text-gray-500 italic p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                Aucun pôle disponible pour le moment.
                             </div>
                         </div>
                     </div>

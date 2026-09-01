@@ -21,8 +21,9 @@ export class PublicDataService {
   // --- Editorial ---
   getEditorial(page: string): Observable<any> { return this.http.get(`${this.apiUrl}/editorial?page=${page}`); }
   
-  // --- Activités ---
+  // --- Activités & Pôles ---
   getActivites(): Observable<any> { return this.http.get(`${this.apiUrl}/activites`); }
+  getPoles(): Observable<any> { return this.http.get(`${this.apiUrl}/poles`); }
   
   // --- Sondages ---
   getSondages(): Observable<any> { return this.http.get(`${this.apiUrl}/sondages`); }

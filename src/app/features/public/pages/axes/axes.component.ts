@@ -73,6 +73,34 @@ export class AxesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.publicData.getPoles().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data && res.data.length > 0) {
+          const publishedPoles = res.data.filter((p: any) => p.statut === 'PUBLIE');
+          if (publishedPoles.length > 0) {
+            this.poles = publishedPoles.map((p: any, i: number) => ({
+              id: p.id,
+              titre: p.titre,
+              soustitre: p.description,
+              icon: this.getIconForIndex(i),
+              color: this.getColorForIndex(i),
+              actions: p.objectifs ? p.objectifs.split('\n').map((a: string) => a.trim()).filter((a: string) => a) : []
+            }));
+            this.cdr.markForCheck();
+            return; // Don't load from editorial if we have dynamic poles
+          }
+        }
+        
+        // Fallback to editorial or keep hardcoded if API fails/empty
+        this.loadEditorialPoles();
+      },
+      error: () => this.loadEditorialPoles()
+    });
+  }
+
+  private loadEditorialPoles() {
     this.publicData.getEditorial('axes').pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -105,7 +133,7 @@ export class AxesComponent implements OnInit, OnDestroy {
     return colors[index] || 'slate';
   }
 
-  trackByPole(index: number, item: Pole): number {
+  trackByPole(index: number, item: Pole): any {
     return item.id;
   }
 
