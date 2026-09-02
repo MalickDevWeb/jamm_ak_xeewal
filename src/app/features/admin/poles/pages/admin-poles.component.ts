@@ -114,6 +114,20 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             </div>
 
             <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Icône <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-5 sm:grid-cols-10 gap-2">
+                <button *ngFor="let icon of availableIcons" 
+                        type="button"
+                        (click)="formData.icone = icon.value"
+                        [ngClass]="formData.icone === icon.value ? 'bg-[#e6f3eb] border-[#008d36] text-[#008d36] scale-110 shadow-sm' : 'bg-gray-50 border-gray-200 text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
+                        class="h-10 border rounded-xl flex items-center justify-center text-lg transition-all"
+                        [title]="icon.label">
+                  <i [class]="icon.value"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
               <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Statut</label>
               <select [(ngModel)]="formData.statut" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none cursor-pointer">
                 <option value="PUBLIE">Publié (Visible pour tous)</option>
@@ -171,8 +185,22 @@ export class AdminPolesComponent implements OnInit {
     titre: '',
     description: '',
     objectifs: '',
+    icone: 'fa-solid fa-star',
     statut: 'PUBLIE'
   };
+
+  availableIcons = [
+    { label: 'Général / Étoile', value: 'fa-solid fa-star' },
+    { label: 'Utilisateurs / Social', value: 'fa-solid fa-users' },
+    { label: 'Fusée / Innovation', value: 'fa-solid fa-rocket' },
+    { label: 'Feuille / Environnement', value: 'fa-solid fa-leaf' },
+    { label: 'Santé / Cœur', value: 'fa-solid fa-heart-pulse' },
+    { label: 'Sport', value: 'fa-solid fa-person-running' },
+    { label: 'Éducation / Livre', value: 'fa-solid fa-book-open' },
+    { label: 'Économie / Pièces', value: 'fa-solid fa-coins' },
+    { label: 'Sécurité / Bouclier', value: 'fa-solid fa-shield-halved' },
+    { label: 'Culture / Masque', value: 'fa-solid fa-masks-theater' }
+  ];
 
   ngOnInit() {
     this.loadPoles();
@@ -189,15 +217,16 @@ export class AdminPolesComponent implements OnInit {
     });
   }
 
-  getObjectifsArray(objectifs: string): string[] {
+  getObjectifsArray(objectifs: any): string[] {
     if (!objectifs) return [];
-    return objectifs.split('\\n').map(o => o.trim()).filter(o => o.length > 0);
+    if (Array.isArray(objectifs)) return objectifs;
+    return typeof objectifs === 'string' ? objectifs.split('\n').map(o => o.trim()).filter(o => o.length > 0) : [];
   }
 
   openCreateModal() {
     this.isCreating.set(true);
     this.currentId.set(null);
-    this.formData = { titre: '', description: '', objectifs: '', statut: 'PUBLIE' };
+    this.formData = { titre: '', description: '', objectifs: '', icone: 'fa-solid fa-star', statut: 'PUBLIE' };
     this.errorMessage.set('');
     this.showModal.set(true);
   }
@@ -208,7 +237,8 @@ export class AdminPolesComponent implements OnInit {
     this.formData = {
       titre: pole.titre,
       description: pole.description,
-      objectifs: pole.objectifs || '',
+      objectifs: Array.isArray(pole.objectifs) ? pole.objectifs.join('\n') : (pole.objectifs || ''),
+      icone: pole.icone || 'fa-solid fa-star',
       statut: pole.statut
     };
     this.errorMessage.set('');
@@ -240,9 +270,14 @@ export class AdminPolesComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
+    const dataToSend = {
+      ...this.formData,
+      objectifs: this.formData.objectifs ? this.formData.objectifs.split('\n').map(o => o.trim()).filter(o => o.length > 0) : []
+    };
+
     const action = this.isCreating() 
-      ? this.adminData.createEntity('poles', this.formData)
-      : this.adminData.updateEntity('poles', this.currentId()!, this.formData);
+      ? this.adminData.createEntity('poles', dataToSend)
+      : this.adminData.updateEntity('poles', this.currentId()!, dataToSend);
 
     action.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {

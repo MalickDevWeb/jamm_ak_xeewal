@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { PublicDataService } from '../../../../core/services/public-data.service';
 
 interface Pole {
-  id: number;
+  id: number | string;
   titre: string;
   soustitre: string;
   icon: string;
@@ -67,6 +67,8 @@ export class AxesComponent implements OnInit, OnDestroy {
     }
   ];
 
+  qrCodeUrl: string = 'assets/qrcode.png';
+
   constructor(
     private publicData: PublicDataService,
     private cdr: ChangeDetectorRef
@@ -84,43 +86,61 @@ export class AxesComponent implements OnInit, OnDestroy {
               id: p.id,
               titre: p.titre,
               soustitre: p.description,
-              icon: this.getIconForIndex(i),
+              icon: p.icone || this.getIconForIndex(i),
               color: this.getColorForIndex(i),
-              actions: p.objectifs ? p.objectifs.split('\n').map((a: string) => a.trim()).filter((a: string) => a) : []
+              actions: Array.isArray(p.objectifs) ? p.objectifs : (p.objectifs ? p.objectifs.split('\n').map((a: string) => a.trim()).filter((a: string) => a) : [])
             }));
             this.cdr.markForCheck();
-            return; // Don't load from editorial if we have dynamic poles
+            setTimeout(() => {
+              if (typeof document !== 'undefined') {
+                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+              }
+            }, 100);
           }
         }
         
-        // Fallback to editorial or keep hardcoded if API fails/empty
-        this.loadEditorialPoles();
+        // Charge toujours le contenu éditorial
+        this.loadEditorialContent();
+        this.loadSettings();
       },
-      error: () => this.loadEditorialPoles()
+      error: () => {
+        this.loadEditorialContent();
+        this.loadSettings();
+      }
     });
   }
 
-  private loadEditorialPoles() {
+  private loadSettings() {
+    this.publicData.getSettings().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        if (res.data && res.data.qr_code_url) {
+          const encoded = encodeURIComponent(res.data.qr_code_url);
+          this.qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=022c16&bgcolor=ffffff&margin=10&data=${encoded}`;
+          this.cdr.markForCheck();
+        }
+      }
+    });
+  }
+
+  private loadEditorialContent() {
     this.publicData.getEditorial('axes').pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res.data) {
           this.content = res.data;
-          if (res.data.poles && Array.isArray(res.data.poles)) {
-            this.poles = res.data.poles.map((p: any, i: number) => ({
-              id: i + 1,
-              titre: p.titre,
-              soustitre: p.soustitre,
-              icon: this.getIconForIndex(i),
-              color: this.getColorForIndex(i),
-              actions: p.actions ? p.actions.split('\n') : []
-            }));
-          }
           this.cdr.markForCheck();
         }
       }
     });
+  }
+
+  getDynamicHeroTitle(): string {
+    if (!this.content || !this.content.heroTitle) return '';
+    // Replace "Nos X Pôles" or "Nos 3 Pôles" with dynamic length
+    return this.content.heroTitle.replace(/Nos \d+ Pôle/i, `Nos ${this.poles.length} Pôle`);
   }
 
   private getIconForIndex(index: number): string {

@@ -810,150 +810,330 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     try {
-      const W = 400, H = 640;
+      // === CNI sénégalaise ISO ID-1 : 85,6 × 54mm à 300 DPI ===
+      const W = 1011; // 85.6mm × 300/25.4
+      const H = 638;  // 54mm  × 300/25.4
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d')!;
       const isActif = adherent.statut === 'ACTIF';
 
-      // 1. Background (Rounded rect)
-      ctx.beginPath();
-      const radius = 40;
-      ctx.moveTo(radius, 0); ctx.lineTo(W - radius, 0); ctx.quadraticCurveTo(W, 0, W, radius);
-      ctx.lineTo(W, H - radius); ctx.quadraticCurveTo(W, H, W - radius, H);
-      ctx.lineTo(radius, H); ctx.quadraticCurveTo(0, H, 0, H - radius);
-      ctx.lineTo(0, radius); ctx.quadraticCurveTo(0, 0, radius, 0);
-      ctx.closePath();
-      ctx.clip(); // Clip everything to rounded corners
+      // ─── 1. FOND + CLIP ARRONDI ───────────────────────────────────────
+      const R = 28;
+      this.roundRect(ctx, 0, 0, W, H, R);
+      ctx.clip();
 
       const bgGrad = ctx.createLinearGradient(0, 0, W, H);
       if (isActif) {
-        bgGrad.addColorStop(0, '#024c26'); bgGrad.addColorStop(1, '#01a646');
+        bgGrad.addColorStop(0, '#024c26');
+        bgGrad.addColorStop(1, '#01a646');
       } else {
-        bgGrad.addColorStop(0, '#4b5563'); bgGrad.addColorStop(1, '#6b7280'); // gray-600 to gray-500
+        bgGrad.addColorStop(0, '#6b7280');
+        bgGrad.addColorStop(1, '#9ca3af');
       }
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // 2. Top bar (yellow gradient)
-      const topBar = ctx.createLinearGradient(0, 0, W, 0);
-      topBar.addColorStop(0, '#ffb000'); topBar.addColorStop(0.5, '#fde047'); topBar.addColorStop(1, '#ffb000');
-      ctx.fillStyle = topBar;
-      ctx.fillRect(0, 0, W, 6);
+      // ─── 2. FILIGRANE ────────────────────────────────────────────────
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      ctx.fillStyle = '#022c16';
+      ctx.font = '900 500px serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('🍃', W + 80, H / 2 + 200);
+      ctx.globalAlpha = 1;
+      ctx.restore();
 
-      // 3. Header section
-      // Logo background (white circle)
-      ctx.beginPath(); ctx.arc(50, 50, 24, 0, Math.PI * 2);
-      ctx.fillStyle = 'white'; ctx.fill();
-      // Logo text
-      ctx.fillStyle = '#008d36';
-      ctx.font = '900 10px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('JÀMM', 50, 48); ctx.fillText('XÉEWAL', 50, 58);
-      
-      // Header Title
-      ctx.textAlign = 'left'; ctx.fillStyle = 'white';
-      ctx.font = '900 16px sans-serif';
-      ctx.fillText('JÀMM AK', 84, 44);
-      ctx.fillText('XÉEWAL', 84, 62);
+      // ─── 3. BANDE JAUNE EN-TÊTE (top 80px) ──────────────────────────
+      const headerH = 80;
+      const headerGrad = ctx.createLinearGradient(0, 0, W, 0);
+      if (isActif) {
+        headerGrad.addColorStop(0, '#022c16');
+        headerGrad.addColorStop(1, '#024c26');
+      } else {
+        headerGrad.addColorStop(0, '#374151');
+        headerGrad.addColorStop(1, '#4b5563');
+      }
+      ctx.fillStyle = headerGrad;
+      ctx.fillRect(0, 0, W, headerH);
 
-      // Status pill
-      ctx.fillStyle = isActif ? '#ffb000' : '#e5e7eb';
-      this.roundRect(ctx, W - 140, 36, 110, 28, 14); ctx.fill();
+      // Ligne déco jaune sous header
+      ctx.fillStyle = isActif ? '#F59E0B' : '#9ca3af';
+      ctx.fillRect(0, headerH, W, 4);
+
+      // Logo (cercle blanc)
+      const logoR = 28;
+      ctx.beginPath();
+      ctx.arc(28 + logoR, headerH / 2, logoR, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      try {
+        const logoImg = await this.loadImage(window.location.origin + '/assets/icons/icon-192x192.png');
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(28 + logoR, headerH / 2, logoR - 4, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(logoImg, 32, headerH / 2 - logoR + 4, (logoR - 4) * 2, (logoR - 4) * 2);
+        ctx.restore();
+      } catch { /* skip */ }
+
+      // Titre organisation
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'white';
+      ctx.font = '900 22px sans-serif';
+      ctx.fillText('JÀMM AK XÉEWAL', 28 + logoR * 2 + 14, headerH / 2 - 6);
+      ctx.fillStyle = isActif ? '#F59E0B' : '#d1d5db';
+      ctx.font = '600 15px sans-serif';
+      ctx.fillText('Mouvement Citoyen · Thiès-Nord', 28 + logoR * 2 + 14, headerH / 2 + 16);
+
+      // Badge statut (droite)
+      const pillText = isActif ? '✦  Membre Officiel' : '⏳  En attente';
+      ctx.font = 'bold 16px sans-serif';
+      const ptw = ctx.measureText(pillText).width;
+      const ppx = 14, ppy = 8;
+      const pw = ptw + ppx * 2, ph = 32;
+      const px = W - 28 - pw, py = headerH / 2 - ph / 2;
+      this.roundRect(ctx, px, py, pw, ph, ph / 2);
+      ctx.fillStyle = isActif ? '#F59E0B' : '#e5e7eb';
+      ctx.fill();
       ctx.fillStyle = isActif ? '#022c16' : '#374151';
-      ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText(isActif ? '★ Membre Officiel' : '⏳ En attente', W - 85, 54);
+      ctx.textAlign = 'left';
+      ctx.fillText(pillText, px + ppx, py + ph / 2 + 6);
 
-      // 4. Identity section
-      // Avatar circle
-      ctx.beginPath(); ctx.arc(70, 150, 40, 0, Math.PI * 2);
-      ctx.fillStyle = isActif ? '#ffb000' : '#d1d5db'; ctx.fill();
-      ctx.lineWidth = 4; ctx.strokeStyle = isActif ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.2)';
-      ctx.stroke();
-      // Avatar initials
-      ctx.fillStyle = isActif ? '#024c26' : '#6b7280';
-      ctx.font = '900 36px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText((adherent.prenom?.charAt(0) || '') + (adherent.nom?.charAt(0) || ''), 70, 162);
+      // ─── 4. ZONE PHOTO (gauche, avec repères de découpe) ─────────────
+      const PHOTO_X = 32;      // left offset
+      const PHOTO_Y = headerH + 20; // below header bar
+      const PHOTO_W = 200;     // photo width (paysport-style)
+      const PHOTO_H = H - headerH - 100; // photo height leaving footer space
+      const cutColor = 'rgba(255,255,255,0.5)';
+      const cutLen = 18;
+      const cutOffset = 8;
 
-      // Name & details
+      // Fond blanc zone photo
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(PHOTO_X - cutOffset, PHOTO_Y - cutOffset, PHOTO_W + cutOffset * 2, PHOTO_H + cutOffset * 2);
+
+      // Bordure tiretée pour découpe
+      ctx.setLineDash([10, 6]);
+      ctx.strokeStyle = cutColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(PHOTO_X - cutOffset, PHOTO_Y - cutOffset, PHOTO_W + cutOffset * 2, PHOTO_H + cutOffset * 2);
+      ctx.setLineDash([]);
+
+      // Repères de coin (✂)
+      const corners = [
+        [PHOTO_X - cutOffset, PHOTO_Y - cutOffset],
+        [PHOTO_X + PHOTO_W + cutOffset, PHOTO_Y - cutOffset],
+        [PHOTO_X - cutOffset, PHOTO_Y + PHOTO_H + cutOffset],
+        [PHOTO_X + PHOTO_W + cutOffset, PHOTO_Y + PHOTO_H + cutOffset]
+      ];
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 3;
+      corners.forEach(([cx, cy]) => {
+        const dx = cx < W / 2 ? 1 : -1;
+        const dy = cy < H / 2 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + dy * cutLen); ctx.lineTo(cx, cy); ctx.lineTo(cx + dx * cutLen, cy);
+        ctx.stroke();
+      });
+
+      // Icône ✂️ en haut à droite du cadre photo
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('✂', PHOTO_X + PHOTO_W + cutOffset + 4, PHOTO_Y - cutOffset - 2);
+
+      // Photo ou initiales dans le cadre
+      const photoSrc = adherent.photo || adherent.carteRectoUrl;
+      let photoLoaded = false;
+      if (photoSrc) {
+        try {
+          const photoImg = await this.loadImage(photoSrc);
+          ctx.save();
+          ctx.rect(PHOTO_X, PHOTO_Y, PHOTO_W, PHOTO_H);
+          ctx.clip();
+          // Cover-fit
+          const iw = photoImg.width, ih = photoImg.height;
+          const scale = Math.max(PHOTO_W / iw, PHOTO_H / ih);
+          const sw = iw * scale, sh = ih * scale;
+          ctx.drawImage(photoImg, PHOTO_X + (PHOTO_W - sw) / 2, PHOTO_Y + (PHOTO_H - sh) / 2, sw, sh);
+          ctx.restore();
+          photoLoaded = true;
+        } catch { /* fallback */ }
+      }
+      if (!photoLoaded) {
+        // Silhouette
+        const avatarR = 60;
+        const avatarCX = PHOTO_X + PHOTO_W / 2;
+        const avatarCY = PHOTO_Y + PHOTO_H / 2 - 10;
+        ctx.beginPath();
+        ctx.arc(avatarCX, avatarCY, avatarR, 0, Math.PI * 2);
+        ctx.fillStyle = isActif ? 'rgba(245,158,11,0.3)' : 'rgba(209,213,219,0.3)';
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.font = '900 60px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          (adherent.prenom?.charAt(0) || '') + (adherent.nom?.charAt(0) || ''),
+          avatarCX, avatarCY + 22
+        );
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = '500 15px sans-serif';
+        ctx.fillText('Photo à insérer', avatarCX, PHOTO_Y + PHOTO_H - 16);
+      }
+
+      // ─── 5. INFOS MEMBRE (droite de la photo) ────────────────────────
+      const infoX = PHOTO_X + PHOTO_W + cutOffset * 2 + 28;
+      const infoW = W - infoX - 28;
+      let iy = PHOTO_Y + 10;
+
+      // Nom complet
       ctx.textAlign = 'left';
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '800 11px sans-serif';
-      ctx.fillText('MEMBRE', 130, 130);
-      
+      ctx.font = '600 14px sans-serif';
+      ctx.fillText('NOM & PRÉNOM', infoX, iy);
+      iy += 28;
+
+      const fullName = `${(adherent.prenom || '').toUpperCase()} ${(adherent.nom || '').toUpperCase()}`;
       ctx.fillStyle = 'white';
-      ctx.font = '900 24px sans-serif';
-      const fullName = (adherent.prenom + ' ' + adherent.nom).toUpperCase();
-      // Auto-wrap name if too long
-      if (fullName.length > 15) {
-        ctx.font = '900 20px sans-serif';
-        const parts = fullName.split(' ');
-        ctx.fillText(parts[0], 130, 156);
-        ctx.fillText(parts.slice(1).join(' '), 130, 178);
-      } else {
-        ctx.fillText(fullName, 130, 156);
-      }
-      
-      // Location
-      ctx.fillStyle = '#ffb000';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('📍 ' + (adherent.quartier || 'Thiès-Nord'), 130, fullName.length > 15 ? 200 : 180);
+      ctx.font = '900 28px sans-serif';
+      if (ctx.measureText(fullName).width > infoW) ctx.font = '900 22px sans-serif';
+      ctx.fillText(fullName, infoX, iy);
+      iy += 36;
 
-      // 5. Details grid
-      const by = 240;
-      // Box 1 (N° Membre)
+      // Quartier
+      ctx.fillStyle = isActif ? '#F59E0B' : '#d1d5db';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText('📍 ' + (adherent.quartier || 'Thiès-Nord'), infoX, iy);
+      iy += 32;
+
+      // Profession si dispo
+      if (adherent.profession) {
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '600 16px sans-serif';
+        ctx.fillText('💼 ' + adherent.profession, infoX, iy);
+        iy += 28;
+      }
+
+      iy += 12;
+
+      // N° Membre pill
+      this.roundRect(ctx, infoX, iy, 200, 38, 19);
       ctx.fillStyle = 'rgba(255,255,255,0.1)';
-      ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
-      this.roundRect(ctx, 30, by, 160, 60, 16); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 10px sans-serif';
-      ctx.fillText('N° MEMBRE', 42, by + 22);
-      ctx.fillStyle = 'white'; ctx.font = '900 15px sans-serif';
-      ctx.fillText('JA-' + (adherent.id || 'XXXXXX').substring(0,6).toUpperCase(), 42, by + 45);
-
-      // Box 2 (Statut)
-      this.roundRect(ctx, 200, by, 170, 60, 16); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 10px sans-serif';
-      ctx.fillText('STATUT', 212, by + 22);
-      ctx.fillStyle = isActif ? '#ffb000' : '#d1d5db'; ctx.font = '900 15px sans-serif';
-      ctx.fillText(isActif ? '✅ Actif' : '⏳ En attente', 212, by + 45);
-
-      // 6. Status Message (below grid)
+      ctx.fill();
+      ctx.strokeStyle = isActif ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = isActif ? '#F59E0B' : 'white';
+      ctx.font = '900 17px sans-serif';
       ctx.textAlign = 'center';
+      ctx.fillText('N° JA-' + (adherent.id || '----').substring(0, 6).toUpperCase(), infoX + 100, iy + 25);
+      iy += 52;
+
+      // QR Code (si ACTIF)
+      const qrSize = 120;
+      const qrPad = 8;
+      const qrBoxSize = qrSize + qrPad * 2;
+      const qrBoxX = W - 28 - qrBoxSize;
+      const qrBoxY = PHOTO_Y + 10;
+
+      this.roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 14);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.strokeStyle = isActif ? '#F59E0B' : '#d1d5db';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=022c16&bgcolor=ffffff&margin=4&data=${encodeURIComponent(baseUrl + '/membre/' + adherent.id)}`;
+      try {
+        const qrImg = await this.loadImage(qrUrl);
+        if (isActif) {
+          ctx.drawImage(qrImg, qrBoxX + qrPad, qrBoxY + qrPad, qrSize, qrSize);
+        } else {
+          ctx.save();
+          ctx.filter = 'blur(5px)';
+          ctx.drawImage(qrImg, qrBoxX + qrPad, qrBoxY + qrPad, qrSize, qrSize);
+          ctx.restore();
+          ctx.fillStyle = 'rgba(55,65,81,0.7)';
+          ctx.font = '32px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🔒', qrBoxX + qrBoxSize / 2, qrBoxY + qrBoxSize / 2 + 10);
+        }
+      } catch { /* skip */ }
+
+      // Label sous le QR
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '500 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Profil numérique', qrBoxX + qrBoxSize / 2, qrBoxY + qrBoxSize + 18);
+
+      // ─── 6. FOOTER BAR ───────────────────────────────────────────────
+      const footerH = 58;
+      const footerY = H - footerH;
+      const fR = 16;
+
+      ctx.beginPath();
+      ctx.moveTo(0, footerY + fR);
+      ctx.quadraticCurveTo(0, footerY, fR, footerY);
+      ctx.lineTo(W - fR, footerY);
+      ctx.quadraticCurveTo(W, footerY, W, footerY + fR);
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+
       if (isActif) {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = 'bold 13px sans-serif';
-        ctx.fillText('✅ Ce membre est officiellement enregistré et actif.', W/2, 450);
+        const fg = ctx.createLinearGradient(0, footerY, W, footerY);
+        fg.addColorStop(0, '#F59E0B'); fg.addColorStop(1, '#fde047');
+        ctx.fillStyle = fg;
       } else {
-        ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = 'bold 13px sans-serif';
-        ctx.fillText('⏳ Ce membre est en attente de validation.', W/2, 450);
+        ctx.fillStyle = '#d1d5db';
       }
+      ctx.fill();
 
-      // 7. Footer
-      ctx.fillStyle = isActif ? 'rgba(255,176,0,0.2)' : 'rgba(255,255,255,0.1)';
-      ctx.fillRect(0, H - 50, W, 50);
-      // Top border of footer
-      ctx.fillStyle = isActif ? 'rgba(255,176,0,0.2)' : 'rgba(255,255,255,0.1)';
-      ctx.fillRect(0, H - 51, W, 1);
-      
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = 'bold 10px sans-serif';
-      ctx.fillText('🛡 CARTE OFFICIELLE · JÀMM AK XÉEWAL · THIÈS-NORD', W/2, H - 22);
+      const footerItems = [
+        { label: 'Adhésion', value: '2024–2026' },
+        { label: 'Statut', value: isActif ? 'Actif' : 'En attente' },
+        { label: 'N° Membre', value: `JA-${(adherent.id || '----').substring(0, 4).toUpperCase()}` }
+      ];
+      const itemW = W / 3;
+      const tc = isActif ? '#022c16' : '#4b5563';
+      footerItems.forEach((item, i) => {
+        const cx = i * itemW + itemW / 2;
+        if (i > 0) {
+          ctx.fillStyle = isActif ? 'rgba(2,44,22,0.15)' : 'rgba(75,85,99,0.3)';
+          ctx.fillRect(i * itemW, footerY + 10, 1, footerH - 20);
+        }
+        ctx.textAlign = 'center';
+        ctx.fillStyle = tc;
+        ctx.font = '600 13px sans-serif';
+        ctx.fillText(item.label, cx, footerY + 19);
+        ctx.font = '900 17px sans-serif';
+        ctx.fillText(item.value, cx, footerY + 42);
+      });
 
-      // Optional: Add small URL text at the very bottom
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText('JAMMAKXEEWAL.SN', W/2, H - 6);
-
-      // Download
+      // ─── Download ────────────────────────────────────────────────────
       const link = document.createElement('a');
-      link.download = `carte_membre_${adherent.prenom}_${adherent.nom}.png`;
+      link.download = `carte_cni_${adherent.prenom}_${adherent.nom}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
+
     } catch (err) {
-      this.showAlertMethod('error', 'Erreur', 'Impossible de générer le badge.');
+      this.showAlertMethod('error', 'Erreur', 'Impossible de générer la carte.');
     } finally {
       this.isDownloading = false;
       this.cdr.markForCheck();
     }
   }
+
+  private loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
 
   private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
     ctx.beginPath();

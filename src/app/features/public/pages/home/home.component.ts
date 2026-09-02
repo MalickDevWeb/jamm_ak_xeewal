@@ -38,7 +38,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
   readonly encodeURIComponent = encodeURIComponent;
 
-  readonly defaultHeroTitle = `Écouter les besoins, <br/>\n<span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none'>Construire Ensemble.</span>`;
+  readonly defaultHeroTitle = `Écouter les besoins, <br/>\n<span class='text-brand-yellow'>Construire Ensemble.</span>`;
   readonly defaultHeroParagraph = `JÀMM AK XÉEWAL n'est pas qu'une idée, c'est <strong class="text-white">une force en action sur le terrain</strong>.<br/><br/>Rejoignez des centaines de citoyens engagés pour transformer notre quartier, rue par rue.`;
 
   // Gallery state
@@ -456,7 +456,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (parts.length > 1) {
       const firstPart = parts[0] + ',';
       const secondPart = parts.slice(1).join(',').trim();
-      return `${firstPart} <br/>\n<span class='text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow drop-shadow-none'>${secondPart}</span>`;
+      return `${firstPart} <br/>\n<span class='text-brand-yellow'>${secondPart}</span>`;
     }
     return title;
   }

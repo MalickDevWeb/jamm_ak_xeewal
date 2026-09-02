@@ -4,6 +4,7 @@ import { tap, catchError } from 'rxjs/operators';
 import { throwError, Observable, BehaviorSubject } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { SentryService } from './sentry.service';
 
 export interface AuthResponse {
   success: boolean;
@@ -53,9 +54,20 @@ export class AuthService {
           if (response.success && response.data) {
             localStorage.setItem('admin_token', response.data.token);
             this.currentUserSubject.next(response.data.user);
+            // Identifier l'utilisateur dans Sentry
+            SentryService.setUser({
+              id: response.data.user.id,
+              email: response.data.user.email,
+              role: response.data.user.role || 'ADMIN',
+            });
           }
         }),
         catchError(error => {
+          // Logger les erreurs de login dans Sentry (sans le mot de passe!)
+          SentryService.captureException(error, {
+            context: 'admin_login',
+            email: credentials.email,
+          });
           return throwError(() => new Error(error.error?.error || 'Erreur de connexion'));
         })
       );
@@ -64,6 +76,8 @@ export class AuthService {
   logout() {
     localStorage.removeItem('admin_token');
     this.currentUserSubject.next(null);
+    // Nettoyer l'identification Sentry
+    SentryService.setUser(null);
   }
 
   isAuthenticated(): boolean {
@@ -79,12 +93,19 @@ export class AuthService {
     localStorage.setItem('citizen_token', token);
     localStorage.setItem('citizen_user', JSON.stringify(adherent));
     this.currentCitizenSubject.next(adherent);
+    // Identifier le citoyen dans Sentry
+    SentryService.setUser({
+      id: adherent.id,
+      email: adherent.telephone || 'citizen',
+      role: 'CITIZEN',
+    });
   }
 
   logoutCitizen() {
     localStorage.removeItem('citizen_token');
     localStorage.removeItem('citizen_user');
     this.currentCitizenSubject.next(null);
+    SentryService.setUser(null);
   }
 
   isCitizenAuthenticated(): boolean {
