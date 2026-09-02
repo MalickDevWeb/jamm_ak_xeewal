@@ -172,7 +172,7 @@
                   </div>
 
                   <!-- Notice Activation -->
-                  <div *ngIf="currentAdherent?.statut !== 'ACTIF'" class="mt-6 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full text-brand-dark font-medium text-xs md:text-sm flex items-center gap-3 shadow-lg border border-gray-200 animate-pulse">
+                  <div *ngIf="currentAdherent && currentAdherent.statut !== 'ACTIF'" class="mt-6 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full text-brand-dark font-medium text-xs md:text-sm flex items-center gap-3 shadow-lg border border-gray-200 animate-pulse">
                       <i class="fa-solid fa-circle-info text-blue-500"></i> Votre carte sera activée après validation par un administrateur.
                   </div>
 
