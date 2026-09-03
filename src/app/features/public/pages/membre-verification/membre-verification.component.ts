@@ -41,4 +41,10 @@ export class MembreVerificationComponent implements OnInit {
     const id = this.adherent()?.id;
     return id ? 'JA-' + id.toString().substring(0, 6).toUpperCase() : 'JA-XXXX';
   }
+
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
+
+  encodeURIComponent(uri: string): string {
+    return encodeURIComponent(uri);
+  }
 }
