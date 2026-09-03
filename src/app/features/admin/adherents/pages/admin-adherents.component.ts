@@ -437,8 +437,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
           <div class="flex items-center gap-4 flex-1 min-w-0">
               <!-- Photo de l'adhérent -->
               <div class="w-16 h-16 rounded-full flex items-center justify-center shrink-0 relative overflow-hidden border-2 border-transparent shadow-md bg-brand-yellow">
-                  <i *ngIf="!badgeAdherent?.photo && !badgeAdherent?.carteRectoUrl" class="fa-solid fa-user text-4xl mt-3 text-[#024c26]"></i>
-                  <img *ngIf="badgeAdherent?.photo || badgeAdherent?.carteRectoUrl" [src]="badgeAdherent.photo || badgeAdherent.carteRectoUrl" alt="Photo Adhérent" class="w-full h-full object-cover relative z-10" crossorigin="anonymous">
+                  <i class="fa-solid fa-user text-4xl mt-3 text-[#024c26]"></i>
               </div>
 
               <!-- Informations -->

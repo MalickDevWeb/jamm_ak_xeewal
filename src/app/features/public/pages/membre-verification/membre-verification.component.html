@@ -21,14 +21,6 @@
     <!-- Member Card -->
     <div *ngIf="!isLoading() && adherent()" class="w-full max-w-sm">
 
-        <!-- Verified Badge -->
-        <div class="flex justify-center mb-6">
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2 rounded-full">
-                <i class="fa-solid fa-shield-check text-brand-yellow text-lg"></i>
-                <span class="text-white font-bold text-sm uppercase tracking-widest">Vérification Officielle</span>
-            </div>
-        </div>
-
         <!-- Card -->
         <div class="relative rounded-[2rem] overflow-hidden shadow-2xl transition-all max-w-[384px] mx-auto w-full"
              [ngClass]="adherent()?.statut === 'ACTIF' ? 'bg-gradient-to-br from-[#024c26] to-[#01a646]' : 'bg-gradient-to-br from-gray-600 to-gray-500'"
@@ -56,8 +48,7 @@
                 <div class="flex items-center gap-4 flex-1 min-w-0">
                     <!-- Photo de l'adhérent -->
                     <div class="w-16 h-16 rounded-full flex items-center justify-center shrink-0 relative overflow-hidden border-2 border-transparent shadow-md bg-brand-yellow">
-                        <i *ngIf="!adherent()?.photo && !adherent()?.carteRectoUrl" class="fa-solid fa-user text-4xl mt-3 text-[#024c26]"></i>
-                        <img *ngIf="adherent()?.photo || adherent()?.carteRectoUrl" [src]="adherent()?.photo || adherent()?.carteRectoUrl" alt="Photo Adhérent" class="w-full h-full object-cover relative z-10" crossorigin="anonymous">
+                        <i class="fa-solid fa-user text-4xl mt-3 text-[#024c26]"></i>
                     </div>
 
                     <!-- Informations -->
