@@ -5,6 +5,8 @@ import { authGuard } from './core/guards/auth.guard';
 import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
 import { AdminAuthLayoutComponent } from './layouts/admin-auth-layout/admin-auth-layout.component';
 import { AdminDashboardLayoutComponent } from './layouts/admin-dashboard-layout/admin-dashboard-layout.component';
+import { TerrainLayoutComponent } from './layouts/terrain-layout/terrain-layout.component';
+import { terrainGuard } from './core/guards/terrain.guard';
 
 export const routes: Routes = [
   // --- Admin Login ---
@@ -98,6 +100,11 @@ export const routes: Routes = [
         path: 'poles', 
         loadComponent: () => import('./features/admin/poles/pages/admin-poles.component')
           .then(m => m.AdminPolesComponent)
+      },
+      { 
+        path: 'agents-terrain', 
+        loadComponent: () => import('./features/admin/agents-terrain/pages/admin-agents-terrain.component')
+          .then(m => m.AdminAgentsTerrainComponent)
       }
     ]
   },
@@ -170,16 +177,30 @@ export const routes: Routes = [
         path: 'maintenance', 
         loadComponent: () => import('./features/public/pages/maintenance/maintenance.component')
           .then(m => m.MaintenanceComponent)
-      },
-      { 
-        path: 'membre/:id', 
-        loadComponent: () => import('./features/public/pages/membre-verification/membre-verification.component')
-          .then(m => m.MembreVerificationComponent)
-      },
+      }
+    ]
+  },
+  // --- Public Standalone Pages (No Navbar/Footer) ---
+  {
+    path: 'membre/:id',
+    loadComponent: () => import('./features/public/pages/membre-verification/membre-verification.component')
+      .then(m => m.MembreVerificationComponent)
+  },
+  // --- Terrain (Agents Terrain) ---
+  {
+    path: 'terrain/login',
+    loadComponent: () => import('./features/terrain/auth/pages/terrain-login/terrain-login.component')
+      .then(m => m.TerrainLoginComponent)
+  },
+  {
+    path: 'terrain',
+    component: TerrainLayoutComponent,
+    canActivate: [terrainGuard],
+    children: [
       {
-        path: '**',
-        loadComponent: () => import('./features/public/pages/not-found/not-found.component')
-          .then(m => m.NotFoundComponent)
+        path: '',
+        loadComponent: () => import('./features/terrain/adhesion/pages/terrain-adhesion/terrain-adhesion.component')
+          .then(m => m.TerrainAdhesionComponent)
       }
     ]
   },
@@ -188,5 +209,17 @@ export const routes: Routes = [
     path: 'maintenance_sat',
     loadComponent: () => import('./features/admin/maintenance/pages/maintenance-sat.component')
       .then(m => m.MaintenanceSatComponent)
+  },
+  // --- Fallback (404) ---
+  {
+    path: '**',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/public/pages/not-found/not-found.component')
+          .then(m => m.NotFoundComponent)
+      }
+    ]
   }
 ];

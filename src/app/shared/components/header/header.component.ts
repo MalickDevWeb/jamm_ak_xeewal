@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PushNotificationService } from '../../../core/services/push-notification.service';
@@ -52,11 +52,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() { this.sub?.unsubscribe(); }
 
-  toggleNotifications() {
+  toggleNotifications(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
     this.showNotifications = !this.showNotifications;
     if (this.showNotifications && this.unreadCount > 0) {
       this.pushService.markAllAsRead();
       this.unreadCount = 0;
+    }
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    if (this.showNotifications) {
+      this.showNotifications = false;
     }
   }
 

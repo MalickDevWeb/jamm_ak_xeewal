@@ -1,0 +1,284 @@
+<!-- ===== TOP BAR (Agent Info + Points + Logout) ===== -->
+<div class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200 shadow-sm">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Agent Info -->
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#d97706] flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-street-view text-[#022c16] text-lg"></i>
+      </div>
+      <div>
+        <p class="text-gray-900 font-bold text-sm leading-tight">{{ agentUser?.prenom }} {{ agentUser?.nom }}</p>
+        <p class="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Agent Terrain</p>
+      </div>
+    </div>
+
+    <!-- Points Badge + Logout -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-xl border border-orange-100">
+        <i class="fa-solid fa-trophy text-[#f59e0b] text-sm"></i>
+        <span class="text-gray-900 font-black text-lg leading-none">{{ agentPoints }}</span>
+        <span class="text-gray-600 text-xs font-medium hidden sm:inline">inscrit{{ agentPoints > 1 ? 's' : '' }}</span>
+      </div>
+      <button (click)="logout()" class="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 border border-red-100 flex items-center justify-center text-red-500 hover:text-red-600 transition-all shadow-sm" title="Déconnexion">
+        <i class="fa-solid fa-power-off text-sm"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 relative">
+
+  <!-- Form Header -->
+  <div class="text-center mb-8" *ngIf="!success">
+    <h1 class="text-3xl md:text-4xl font-black text-[#022c16] mb-2 tracking-tight">
+      Inscription <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#f59e0b] to-yellow-500">Citoyen</span>
+    </h1>
+    <p class="text-gray-500 text-sm md:text-base max-w-xl mx-auto font-medium">
+      Remplissez ce formulaire pour inscrire un nouveau citoyen au mouvement.
+    </p>
+  </div>
+
+  <!-- ===== FORM ===== -->
+  <form class="relative max-w-3xl mx-auto" (ngSubmit)="onSubmit()" *ngIf="!success">
+    <!-- Ligne Verticale (Timeline) -->
+    <div class="absolute left-6 md:left-8 top-8 bottom-24 w-1 bg-gray-200 rounded-full z-0 hidden md:block"></div>
+
+    <!-- Étape 1 : Identité -->
+    <div class="relative mb-6 group">
+      <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-[#f59e0b] rounded-full shadow-md flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">1</div>
+      
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 md:ml-16 transition-all duration-300">
+        <div class="p-5 md:p-6 flex items-center justify-between">
+          <h3 class="text-lg md:text-xl font-black text-[#022c16] flex items-center gap-3 m-0">
+            <span class="md:hidden bg-[#f59e0b] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">1</span> 
+            Informations du citoyen
+          </h3>
+        </div>
+        
+        <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
+          <div class="space-y-6 mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Prénom <span class="text-red-500">*</span></label>
+                <input type="text" name="prenom" [(ngModel)]="formData.prenom" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-[#022c16] focus:ring-4 focus:ring-[#022c16]/10 text-base transition-all" placeholder="Ex: Modou">
+              </div>
+              <div>
+                <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Nom <span class="text-red-500">*</span></label>
+                <input type="text" name="nom" [(ngModel)]="formData.nom" required class="w-full border-2 border-gray-100 rounded-xl p-4 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-[#022c16] focus:ring-4 focus:ring-[#022c16]/10 text-base transition-all" placeholder="Ex: Fall">
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-gray-800 font-extrabold mb-2 text-sm uppercase tracking-wide">Téléphone <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold border-r border-gray-200 pr-2">+221</span>
+                  <input type="tel" name="telephone" [(ngModel)]="formData.telephone" required class="w-full border-2 border-gray-100 rounded-xl p-4 pl-20 bg-gray-50/50 focus:bg-white focus:outline-none focus:border-[#022c16] focus:ring-4 focus:ring-[#022c16]/10 text-base transition-all font-bold tracking-wider" placeholder="77 123 45 67">
+                </div>
+              </div>
+              <div>
+                <div class="space-y-2 relative">
+                  <label class="block text-sm font-black text-gray-700 uppercase tracking-widest">
+                    Quartier <span class="text-[#022c16]">*</span>
+                  </label>
+                  <app-quartier-select [quartiers]="quartiers" [(value)]="formData.quartier"></app-quartier-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Carte d'Identité -->
+    <div class="relative mb-6 group">
+      <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-[#f59e0b] rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">2</div>
+
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+        <div class="p-5 md:p-6 flex items-center justify-between">
+          <h3 class="text-lg md:text-xl font-black text-[#022c16] flex items-center gap-3 m-0">
+            <span class="md:hidden bg-[#f59e0b] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">2</span>
+            Carte d'Identité
+            <span class="text-gray-400 font-normal text-xs normal-case ml-2">(Optionnel)</span>
+          </h3>
+        </div>
+
+        <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
+          <!-- Inputs fichiers cachés -->
+          <input #rectoInput type="file" accept="image/*" class="hidden" (change)="onRectoSelected($event)">
+          <input #versoInput type="file" accept="image/*" class="hidden" (change)="onVersoSelected($event)">
+          <input #rectoCameraInput type="file" accept="image/*" capture="environment" class="hidden" (change)="onRectoSelected($event)">
+          <input #versoCameraInput type="file" accept="image/*" capture="environment" class="hidden" (change)="onVersoSelected($event)">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Recto -->
+            <div>
+              <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
+                <i class="fa-regular fa-id-card mr-1 text-[#022c16]"></i> Face Avant (Recto)
+              </label>
+
+              <div *ngIf="!carteRectoBase64"
+                   class="relative border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all min-h-[170px]"
+                   [ngClass]="rectoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
+                <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300">
+                  <i class="fa-regular fa-id-card"></i>
+                </div>
+                <!-- Boutons d'action -->
+                <div class="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                  <button type="button" (click)="triggerRectoCamera()"
+                          class="flex-1 flex items-center justify-center gap-2 bg-[#022c16] text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow hover:bg-[#022c16]/90 active:scale-95 transition-all">
+                    <i class="fa-solid fa-camera text-sm"></i> Photo
+                  </button>
+                  <button type="button" (click)="triggerRectoUpload()"
+                          class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs py-2.5 px-3 rounded-xl hover:bg-gray-200 active:scale-95 transition-all border border-gray-200">
+                    <i class="fa-solid fa-images text-sm"></i> Galerie
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="carteRectoBase64" class="relative rounded-2xl overflow-hidden border-2 border-[#022c16] shadow-md transition-all">
+                <img [src]="carteRectoBase64" alt="Recto" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles">
+                
+                <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20">
+                  <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-[#f59e0b]"></i>
+                </div>
+
+                <button *ngIf="!isUploadingFiles" type="button" (click)="removeRecto()"
+                        class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30"
+                        title="Supprimer le recto" aria-label="Supprimer le recto">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+                <div class="absolute top-2 left-2 bg-[#022c16] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Recto</div>
+              </div>
+              <p *ngIf="rectoError" class="mt-2 text-xs text-red-500 font-medium"><i class="fa-solid fa-triangle-exclamation"></i> {{ rectoError }}</p>
+            </div>
+
+            <!-- Verso -->
+            <div>
+              <label class="block text-gray-700 font-bold mb-2 text-sm uppercase tracking-wide">
+                <i class="fa-solid fa-rotate-180 mr-1 text-[#022c16]"></i> Face Arrière (Verso)
+              </label>
+
+              <div *ngIf="!carteVersoBase64"
+                   class="relative border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all min-h-[170px]"
+                   [ngClass]="versoError ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'">
+                <div class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-2xl text-gray-300">
+                  <i class="fa-solid fa-id-card-clip"></i>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                  <button type="button" (click)="triggerVersoCamera()"
+                          class="flex-1 flex items-center justify-center gap-2 bg-[#022c16] text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow hover:bg-[#022c16]/90 active:scale-95 transition-all">
+                    <i class="fa-solid fa-camera text-sm"></i> Photo
+                  </button>
+                  <button type="button" (click)="triggerVersoUpload()"
+                          class="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 font-bold text-xs py-2.5 px-3 rounded-xl hover:bg-gray-200 active:scale-95 transition-all border border-gray-200">
+                    <i class="fa-solid fa-images text-sm"></i> Galerie
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="carteVersoBase64" class="relative rounded-2xl overflow-hidden border-2 border-[#022c16] shadow-md transition-all">
+                <img [src]="carteVersoBase64" alt="Verso" class="w-full h-44 object-cover transition-all" [class.opacity-50]="isUploadingFiles">
+                
+                <div *ngIf="isUploadingFiles" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white backdrop-blur-[2px] z-20">
+                  <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-[#f59e0b]"></i>
+                </div>
+
+                <button *ngIf="!isUploadingFiles" type="button" (click)="removeVerso()"
+                        class="absolute right-3 bottom-3 shrink-0 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-lg z-30"
+                        title="Supprimer le verso" aria-label="Supprimer le verso">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+                <div class="absolute top-2 left-2 bg-[#022c16] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide shadow z-10">✓ Verso</div>
+              </div>
+              <p *ngIf="versoError" class="mt-2 text-xs text-red-500 font-medium"><i class="fa-solid fa-triangle-exclamation"></i> {{ versoError }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 3 : Pôle -->
+    <div class="relative mb-6 group" *ngIf="poles.length > 0">
+      <div class="absolute left-6 md:left-8 top-8 w-10 h-10 bg-[#f59e0b] rounded-full flex items-center justify-center text-white font-black text-lg z-10 -translate-x-1/2 -translate-y-1/2 hidden md:flex transition-colors duration-300">3</div>
+
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:ml-16 transition-all duration-300">
+        <div class="p-5 md:p-6 flex items-center justify-between">
+          <h3 class="text-lg md:text-xl font-black text-[#022c16] flex items-center gap-3 m-0">
+            <span class="md:hidden bg-[#f59e0b] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm">3</span>
+            Pôle d'action <span class="text-xs text-gray-400 font-normal normal-case ml-2">(Optionnel)</span>
+          </h3>
+        </div>
+        
+        <div class="p-5 md:p-8 pt-0 border-t border-gray-100">
+          <div class="space-y-6 mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label *ngFor="let pole of poles; trackBy: trackByOption" class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer transition-all text-center group"
+                     [ngClass]="formData.poleId === pole.id ? 'border-[#022c16] bg-[#022c16]/5 shadow-md scale-[1.02]' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300'">
+                <input type="radio" name="pole" [value]="pole.id" [(ngModel)]="formData.poleId" class="peer sr-only">
+                <div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#022c16] text-white flex items-center justify-center text-[10px] transition-transform duration-300"
+                     [class.scale-0]="formData.poleId !== pole.id" [class.scale-100]="formData.poleId === pole.id">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm transition-transform duration-300"
+                     [ngClass]="formData.poleId === pole.id ? 'bg-[#022c16] text-white scale-110' : 'bg-white text-[#022c16] group-hover:scale-110'">
+                  <i class="fa-solid fa-layer-group text-lg"></i>
+                </div>
+                <span class="block font-black text-sm mb-1 transition-colors" [ngClass]="formData.poleId === pole.id ? 'text-[#022c16]' : 'text-gray-800'">{{ pole.label }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMsg" class="md:ml-16 mt-6 relative z-10 bg-red-50 border border-red-200 text-red-600 px-5 py-4 rounded-2xl flex items-start sm:items-center gap-3">
+      <i class="fa-solid fa-circle-exclamation text-xl text-red-500"></i>
+      <span class="font-medium text-sm leading-snug">{{ errorMsg }}</span>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="md:ml-16 mt-6 relative z-10">
+      <button type="submit" [disabled]="isSubmitting" class="w-full bg-gradient-to-r from-[#f59e0b] to-yellow-400 text-[#022c16] text-lg font-black py-4 rounded-2xl shadow-lg hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transition-all uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-80 relative overflow-hidden">
+        <div *ngIf="isSubmitting" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+        
+        <span *ngIf="!isSubmitting">Valider l'inscription <i class="fa-solid fa-user-plus ml-2"></i></span>
+        <span *ngIf="isSubmitting && !isUploadingFiles"><i class="fa-solid fa-circle-notch fa-spin"></i> Inscription en cours...</span>
+        <span *ngIf="isUploadingFiles" class="flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up animate-bounce"></i> Transfert sécurisé...
+        </span>
+      </button>
+    </div>
+  </form>
+
+  <!-- ===== SUCCESS STATE ===== -->
+  <div class="md:ml-16 mt-6 relative z-10 bg-green-50 border-2 border-green-500 p-8 rounded-3xl text-center shadow-lg" *ngIf="success">
+    <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h3 class="text-3xl font-black text-gray-900 mb-2">Inscription réussie !</h3>
+    <p class="text-gray-600 text-lg font-medium mb-6">
+      <span class="text-[#022c16] font-bold">{{ successName }}</span> a été inscrit(e) au mouvement.
+    </p>
+
+    <!-- Points Display -->
+    <div class="inline-flex items-center gap-3 bg-white border border-[#f59e0b]/30 px-6 py-4 rounded-2xl mb-8 shadow-sm">
+      <i class="fa-solid fa-trophy text-[#f59e0b] text-2xl"></i>
+      <div>
+        <span class="text-[#022c16] font-black text-3xl">{{ agentPoints }}</span>
+        <span class="text-gray-500 text-sm ml-1 font-medium">inscription{{ agentPoints > 1 ? 's' : '' }}</span>
+      </div>
+      <span class="text-green-500 text-xs font-bold bg-green-100 px-3 py-1 rounded-full">+1 ✓</span>
+    </div>
+
+    <!-- CTA -->
+    <div>
+      <button (click)="resetForm()" type="button" class="w-full sm:w-auto px-8 py-4 bg-[#022c16] text-white font-bold rounded-2xl shadow-md hover:bg-[#022c16]/90 transition-colors inline-flex items-center justify-center gap-2">
+        <i class="fa-solid fa-user-plus"></i> Inscrire une autre personne
+      </button>
+    </div>
+  </div>
+</div>

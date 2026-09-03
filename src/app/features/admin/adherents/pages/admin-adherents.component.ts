@@ -413,6 +413,97 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
   <app-alert-popup [visible]="showAlert" [type]="alertType" [title]="alertTitle" [message]="alertMessage" (close)="showAlert = false"></app-alert-popup>
   <app-confirm-dialog [visible]="showConfirmDialog" [title]="confirmTitle" message="Cette action est irréversible." (confirm)="confirmDelete()" (cancel)="showConfirmDialog = false"></app-confirm-dialog>
 
+  <!-- Offscreen template for citizen digital card -->
+  <div id="citizen-card-export" *ngIf="badgeAdherent" class="w-[384px] absolute left-[-9999px] top-[-9999px] z-[-1]">
+    <div class="relative rounded-[2rem] overflow-hidden shadow-2xl bg-gradient-to-br from-[#024c26] to-[#01a646]">
+      <div class="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.08] text-[200px] leading-none pointer-events-none translate-x-1/4 text-brand-dark"><i class="fa-brands fa-pagelines"></i></div>
+      
+      <!-- Header -->
+      <div class="p-4 flex justify-between items-start relative z-10">
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow-sm">
+            <img src="assets/icons/icon-192x192.png" alt="Logo" class="w-full h-full object-contain p-0.5">
+          </div>
+          <div class="text-white"><p class="text-[11px] font-black uppercase m-0">JÀMM AK XÉEWAL</p></div>
+        </div>
+        <div class="font-bold px-2 py-1 rounded-full text-[9px] flex items-center gap-1 bg-brand-yellow text-brand-dark m-0">
+          <i class="fa-solid fa-crown"></i> Membre Officiel
+        </div>
+      </div>
+
+      <!-- Contenu Central : Identité & QR Code -->
+      <div class="px-5 flex justify-between items-center relative z-10 pb-20 pt-2 w-full">
+          <!-- Bloc Identité (Gauche) -->
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Photo de l'adhérent -->
+              <div class="w-16 h-16 rounded-full flex items-center justify-center shrink-0 relative overflow-hidden border-2 border-transparent shadow-md bg-brand-yellow">
+                  <i *ngIf="!badgeAdherent?.photo && !badgeAdherent?.carteRectoUrl" class="fa-solid fa-user text-4xl mt-3 text-[#024c26]"></i>
+                  <img *ngIf="badgeAdherent?.photo || badgeAdherent?.carteRectoUrl" [src]="badgeAdherent.photo || badgeAdherent.carteRectoUrl" alt="Photo Adhérent" class="w-full h-full object-cover relative z-10" crossorigin="anonymous">
+              </div>
+
+              <!-- Informations -->
+              <div class="text-white truncate">
+                  <p class="text-white/80 text-[10px] tracking-wide mb-0.5 font-medium m-0">Nom & Prénom</p>
+                  <h3 class="text-[17px] font-black uppercase truncate tracking-tight m-0">{{ badgeAdherent?.prenom || 'XÉEWAL' }} {{ badgeAdherent?.nom || 'JÀMM AK' }}</h3>
+
+                  <div class="flex items-center gap-1.5 mt-1 text-brand-yellow">
+                      <i class="fa-solid fa-location-dot text-[14px] mt-0.5"></i>
+                      <div>
+                          <p class="text-white/80 text-[8px] tracking-wide leading-none font-medium m-0">Quartier</p>
+                          <p class="text-white font-bold text-[11px] leading-none mt-1 m-0">{{ badgeAdherent?.quartier || 'Thiès-Nord' }}</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Bloc QR Code (Droite) -->
+          <div class="flex flex-col items-center justify-center shrink-0 ml-2 relative group">
+              <div class="bg-white p-2 rounded-xl shadow-lg relative overflow-hidden border-2 border-brand-yellow">
+                  <img [src]="badgeAdherent?.id
+                          ? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&bgcolor=ffffff&margin=8&data=' + encodeURIComponent(baseUrl + '/membre/' + badgeAdherent.id)
+                          : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=022c16&data=membre'"
+                       class="w-[72px] h-[72px] object-contain relative z-10" alt="QR Code d'identité" crossorigin="anonymous">
+              </div>
+              <p class="text-white/90 text-[7.5px] mt-1.5 font-medium tracking-wide flex items-center gap-1 m-0">
+                  Carte Électronique <i class="fa-solid fa-wifi rotate-45 text-brand-yellow"></i>
+              </p>
+          </div>
+      </div>
+
+      <!-- Pied de la Carte : Vague Dorée ou Grise -->
+      <div class="absolute bottom-0 left-0 w-full z-20 flex justify-between items-center px-2 py-3 rounded-t-[1.5rem] shadow-[0_-5px_20px_rgba(0,0,0,0.2)] bg-gradient-to-b from-brand-yellow via-yellow-400 to-yellow-500 text-brand-dark">
+          <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-t-[1.5rem] pointer-events-none"></div>
+
+          <!-- Adhésion -->
+          <div class="flex items-center gap-2 relative z-20 flex-1 justify-center border-r border-brand-dark/10">
+              <i class="fa-regular fa-calendar-days text-[18px] text-brand-dark/80"></i>
+              <div class="text-left">
+                  <p class="text-[8px] font-semibold tracking-wide m-0">Adhésion</p>
+                  <p class="font-black text-[10px] leading-tight mt-0.5 m-0">2024 – 2026</p>
+              </div>
+          </div>
+
+          <!-- Statut -->
+          <div class="flex items-center gap-2 relative z-20 flex-1 justify-center border-r border-brand-dark/10">
+              <i class="fa-regular fa-user text-[18px] text-brand-dark/80"></i>
+              <div class="text-left">
+                  <p class="text-[8px] font-semibold tracking-wide m-0">Statut</p>
+                  <p class="font-black text-[10px] leading-tight mt-0.5 m-0">Membre Actif</p>
+              </div>
+          </div>
+
+          <!-- N° Membre -->
+          <div class="flex items-center gap-2 relative z-20 flex-1 justify-center">
+              <i class="fa-regular fa-star text-[18px] text-brand-dark/80"></i>
+              <div class="text-left">
+                  <p class="text-[8px] font-semibold tracking-wide m-0">N° Membre</p>
+                  <p class="font-black text-[10px] leading-tight mt-0.5 m-0">JA-{{ badgeAdherent?.id ? badgeAdherent.id.toString().substring(0,4) : '4587' }}</p>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
 
     <!-- Bulk Actions Bar -->
     <app-bulk-actions-bar
@@ -433,6 +524,11 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   isLoading = true;
   isDownloading = false;
   badgeAdherent: any = null;
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
+
+  encodeURIComponent(uri: string): string {
+    return encodeURIComponent(uri);
+  }
 
   showModal = false;
   isEditing = false;
@@ -810,316 +906,306 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     try {
-      // === CNI sénégalaise ISO ID-1 : 85,6 × 54mm à 300 DPI ===
-      const W = 1011; // 85.6mm × 300/25.4
-      const H = 638;  // 54mm  × 300/25.4
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext('2d')!;
-      const isActif = adherent.statut === 'ACTIF';
+      // === Dimensions ajustées au format exact d'une carte physique (ISO ID-1 : 85.6mm x 54mm) ===
+      // Ratio : 85.6 / 54 = 1.585
+      const SCALE = 3;
+      const CW = 384 * SCALE;  // largeur totale carte
+      const CH = 242 * SCALE;  // hauteur totale carte (384 / 1.585 ≈ 242)
+      const R = 24 * SCALE;    // border-radius (plus adapté au format physique)
 
-      // ─── 1. FOND + CLIP ARRONDI ───────────────────────────────────────
-      const R = 28;
-      this.roundRect(ctx, 0, 0, W, H, R);
+      const canvas = document.createElement('canvas');
+      canvas.width = CW;
+      canvas.height = CH;
+      const ctx = canvas.getContext('2d')!;
+
+      // ─── Helper: roundRect path ───────────────────────────────────────
+      const rrPath = (x: number, y: number, w: number, h: number, r: number) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+        ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+        ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+        ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+        ctx.closePath();
+      };
+
+      // ─── 1. FOND PRINCIPAL : dégradé vert (from-[#024c26] to-[#01a646]) ──
+      ctx.save();
+      rrPath(0, 0, CW, CH, R);
       ctx.clip();
 
-      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-      if (isActif) {
-        bgGrad.addColorStop(0, '#024c26');
-        bgGrad.addColorStop(1, '#01a646');
-      } else {
-        bgGrad.addColorStop(0, '#6b7280');
-        bgGrad.addColorStop(1, '#9ca3af');
-      }
+      const bgGrad = ctx.createLinearGradient(0, 0, CW, CH);
+      bgGrad.addColorStop(0, '#024c26');
+      bgGrad.addColorStop(1, '#01a646');
       ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillRect(0, 0, CW, CH);
 
-      // ─── 2. FILIGRANE ────────────────────────────────────────────────
+      // ─── 2. FILIGRANE FEUILLE (opacity 0.08, coin droit) ─────────────
       ctx.save();
-      ctx.globalAlpha = 0.06;
+      ctx.globalAlpha = 0.08;
       ctx.fillStyle = '#022c16';
-      ctx.font = '900 500px serif';
+      ctx.font = `900 ${180 * SCALE}px serif`;
       ctx.textAlign = 'right';
-      ctx.fillText('🍃', W + 80, H / 2 + 200);
-      ctx.globalAlpha = 1;
+      ctx.fillText('🍃', CW + 30 * SCALE, CH / 2 + 80 * SCALE);
       ctx.restore();
 
-      // ─── 3. BANDE JAUNE EN-TÊTE (top 80px) ──────────────────────────
-      const headerH = 80;
-      const headerGrad = ctx.createLinearGradient(0, 0, W, 0);
-      if (isActif) {
-        headerGrad.addColorStop(0, '#022c16');
-        headerGrad.addColorStop(1, '#024c26');
-      } else {
-        headerGrad.addColorStop(0, '#374151');
-        headerGrad.addColorStop(1, '#4b5563');
-      }
-      ctx.fillStyle = headerGrad;
-      ctx.fillRect(0, 0, W, headerH);
+      // ─── 3. HEADER (p-4 = 16px) ──────────────────────────────────────
+      const PAD = 16 * SCALE;
+      const LOGO_SIZE = 40 * SCALE;  // w-10 h-10
 
-      // Ligne déco jaune sous header
-      ctx.fillStyle = isActif ? '#F59E0B' : '#9ca3af';
-      ctx.fillRect(0, headerH, W, 4);
-
-      // Logo (cercle blanc)
-      const logoR = 28;
+      // Logo rond blanc
       ctx.beginPath();
-      ctx.arc(28 + logoR, headerH / 2, logoR, 0, Math.PI * 2);
+      ctx.arc(PAD + LOGO_SIZE / 2, PAD + LOGO_SIZE / 2, LOGO_SIZE / 2, 0, Math.PI * 2);
       ctx.fillStyle = 'white';
       ctx.fill();
+      // Ombre logo
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.shadowBlur = 6 * SCALE;
+      ctx.fill();
+      ctx.restore();
+
+      // Logo image
       try {
         const logoImg = await this.loadImage(window.location.origin + '/assets/icons/icon-192x192.png');
         ctx.save();
         ctx.beginPath();
-        ctx.arc(28 + logoR, headerH / 2, logoR - 4, 0, Math.PI * 2);
+        const logoPad = 4 * SCALE;
+        ctx.arc(PAD + LOGO_SIZE / 2, PAD + LOGO_SIZE / 2, LOGO_SIZE / 2 - logoPad, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(logoImg, 32, headerH / 2 - logoR + 4, (logoR - 4) * 2, (logoR - 4) * 2);
+        ctx.drawImage(logoImg, PAD + logoPad, PAD + logoPad, LOGO_SIZE - logoPad * 2, LOGO_SIZE - logoPad * 2);
         ctx.restore();
       } catch { /* skip */ }
 
-      // Titre organisation
-      ctx.textAlign = 'left';
+      // Texte "JÀMM AK XÉEWAL"
       ctx.fillStyle = 'white';
-      ctx.font = '900 22px sans-serif';
-      ctx.fillText('JÀMM AK XÉEWAL', 28 + logoR * 2 + 14, headerH / 2 - 6);
-      ctx.fillStyle = isActif ? '#F59E0B' : '#d1d5db';
-      ctx.font = '600 15px sans-serif';
-      ctx.fillText('Mouvement Citoyen · Thiès-Nord', 28 + logoR * 2 + 14, headerH / 2 + 16);
+      ctx.font = `900 ${11 * SCALE}px sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText('JÀMM AK XÉEWAL', PAD + LOGO_SIZE + 8 * SCALE, PAD + LOGO_SIZE / 2 + 4 * SCALE);
 
-      // Badge statut (droite)
-      const pillText = isActif ? '✦  Membre Officiel' : '⏳  En attente';
-      ctx.font = 'bold 16px sans-serif';
-      const ptw = ctx.measureText(pillText).width;
-      const ppx = 14, ppy = 8;
-      const pw = ptw + ppx * 2, ph = 32;
-      const px = W - 28 - pw, py = headerH / 2 - ph / 2;
-      this.roundRect(ctx, px, py, pw, ph, ph / 2);
-      ctx.fillStyle = isActif ? '#F59E0B' : '#e5e7eb';
+      // Badge "Membre Officiel" (coin droit header, bg-brand-yellow, rounded-full)
+      const badgeText = '★ Membre Officiel';
+      ctx.font = `700 ${9 * SCALE}px sans-serif`;
+      const bW = ctx.measureText(badgeText).width + 16 * SCALE;
+      const bH = 22 * SCALE;
+      const bX = CW - PAD - bW;
+      const bY = PAD + (LOGO_SIZE - bH) / 2;
+      rrPath(bX, bY, bW, bH, bH / 2);
+      ctx.fillStyle = '#F59E0B';
       ctx.fill();
-      ctx.fillStyle = isActif ? '#022c16' : '#374151';
+      ctx.fillStyle = '#022c16';
       ctx.textAlign = 'left';
-      ctx.fillText(pillText, px + ppx, py + ph / 2 + 6);
+      ctx.fillText(badgeText, bX + 8 * SCALE, bY + bH / 2 + 3 * SCALE);
 
-      // ─── 4. ZONE PHOTO (gauche, avec repères de découpe) ─────────────
-      const PHOTO_X = 32;      // left offset
-      const PHOTO_Y = headerH + 20; // below header bar
-      const PHOTO_W = 200;     // photo width (paysport-style)
-      const PHOTO_H = H - headerH - 100; // photo height leaving footer space
-      const cutColor = 'rgba(255,255,255,0.5)';
-      const cutLen = 18;
-      const cutOffset = 8;
+      // ─── 4. ZONE CENTRALE ────────────────────────────────────────────
+      // px-5=20px, pt-2=8px, pb-20=80px (pour laisser place au footer)
+      const CPADY = PAD + LOGO_SIZE + 8 * SCALE; // top de la zone centrale
+      const CPADX = 20 * SCALE;
+      const FOOTER_H = 56 * SCALE; // hauteur footer estimée (réduite pour le format ISO)
+      const CENTER_H = CH - CPADY - FOOTER_H; // hauteur zone centrale
 
-      // Fond blanc zone photo
-      ctx.fillStyle = 'rgba(255,255,255,0.12)';
-      ctx.fillRect(PHOTO_X - cutOffset, PHOTO_Y - cutOffset, PHOTO_W + cutOffset * 2, PHOTO_H + cutOffset * 2);
+      // Photo avatar (w-14 h-14 rounded-full, bg-brand-yellow) - réduit de 10px pour plus d'espace
+      // NOTE: only use adherent.photo, NOT carteRectoUrl (that is the ID card scan)
+      const AVATAR_SIZE = 54 * SCALE;
+      const AVATAR_CX = CPADX + AVATAR_SIZE / 2;
+      const AVATAR_CY = CPADY + CENTER_H / 2;
 
-      // Bordure tiretée pour découpe
-      ctx.setLineDash([10, 6]);
-      ctx.strokeStyle = cutColor;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(PHOTO_X - cutOffset, PHOTO_Y - cutOffset, PHOTO_W + cutOffset * 2, PHOTO_H + cutOffset * 2);
-      ctx.setLineDash([]);
+      // Fond jaune de l'avatar
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(AVATAR_CX, AVATAR_CY, AVATAR_SIZE / 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#F59E0B';
+      ctx.fill();
+      ctx.restore();
 
-      // Repères de coin (✂)
-      const corners = [
-        [PHOTO_X - cutOffset, PHOTO_Y - cutOffset],
-        [PHOTO_X + PHOTO_W + cutOffset, PHOTO_Y - cutOffset],
-        [PHOTO_X - cutOffset, PHOTO_Y + PHOTO_H + cutOffset],
-        [PHOTO_X + PHOTO_W + cutOffset, PHOTO_Y + PHOTO_H + cutOffset]
-      ];
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.lineWidth = 3;
-      corners.forEach(([cx, cy]) => {
-        const dx = cx < W / 2 ? 1 : -1;
-        const dy = cy < H / 2 ? 1 : -1;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy + dy * cutLen); ctx.lineTo(cx, cy); ctx.lineTo(cx + dx * cutLen, cy);
-        ctx.stroke();
-      });
-
-      // Icône ✂️ en haut à droite du cadre photo
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('✂', PHOTO_X + PHOTO_W + cutOffset + 4, PHOTO_Y - cutOffset - 2);
-
-      // Photo ou initiales dans le cadre
-      const photoSrc = adherent.photo || adherent.carteRectoUrl;
-      let photoLoaded = false;
+      const photoSrc = adherent.photo || null;
       if (photoSrc) {
         try {
           const photoImg = await this.loadImage(photoSrc);
           ctx.save();
-          ctx.rect(PHOTO_X, PHOTO_Y, PHOTO_W, PHOTO_H);
+          ctx.beginPath();
+          ctx.arc(AVATAR_CX, AVATAR_CY, AVATAR_SIZE / 2, 0, Math.PI * 2);
           ctx.clip();
-          // Cover-fit
           const iw = photoImg.width, ih = photoImg.height;
-          const scale = Math.max(PHOTO_W / iw, PHOTO_H / ih);
-          const sw = iw * scale, sh = ih * scale;
-          ctx.drawImage(photoImg, PHOTO_X + (PHOTO_W - sw) / 2, PHOTO_Y + (PHOTO_H - sh) / 2, sw, sh);
+          const sc = Math.max(AVATAR_SIZE / iw, AVATAR_SIZE / ih);
+          ctx.drawImage(photoImg,
+            AVATAR_CX - iw * sc / 2, AVATAR_CY - ih * sc / 2,
+            iw * sc, ih * sc);
           ctx.restore();
-          photoLoaded = true;
-        } catch { /* fallback */ }
-      }
-      if (!photoLoaded) {
-        // Silhouette
-        const avatarR = 60;
-        const avatarCX = PHOTO_X + PHOTO_W / 2;
-        const avatarCY = PHOTO_Y + PHOTO_H / 2 - 10;
-        ctx.beginPath();
-        ctx.arc(avatarCX, avatarCY, avatarR, 0, Math.PI * 2);
-        ctx.fillStyle = isActif ? 'rgba(245,158,11,0.3)' : 'rgba(209,213,219,0.3)';
-        ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.font = '900 60px sans-serif';
+        } catch {
+          // Fallback: initiales
+          ctx.fillStyle = '#024c26';
+          ctx.font = `900 ${26 * SCALE}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            (adherent.prenom?.charAt(0) || '?') + (adherent.nom?.charAt(0) || ''),
+            AVATAR_CX, AVATAR_CY + 9 * SCALE
+          );
+        }
+      } else {
+        // Initiales sur fond jaune
+        ctx.fillStyle = '#024c26';
+        ctx.font = `900 ${26 * SCALE}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.fillText(
-          (adherent.prenom?.charAt(0) || '') + (adherent.nom?.charAt(0) || ''),
-          avatarCX, avatarCY + 22
+          (adherent.prenom?.charAt(0) || '?') + (adherent.nom?.charAt(0) || ''),
+          AVATAR_CX, AVATAR_CY + 9 * SCALE
         );
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font = '500 15px sans-serif';
-        ctx.fillText('Photo à insérer', avatarCX, PHOTO_Y + PHOTO_H - 16);
       }
 
-      // ─── 5. INFOS MEMBRE (droite de la photo) ────────────────────────
-      const infoX = PHOTO_X + PHOTO_W + cutOffset * 2 + 28;
-      const infoW = W - infoX - 28;
-      let iy = PHOTO_Y + 10;
+      // ─── Informations membre (à droite de la photo, centrée verticalement) ──
+      const INFO_X = CPADX + AVATAR_SIZE + 16 * SCALE;
+      const QR_BOX_PRE = 88 * SCALE;
+      const INFO_MAX_W = CW - INFO_X - QR_BOX_PRE - CPADX - 12 * SCALE;
 
-      // Nom complet
+      // Centrage vertical : aligner le bloc texte sur AVATAR_CY
+      // Calcul de la hauteur totale du bloc texte (3 lignes)
+      const lineH1 = 12 * SCALE;  // label "Nom & Prénom"
+      const lineH2 = 22 * SCALE;  // nom complet
+      const lineH3 = 10 * SCALE;  // label quartier
+      const lineH4 = 16 * SCALE;  // valeur quartier
+      const blockH  = lineH1 + lineH2 + 6 * SCALE + lineH3 + lineH4;
+      let IY = AVATAR_CY - blockH / 2;
+
+      // Label "Nom & Prénom"
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = `500 ${10 * SCALE}px sans-serif`;
       ctx.textAlign = 'left';
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '600 14px sans-serif';
-      ctx.fillText('NOM & PRÉNOM', infoX, iy);
-      iy += 28;
+      ctx.fillText('Nom & Prenom', INFO_X, IY + lineH1);
+      IY += lineH1 + 4 * SCALE;
 
+      // Nom complet (17px font-black uppercase)
       const fullName = `${(adherent.prenom || '').toUpperCase()} ${(adherent.nom || '').toUpperCase()}`;
       ctx.fillStyle = 'white';
-      ctx.font = '900 28px sans-serif';
-      if (ctx.measureText(fullName).width > infoW) ctx.font = '900 22px sans-serif';
-      ctx.fillText(fullName, infoX, iy);
-      iy += 36;
-
-      // Quartier
-      ctx.fillStyle = isActif ? '#F59E0B' : '#d1d5db';
-      ctx.font = 'bold 18px sans-serif';
-      ctx.fillText('📍 ' + (adherent.quartier || 'Thiès-Nord'), infoX, iy);
-      iy += 32;
-
-      // Profession si dispo
-      if (adherent.profession) {
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.font = '600 16px sans-serif';
-        ctx.fillText('💼 ' + adherent.profession, infoX, iy);
-        iy += 28;
+      ctx.font = `900 ${17 * SCALE}px sans-serif`;
+      let nameToDisplay = fullName;
+      while (ctx.measureText(nameToDisplay).width > INFO_MAX_W && nameToDisplay.length > 3) {
+        nameToDisplay = nameToDisplay.slice(0, -1);
       }
+      if (nameToDisplay !== fullName) nameToDisplay += '...';
+      ctx.fillText(nameToDisplay, INFO_X, IY + lineH2);
+      IY += lineH2 + 6 * SCALE;
 
-      iy += 12;
+      // Label "Quartier" (petit, jaune)
+      ctx.fillStyle = '#F59E0B';
+      ctx.font = `600 ${8 * SCALE}px sans-serif`;
+      ctx.fillText('Quartier', INFO_X, IY + lineH3);
+      IY += lineH3 + 4 * SCALE;
 
-      // N° Membre pill
-      this.roundRect(ctx, infoX, iy, 200, 38, 19);
-      ctx.fillStyle = 'rgba(255,255,255,0.1)';
-      ctx.fill();
-      ctx.strokeStyle = isActif ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.2)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = isActif ? '#F59E0B' : 'white';
-      ctx.font = '900 17px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('N° JA-' + (adherent.id || '----').substring(0, 6).toUpperCase(), infoX + 100, iy + 25);
-      iy += 52;
+      // Valeur quartier (blanc, gras, sans emoji pour eviter les problemes de rendu)
+      ctx.fillStyle = 'white';
+      ctx.font = `700 ${11 * SCALE}px sans-serif`;
+      ctx.fillText((adherent.quartier || 'Thies-Nord'), INFO_X, IY + lineH4);
 
-      // QR Code (si ACTIF)
-      const qrSize = 120;
-      const qrPad = 8;
-      const qrBoxSize = qrSize + qrPad * 2;
-      const qrBoxX = W - 28 - qrBoxSize;
-      const qrBoxY = PHOTO_Y + 10;
+      // ─── 5. QR CODE (coin droit) ─────────────────────────────────────
+      const QR_BOX = 88 * SCALE;  // bg-white p-2 rounded-xl (72px + 8px padding*2 = 88)
+      const QR_IMG = 72 * SCALE;
+      const QR_PAD = 8 * SCALE;
+      const QR_X = CW - CPADX - QR_BOX;
+      const QR_Y = CPADY + (CENTER_H - QR_BOX) / 2;
 
-      this.roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 14);
+      // Fond blanc arrondi + bordure jaune
+      rrPath(QR_X, QR_Y, QR_BOX, QR_BOX, 12 * SCALE);
       ctx.fillStyle = 'white';
       ctx.fill();
-      ctx.strokeStyle = isActif ? '#F59E0B' : '#d1d5db';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = 2 * SCALE;
       ctx.stroke();
 
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=022c16&bgcolor=ffffff&margin=4&data=${encodeURIComponent(baseUrl + '/membre/' + adherent.id)}`;
+      // Image QR
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=216x216&color=022c16&bgcolor=ffffff&margin=8&data=${encodeURIComponent(this.baseUrl + '/membre/' + adherent.id)}`;
       try {
         const qrImg = await this.loadImage(qrUrl);
-        if (isActif) {
-          ctx.drawImage(qrImg, qrBoxX + qrPad, qrBoxY + qrPad, qrSize, qrSize);
-        } else {
-          ctx.save();
-          ctx.filter = 'blur(5px)';
-          ctx.drawImage(qrImg, qrBoxX + qrPad, qrBoxY + qrPad, qrSize, qrSize);
-          ctx.restore();
-          ctx.fillStyle = 'rgba(55,65,81,0.7)';
-          ctx.font = '32px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('🔒', qrBoxX + qrBoxSize / 2, qrBoxY + qrBoxSize / 2 + 10);
-        }
-      } catch { /* skip */ }
+        ctx.drawImage(qrImg, QR_X + QR_PAD, QR_Y + QR_PAD, QR_IMG, QR_IMG);
+      } catch { /* QR indisponible */ }
 
-      // Label sous le QR
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.font = '500 12px sans-serif';
+      // Label "Carte Électronique" sous le QR
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = `500 ${7.5 * SCALE}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('Profil numérique', qrBoxX + qrBoxSize / 2, qrBoxY + qrBoxSize + 18);
+      ctx.fillText('Carte Électronique ↗', QR_X + QR_BOX / 2, QR_Y + QR_BOX + 14 * SCALE);
 
-      // ─── 6. FOOTER BAR ───────────────────────────────────────────────
-      const footerH = 58;
-      const footerY = H - footerH;
-      const fR = 16;
+      // ─── 6. FOOTER DORÉ (rounded-t-[1.5rem]) ─────────────────────────
+      const FY = CH - FOOTER_H;
+      const FR = 24 * SCALE; // 1.5rem
 
       ctx.beginPath();
-      ctx.moveTo(0, footerY + fR);
-      ctx.quadraticCurveTo(0, footerY, fR, footerY);
-      ctx.lineTo(W - fR, footerY);
-      ctx.quadraticCurveTo(W, footerY, W, footerY + fR);
-      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.moveTo(0, FY + FR);
+      ctx.arcTo(0, FY, FR, FY, FR);
+      ctx.lineTo(CW - FR, FY);
+      ctx.arcTo(CW, FY, CW, FY + FR, FR);
+      ctx.lineTo(CW, CH);
+      ctx.lineTo(0, CH);
+      ctx.closePath();
 
-      if (isActif) {
-        const fg = ctx.createLinearGradient(0, footerY, W, footerY);
-        fg.addColorStop(0, '#F59E0B'); fg.addColorStop(1, '#fde047');
-        ctx.fillStyle = fg;
-      } else {
-        ctx.fillStyle = '#d1d5db';
-      }
+      const footerGrad = ctx.createLinearGradient(0, FY, 0, CH);
+      footerGrad.addColorStop(0, '#F59E0B');
+      footerGrad.addColorStop(0.5, '#FBBF24');
+      footerGrad.addColorStop(1, '#F59E0B');
+      ctx.fillStyle = footerGrad;
       ctx.fill();
 
-      const footerItems = [
-        { label: 'Adhésion', value: '2024–2026' },
-        { label: 'Statut', value: isActif ? 'Actif' : 'En attente' },
-        { label: 'N° Membre', value: `JA-${(adherent.id || '----').substring(0, 4).toUpperCase()}` }
+      // Reflet blanc en haut du footer
+      ctx.save();
+      const reflectGrad = ctx.createLinearGradient(0, FY, 0, FY + 20 * SCALE);
+      reflectGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
+      reflectGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.beginPath();
+      ctx.moveTo(0, FY + FR);
+      ctx.arcTo(0, FY, FR, FY, FR);
+      ctx.lineTo(CW - FR, FY);
+      ctx.arcTo(CW, FY, CW, FY + FR, FR);
+      ctx.lineTo(CW, FY + 20 * SCALE);
+      ctx.lineTo(0, FY + 20 * SCALE);
+      ctx.closePath();
+      ctx.fillStyle = reflectGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // 3 sections footer
+      const footerSections = [
+        { icon: '📅', label: 'Adhésion', value: '2024 – 2026' },
+        { icon: '👤', label: 'Statut',   value: 'Membre Actif' },
+        { icon: '⭐', label: 'N° Membre', value: `JA-${(adherent.id || '----').substring(0, 4).toUpperCase()}` }
       ];
-      const itemW = W / 3;
-      const tc = isActif ? '#022c16' : '#4b5563';
-      footerItems.forEach((item, i) => {
-        const cx = i * itemW + itemW / 2;
+      const sW = CW / 3;
+      const TC = '#022c16';
+
+      footerSections.forEach((s, i) => {
+        const cx = i * sW + sW / 2;
+        const cy = FY + FOOTER_H / 2;
+
+        // Séparateur
         if (i > 0) {
-          ctx.fillStyle = isActif ? 'rgba(2,44,22,0.15)' : 'rgba(75,85,99,0.3)';
-          ctx.fillRect(i * itemW, footerY + 10, 1, footerH - 20);
+          ctx.fillStyle = 'rgba(2,44,22,0.12)';
+          ctx.fillRect(i * sW, FY + 10 * SCALE, 1.5 * SCALE, FOOTER_H - 20 * SCALE);
         }
+
+        // Label
+        ctx.fillStyle = TC;
+        ctx.font = `600 ${8 * SCALE}px sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillStyle = tc;
-        ctx.font = '600 13px sans-serif';
-        ctx.fillText(item.label, cx, footerY + 19);
-        ctx.font = '900 17px sans-serif';
-        ctx.fillText(item.value, cx, footerY + 42);
+        ctx.fillText(s.label, cx, cy - 8 * SCALE);
+
+        // Valeur
+        ctx.font = `900 ${10 * SCALE}px sans-serif`;
+        ctx.fillText(s.value, cx, cy + 8 * SCALE);
       });
 
-      // ─── Download ────────────────────────────────────────────────────
+      ctx.restore(); // end clip
+
+      // ─── Téléchargement ──────────────────────────────────────────────
       const link = document.createElement('a');
-      link.download = `carte_cni_${adherent.prenom}_${adherent.nom}.png`;
+      link.download = `carte_membre_${adherent.prenom}_${adherent.nom}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
 
     } catch (err) {
-      this.showAlertMethod('error', 'Erreur', 'Impossible de générer la carte.');
+      console.error('downloadBadge error:', err);
+      this.showAlertMethod('error', 'Erreur', 'Impossible de générer la carte numérique.');
     } finally {
       this.isDownloading = false;
+      this.badgeAdherent = null;
       this.cdr.markForCheck();
     }
   }

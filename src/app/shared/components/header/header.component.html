@@ -61,7 +61,7 @@
             <!-- Desktop CTAs -->
             <div class="hidden lg:flex items-center gap-3">
                 <div class="relative">
-                    <button (click)="toggleNotifications()"
+                    <button (click)="toggleNotifications($event)"
                             class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center transition-all shadow-sm relative"
                             [ngClass]="isSubscribed() ? 'text-brand-yellow hover:text-yellow-500 hover:bg-yellow-50' : 'text-gray-400 hover:text-brand-green hover:bg-brand-green/10'"
                             aria-label="Notifications">
@@ -69,7 +69,7 @@
                         <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse">{{unreadCount}}</span>
                     </button>
                     <!-- Popup notifications Desktop -->
-                    <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[60] origin-top-right">
+                    <div *ngIf="showNotifications" (click)="$event.stopPropagation()" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[60] origin-top-right">
                         <div *ngIf="showSubscribeSuccess()" class="absolute inset-0 z-10 bg-gradient-to-br from-brand-dark to-brand-green flex flex-col items-center justify-center gap-3 rounded-2xl">
                             <div class="relative">
                                 <div class="absolute inset-0 rounded-full bg-brand-yellow animate-ping opacity-40"></div>
@@ -138,7 +138,7 @@
             <!-- Mobile: CTA bouton + Hamburger -->
             <div class="flex items-center lg:hidden gap-2 flex-shrink-0">
                 <div class="relative">
-                    <button (click)="toggleNotifications()"
+                    <button (click)="toggleNotifications($event)"
                             class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-brand-green/10 text-gray-500 hover:text-brand-green transition-colors border border-gray-200 shadow-sm relative"
                             aria-label="Notifications">
                         <i class="fa-regular fa-bell text-base" [class.text-brand-yellow]="isSubscribed()"></i>
@@ -146,7 +146,7 @@
                     </button>
 
                     <!-- Popup notifications Mobile -->
-                    <div *ngIf="showNotifications" class="fixed top-[calc(env(safe-area-inset-top,0px)+85px)] left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-3 sm:w-[320px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
+                    <div *ngIf="showNotifications" (click)="$event.stopPropagation()" class="fixed top-[calc(env(safe-area-inset-top,0px)+85px)] left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-3 sm:w-[320px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
 
                         <!-- Success overlay mobile -->
                         <div *ngIf="showSubscribeSuccess()" class="absolute inset-0 z-10 bg-gradient-to-br from-brand-dark to-brand-green flex flex-col items-center justify-center gap-3 rounded-2xl">

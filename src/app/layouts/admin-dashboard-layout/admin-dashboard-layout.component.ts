@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AdminDataService } from '../../core/services/admin-data.service';
@@ -82,7 +82,7 @@ interface NavItem {
             <span class="font-bold text-gray-800 text-sm">Admin</span>
           </div>
         </div>
-        <button (click)="toggleNotifications()" class="relative p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
+        <button (click)="toggleNotifications($event)" class="relative p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
           <i class="fa-regular fa-bell text-lg"></i>
           <span *ngIf="unreadCount > 0" class="absolute top-1.5 right-1.5 w-4 h-4 text-[9px] font-bold bg-red-500 text-white rounded-full flex items-center justify-center">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
         </button>
@@ -145,13 +145,13 @@ interface NavItem {
             
             <!-- Notifications -->
             <div class="relative">
-              <button (click)="toggleNotifications()" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm relative text-gray-600">
+              <button (click)="toggleNotifications($event)" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm relative text-gray-600">
                 <i class="fa-regular fa-bell text-lg"></i>
                 <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 w-5 h-5 text-[10px] font-bold bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-[#f8fafc]">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
               </button>
               
               <!-- Notifications Dropdown -->
-              <div *ngIf="notificationsOpen" class="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+              <div *ngIf="notificationsOpen" (click)="$event.stopPropagation()" class="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
                 <div class="px-5 py-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
                   <span class="font-bold text-sm text-gray-800">Notifications</span>
                   <button *ngIf="notifications.length > 0" (click)="markAllNotificationsRead()" class="text-xs text-[#022c16] hover:underline font-semibold">Tout marquer lu</button>
@@ -225,6 +225,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear' },
     { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul' },
     { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group' },
+    { path: '/admin/agents-terrain', label: 'Agents Terrain', icon: 'fa-solid fa-street-view' },
   ];
 
   constructor(
@@ -311,7 +312,19 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     try { return new Set(JSON.parse(localStorage.getItem(this.readStorageKey) || '[]')); } catch { return new Set(); }
   }
 
-  toggleNotifications() { this.notificationsOpen = !this.notificationsOpen; }
+  @HostListener('document:click')
+  onDocumentClick() {
+    if (this.notificationsOpen) {
+      this.notificationsOpen = false;
+    }
+  }
+
+  toggleNotifications(event?: Event) { 
+    if (event) {
+      event.stopPropagation();
+    }
+    this.notificationsOpen = !this.notificationsOpen; 
+  }
 
   openNotification(notification: AdminNotification) {
     const read = this.readNotificationIds;
