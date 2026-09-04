@@ -8,6 +8,7 @@ import { environment } from '../../../../../environments/environment';
 import { PublicDataService, Option } from '../../../../core/services/public-data.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { QuartierSelectComponent } from '../../../../shared/components/quartier-select/quartier-select.component';
+import { validateSenegalPhone, normalizeSenegalPhone } from '../../../../core/utils/validation.utils';
 
 @Component({
   selector: 'app-adherer',
@@ -141,6 +142,17 @@ export class AdhererComponent implements OnInit, OnDestroy {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
+    // 1b. Validation du format téléphone (numéro sénégalais)
+    const phoneCheck = validateSenegalPhone(this.formData.telephone);
+    if (!phoneCheck.valid) {
+      this.errorMsg = phoneCheck.message || 'Numéro de téléphone invalide.';
+      this.cdr.markForCheck();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    // Normaliser le téléphone avant envoi
+    this.formData.telephone = normalizeSenegalPhone(this.formData.telephone) || this.formData.telephone;
 
     // 2. Validation des images de la carte d'identité (OBLIGATOIRE : le titre de l'étape est marqué d'un astérisque rouge)
     // On accepte soit un fichier local (rectoBlob/versoBlob) soit une URL déjà uploadée (carteRectoUrl/carteVersoUrl)

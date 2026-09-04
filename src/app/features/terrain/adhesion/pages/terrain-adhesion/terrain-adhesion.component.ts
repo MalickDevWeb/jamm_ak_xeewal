@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
 import { PublicDataService, Option } from '../../../../../core/services/public-data.service';
 import { QuartierSelectComponent } from '../../../../../shared/components/quartier-select/quartier-select.component';
+import { validateSenegalPhone, normalizeSenegalPhone, requireText } from '../../../../../core/utils/validation.utils';
 
 @Component({
   selector: 'app-terrain-adhesion',
@@ -131,12 +132,28 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
 
   async onSubmit() {
     // 1. Validation des champs texte obligatoires
-    if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
-      this.errorMsg = 'Veuillez remplir tous les champs obligatoires (Prénom, Nom, Téléphone, Quartier).';
+    const prenomErr = requireText(this.formData.prenom, 'Le prénom');
+    if (prenomErr) { this.errorMsg = prenomErr; this.cdr.markForCheck(); this.scrollToCni(); return; }
+    const nomErr = requireText(this.formData.nom, 'Le nom');
+    if (nomErr) { this.errorMsg = nomErr; this.cdr.markForCheck(); this.scrollToCni(); return; }
+    if (!this.formData.quartier) {
+      this.errorMsg = 'Veuillez sélectionner un quartier.';
       this.cdr.markForCheck();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
+    // 1b. Validation du format téléphone (numéro sénégalais)
+    const phoneCheck = validateSenegalPhone(this.formData.telephone);
+    if (!phoneCheck.valid) {
+      this.errorMsg = phoneCheck.message || 'Numéro de téléphone invalide.';
+      this.cdr.markForCheck();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Normaliser le téléphone avant envoi
+    this.formData.telephone = normalizeSenegalPhone(this.formData.telephone) || this.formData.telephone;
 
     // 2. Validation des images de la carte d'identité (OBLIGATOIRE pour les agents terrain)
     // On accepte soit un fichier local (rectoBlob/versoBlob) soit une URL déjà uploadée (carteRectoUrl/carteVersoUrl)

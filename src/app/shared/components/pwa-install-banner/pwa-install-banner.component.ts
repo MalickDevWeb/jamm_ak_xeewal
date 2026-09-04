@@ -1,7 +1,8 @@
 import {
   Component, OnInit, OnDestroy, ChangeDetectionStrategy,
-  ChangeDetectorRef, signal
+  ChangeDetectorRef, signal, inject
 } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -158,6 +159,7 @@ export class PwaInstallBannerComponent implements OnInit, OnDestroy {
   private deferredPrompt: any = null;
   private readonly STORAGE_KEY = 'pwa_install_dismissed';
   private readonly DELAY_DAYS  = 3; // Réafficher après 3 jours si "Plus tard"
+  private router = inject(Router);
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -171,8 +173,12 @@ export class PwaInstallBannerComponent implements OnInit, OnDestroy {
     const iosDevice = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
     this.isIos.set(iosDevice);
 
-    // Vérifier si l'utilisateur a déjà refusé ou installé
-    if (this.wasDismissedRecently()) return;
+    // Ne pas montrer si l'app est marquée comme définitivement installée
+    if (localStorage.getItem('pwa_installed') === 'true') return;
+
+    // Vérifier si l'utilisateur a déjà refusé (sauf pour les pages terrain où on force la proposition)
+    const isTerrainPage = window.location.pathname.includes('terrain');
+    if (!isTerrainPage && this.wasDismissedRecently()) return;
 
     if (iosDevice) {
       // Sur iOS, afficher les instructions après un délai
@@ -197,9 +203,28 @@ export class PwaInstallBannerComponent implements OnInit, OnDestroy {
 
     // Masquer si l'app est installée depuis une autre source
     window.addEventListener('appinstalled', () => {
+      localStorage.setItem('pwa_installed', 'true');
       this.showBanner.set(false);
       this.markDismissed(999); // Ne plus jamais afficher
       this.cdr.markForCheck();
+    });
+
+    // Écouter les changements de route pour réafficher la bannière sur les pages terrain si nécessaire
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        if (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone) return;
+        if (localStorage.getItem('pwa_installed') === 'true') return;
+        
+        const isTerrain = event.urlAfterRedirects.includes('terrain');
+        if (isTerrain && !this.showBanner()) {
+          if (this.isIos() || this.deferredPrompt) {
+            setTimeout(() => {
+              this.showBanner.set(true);
+              this.cdr.markForCheck();
+            }, 1000); // Léger délai après navigation
+          }
+        }
+      }
     });
   }
 
@@ -221,6 +246,7 @@ export class PwaInstallBannerComponent implements OnInit, OnDestroy {
       const { outcome } = await this.deferredPrompt.userChoice;
 
       if (outcome === 'accepted') {
+        localStorage.setItem('pwa_installed', 'true');
         this.markDismissed(999);
       } else {
         this.markDismissed(this.DELAY_DAYS);

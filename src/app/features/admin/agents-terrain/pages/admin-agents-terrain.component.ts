@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { validateSenegalPhone, normalizeSenegalPhone, validatePassword, requireText } from '../../../../core/utils/validation.utils';
 
 interface SuperAdminTerrain {
   id: string;
@@ -269,11 +270,40 @@ export class AdminAgentsTerrainComponent implements OnInit {
 
   onCreateAgent(event: Event) {
     event.preventDefault();
-    this.isCreating = true;
     this.createError = '';
     this.createSuccess = false;
 
-    this.adminData.createEntity('super-admin-terrain', this.newAdmin).subscribe({
+    // 1. Validation des champs texte obligatoires
+    const prenomErr = requireText(this.newAdmin.prenom, 'Le prénom');
+    if (prenomErr) { this.createError = prenomErr; this.cdr.markForCheck(); return; }
+    const nomErr = requireText(this.newAdmin.nom, 'Le nom');
+    if (nomErr) { this.createError = nomErr; this.cdr.markForCheck(); return; }
+
+    // 2. Validation du téléphone (format sénégalais)
+    const phoneCheck = validateSenegalPhone(this.newAdmin.telephone);
+    if (!phoneCheck.valid) {
+      this.createError = phoneCheck.message || 'Numéro de téléphone invalide.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // 3. Validation du mot de passe
+    const pwdCheck = validatePassword(this.newAdmin.password);
+    if (pwdCheck) {
+      this.createError = pwdCheck;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.isCreating = true;
+
+    // Normaliser le téléphone avant envoi
+    const payload = {
+      ...this.newAdmin,
+      telephone: normalizeSenegalPhone(this.newAdmin.telephone) || this.newAdmin.telephone
+    };
+
+    this.adminData.createEntity('super-admin-terrain', payload).subscribe({
       next: (res: any) => {
         this.isCreating = false;
         if (res.success) {
@@ -302,12 +332,9 @@ export class AdminAgentsTerrainComponent implements OnInit {
 
   getWhatsappShareLink(): string {
     const loginUrl = window.location.origin + '/super_admin_terrain/login';
-    const message = `Bonjour ${this.newAdmin.prenom},\n\nVoici vos accès pour l'application JÀMM AK XÉEWAL (Super Admin Terrain):\n\nLien: ${loginUrl}\nTéléphone: ${this.newAdmin.telephone}\nMot de passe: ${this.newAdmin.password}\n\nBon courage !`;
-    let phone = this.newAdmin.telephone.replace(/\s/g, '');
-    if (!phone.startsWith('+221') && phone.length === 9) {
-      phone = '+221' + phone;
-    }
-    return `https://wa.me/${phone.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    const normalizedPhone = normalizeSenegalPhone(this.newAdmin.telephone) || this.newAdmin.telephone;
+    const message = `Bonjour ${this.newAdmin.prenom},\n\nVoici vos accès pour l'application JÀMM AK XÉEWAL (Super Admin Terrain):\n\nLien: ${loginUrl}\nTéléphone: ${normalizedPhone}\nMot de passe: ${this.newAdmin.password}\n\nBon courage !`;
+    return `https://wa.me/${normalizedPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
   }
 
   toggleAdmin(admin: SuperAdminTerrain) {

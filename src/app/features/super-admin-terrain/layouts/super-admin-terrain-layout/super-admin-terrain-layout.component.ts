@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
-import { PwaInstallBannerComponent } from '../../../../shared/components/pwa-install-banner/pwa-install-banner.component';
 
 @Component({
   selector: 'app-super-admin-terrain-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, PwaInstallBannerComponent],
+  imports: [CommonModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -158,9 +157,6 @@ import { PwaInstallBannerComponent } from '../../../../shared/components/pwa-ins
               </button>
           </div>
       </div>
-      
-      <!-- PWA Install Popup (always present logic is handled in the component itself) -->
-      <app-pwa-install-banner></app-pwa-install-banner>
     </div>
   `
 })

@@ -4,82 +4,93 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
-import { PwaInstallBannerComponent } from '../../../../shared/components/pwa-install-banner/pwa-install-banner.component';
 import { validateSenegalPhone, normalizeSenegalPhone, validatePassword } from '../../../../core/utils/validation.utils';
 
 @Component({
   selector: 'app-super-admin-terrain-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, PwaInstallBannerComponent],
+  imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-gray-900 via-[#022c16] to-[#011a0d] flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50 relative overflow-hidden">
       <!-- Background elements -->
-      <div class="absolute inset-0 z-0 opacity-10">
-        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-yellow rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-green rounded-full blur-[120px]"></div>
-      </div>
+      <div class="absolute top-0 left-0 w-full h-[40vh] bg-[#022c16] rounded-b-[3rem] shadow-xl"></div>
+      <div class="absolute top-10 left-10 w-32 h-32 bg-[#f59e0b]/20 rounded-full blur-2xl"></div>
+      <div class="absolute top-20 right-20 w-48 h-48 bg-[#008d36]/20 rounded-full blur-3xl"></div>
 
       <div class="w-full max-w-md relative z-10">
-        <!-- Logo -->
-        <div class="text-center mb-10">
-          <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_40px_rgba(255,255,255,0.1)] p-2">
-            <img src="assets/icons/icon-192x192.png" alt="Logo" class="w-full h-full object-contain">
+        <!-- Logo & Title -->
+        <div class="text-center mb-8 mt-4">
+          <div class="w-20 h-20 mx-auto bg-white rounded-2xl flex items-center justify-center mb-5 shadow-lg border border-gray-100 relative overflow-hidden">
+            <i class="fa-solid fa-user-shield text-4xl text-[#f59e0b]"></i>
           </div>
-          <h1 class="text-3xl font-black text-white tracking-tight uppercase">JÀMM AK XÉEWAL</h1>
-          <p class="text-brand-yellow font-bold mt-2 tracking-widest text-sm uppercase">Espace Super Admin Terrain</p>
+          <h1 class="text-3xl font-black text-white tracking-tight drop-shadow-md">Admin Terrain</h1>
+          <p class="text-white/90 text-sm mt-2 font-medium">JÀMM AK XÉEWAL — Administration</p>
         </div>
 
-        <!-- Login Form -->
-        <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-yellow via-yellow-300 to-brand-yellow"></div>
-          
+        <!-- Login Card -->
+        <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
           <form (submit)="onLogin($event)" class="space-y-6">
+            <!-- Telephone -->
             <div>
-              <label class="block text-white/80 font-bold mb-2 text-sm uppercase tracking-wider">N° de Téléphone</label>
-              <div class="relative group">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-bold border-r border-white/20 pr-3">+221</span>
-                <input type="tel" [(ngModel)]="telephone" name="telephone" required
-                       class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pl-20 text-white font-bold tracking-wider placeholder-white/30 focus:outline-none focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow transition-all"
-                       placeholder="77 123 45 67">
+              <label class="block text-gray-700 text-xs font-bold mb-2 uppercase tracking-wider">Téléphone</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span class="text-gray-400 font-bold border-r border-gray-200 pr-2">+221</span>
+                </div>
+                <input
+                  type="tel"
+                  [(ngModel)]="telephone"
+                  name="telephone"
+                  required
+                  placeholder="77 123 45 67"
+                  class="w-full pl-[4.5rem] pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] transition-all font-bold tracking-widest"
+                />
               </div>
             </div>
 
+            <!-- Password -->
             <div>
-              <label class="block text-white/80 font-bold mb-2 text-sm uppercase tracking-wider">Mot de passe</label>
+              <label class="block text-gray-700 text-xs font-bold mb-2 uppercase tracking-wider">Mot de passe</label>
               <div class="relative">
-                <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required
-                       class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 text-white font-bold placeholder-white/30 focus:outline-none focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow transition-all"
-                       placeholder="Votre mot de passe">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <i class="fa-solid fa-lock text-gray-400"></i>
+                </div>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                  class="w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] transition-all font-medium"
+                />
                 <button type="button" (click)="showPassword = !showPassword"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors">
+                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
                   <i [class]="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
                 </button>
               </div>
             </div>
 
-            <div *ngIf="errorMsg" class="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              {{ errorMsg }}
+            <!-- Error -->
+            <div *ngIf="errorMsg" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl animate-[fadeIn_0.3s_ease]">
+              <i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i>
+              <span class="text-sm text-red-700 font-medium">{{ errorMsg }}</span>
             </div>
 
+            <!-- Submit -->
             <button type="submit" [disabled]="isLoading"
-                    class="w-full bg-brand-yellow text-brand-dark font-black text-lg uppercase tracking-widest py-4 rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-70">
-              <span *ngIf="!isLoading">Connexion <i class="fa-solid fa-arrow-right-to-bracket ml-1"></i></span>
-              <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i> Authentification...</span>
+                    class="w-full py-4 mt-2 bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-[#022c16] font-black rounded-xl hover:from-[#fbbf24] hover:to-[#f59e0b] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm uppercase tracking-wider shadow-xl shadow-[#f59e0b]/20">
+              <i *ngIf="isLoading" class="fa-solid fa-circle-notch fa-spin"></i>
+              <span>{{ isLoading ? 'Connexion en cours...' : 'Accéder à l\\'espace' }}</span>
             </button>
           </form>
         </div>
 
-        <div class="mt-8 text-center">
-          <a routerLink="/" class="text-white/40 hover:text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-            <i class="fa-solid fa-arrow-left"></i> Retour au site public
-          </a>
-        </div>
+        <!-- Footer -->
+        <p class="text-center text-gray-500 text-xs mt-8 font-medium">
+          Accès sécurisé et réservé aux administrateurs autorisés.
+        </p>
       </div>
-      
-      <!-- PWA Install Popup (always present logic is handled in the component itself) -->
-      <app-pwa-install-banner></app-pwa-install-banner>
     </div>
   `
 })

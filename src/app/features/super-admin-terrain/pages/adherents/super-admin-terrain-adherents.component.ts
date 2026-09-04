@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { validateDateRange } from '../../../../core/utils/validation.utils';
 import { QuartierSelectComponent } from '../../../../shared/components/quartier-select/quartier-select.component';
 
 interface Adherent {
@@ -114,6 +115,9 @@ interface AgentTerrain {
           </div>
         </div>
 
+        <div *ngIf="filterError" class="mt-3 flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs font-medium">
+          <i class="fa-solid fa-triangle-exclamation text-sm"></i> {{ filterError }}
+        </div>
         <div class="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
           <button (click)="resetFilters()" class="text-sm text-gray-500 font-medium hover:text-gray-900 transition-colors">
             Réinitialiser
@@ -206,6 +210,7 @@ export class SuperAdminTerrainAdherentsComponent implements OnInit {
     centreVote: '',
     bureauVote: ''
   };
+  filterError = '';
 
   constructor(
     private http: HttpClient,
@@ -304,8 +309,17 @@ export class SuperAdminTerrainAdherentsComponent implements OnInit {
   }
 
   loadAdherents() {
+    // Validation du range de dates avant appel API
+    const dateErr = validateDateRange(this.filters.startDate, this.filters.endDate);
+    if (dateErr) {
+      this.filterError = dateErr;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.filterError = '';
+
     this.isLoading = true;
-    
+
     // Build query params
     const params = new URLSearchParams();
     if (this.filters.startDate) params.append('startDate', this.filters.startDate);
