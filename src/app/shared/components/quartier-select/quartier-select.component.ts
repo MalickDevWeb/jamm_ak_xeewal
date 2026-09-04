@@ -23,6 +23,7 @@ export class QuartierSelectComponent implements OnChanges {
   @Output() valueChange = new EventEmitter<string>();
 
   @Input() placeholder: string = 'Rechercher ou sélectionner un quartier...';
+  @Input() icon: string = 'fa-solid fa-location-dot';
 
   isOpen = false;
   searchQuery = '';

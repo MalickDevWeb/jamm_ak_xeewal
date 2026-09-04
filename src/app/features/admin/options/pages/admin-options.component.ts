@@ -5,6 +5,13 @@ import { AdminDataService, Option } from '../../../../core/services/admin-data.s
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
+interface CentreVote {
+  id: string;
+  nom: string;
+  bureaux: number;
+  zone: string;
+}
+
 @Component({
   selector: 'app-admin-options',
   standalone: true,
@@ -63,13 +70,30 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             <i class="fa-solid fa-plus text-[#008d36]"></i> Ajouter : {{ currentTypeLabel }}
           </h3>
           <form (ngSubmit)="addOption()" class="flex flex-col sm:flex-row gap-4 items-end">
-            <div class="flex-1 w-full">
-              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Libellé (ex: Thiès Nord)</label>
+            <!-- Normal Option Label -->
+            <div class="flex-1 w-full" *ngIf="selectedType !== 'centres_vote'">
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Libellé</label>
               <input type="text" [(ngModel)]="newOption.label" name="label" required
                      placeholder="Nom de l'élément..."
                      class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
             </div>
-            <button type="submit" [disabled]="!newOption.label || isSaving"
+
+            <!-- Centre de Vote Fields -->
+            <ng-container *ngIf="selectedType === 'centres_vote'">
+              <div class="flex-1 w-full">
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Nom du Centre</label>
+                <input type="text" [(ngModel)]="newCentreVote.nom" name="cv_nom" required
+                       placeholder="Ex: ECOLE MEDINA FALL..."
+                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
+              </div>
+              <div class="w-full sm:w-32">
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Nbr Bureaux</label>
+                <input type="number" min="1" [(ngModel)]="newCentreVote.bureaux" name="cv_bureaux" required
+                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
+              </div>
+            </ng-container>
+
+            <button type="submit" [disabled]="isSaving || (selectedType === 'centres_vote' ? (!newCentreVote.nom || newCentreVote.bureaux < 1) : !newOption.label)"
                     class="w-full sm:w-auto px-6 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               <i [class]="isSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-plus'"></i> Ajouter
             </button>
@@ -79,7 +103,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
         <!-- Liste des éléments -->
         <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
           <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <h3 class="font-bold text-gray-900">Éléments existants ({{ filteredOptions.length }})</h3>
+            <h3 class="font-bold text-gray-900">Éléments existants ({{ displayItems.length }})</h3>
             <button (click)="loadOptions()" class="text-gray-400 hover:text-[#008d36] transition-colors" title="Actualiser">
               <i class="fa-solid fa-rotate-right" [class.fa-spin]="isLoading"></i>
             </button>
@@ -89,28 +113,34 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             <i class="fa-solid fa-circle-notch fa-spin text-3xl text-gray-300"></i>
           </div>
 
-          <div *ngIf="!isLoading && filteredOptions.length === 0" class="p-10 text-center text-gray-500">
+          <div *ngIf="!isLoading && displayItems.length === 0" class="p-10 text-center text-gray-500">
             <i class="fa-regular fa-folder-open text-4xl mb-3 text-gray-300"></i>
             <p class="text-sm font-medium">Aucun élément dans cette liste.</p>
           </div>
 
-          <ul *ngIf="!isLoading && filteredOptions.length > 0" class="divide-y divide-gray-100">
-            <li *ngFor="let opt of filteredOptions" class="p-4 flex flex-col sm:flex-row items-center justify-between hover:bg-gray-50 transition-colors gap-4">
+          <ul *ngIf="!isLoading && displayItems.length > 0" class="divide-y divide-gray-100">
+            <li *ngFor="let opt of displayItems" class="p-4 flex flex-col sm:flex-row items-center justify-between hover:bg-gray-50 transition-colors gap-4">
               
               <div class="flex-1 flex items-center gap-3 w-full" *ngIf="editingId !== opt.id">
-                <div class="w-2 h-2 rounded-full" [ngClass]="opt.actif ? 'bg-[#008d36]' : 'bg-red-500'"></div>
-                <span class="font-bold text-gray-700">{{ opt.label }}</span>
-                <span class="text-[10px] text-gray-400 font-mono bg-gray-100 px-2 py-0.5 rounded">{{ opt.value }}</span>
+                <div *ngIf="selectedType !== 'centres_vote'" class="w-2 h-2 rounded-full" [ngClass]="opt.actif ? 'bg-[#008d36]' : 'bg-red-500'"></div>
+                <div *ngIf="selectedType === 'centres_vote'" class="w-2 h-2 rounded-full bg-[#008d36]"></div>
+                
+                <span class="font-bold text-gray-700">{{ selectedType === 'centres_vote' ? opt.nom : opt.label }}</span>
+                
+                <span *ngIf="selectedType !== 'centres_vote'" class="text-[10px] text-gray-400 font-mono bg-gray-100 px-2 py-0.5 rounded">{{ opt.value }}</span>
+                <span *ngIf="selectedType === 'centres_vote'" class="text-[11px] text-[#008d36] font-bold bg-[#e6f3eb] px-2 py-0.5 rounded-full">{{ opt.bureaux }} bureau(x)</span>
               </div>
               
-              <div class="flex-1 w-full" *ngIf="editingId === opt.id">
+              <div class="flex-1 flex gap-2 w-full" *ngIf="editingId === opt.id">
                 <input type="text" [(ngModel)]="editLabel" 
-                       class="w-full px-3 py-2 bg-white border border-[#008d36] rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#008d36]/20">
+                       class="flex-1 px-3 py-2 bg-white border border-[#008d36] rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#008d36]/20">
+                <input *ngIf="selectedType === 'centres_vote'" type="number" min="1" [(ngModel)]="editBureaux" 
+                       class="w-24 px-3 py-2 bg-white border border-[#008d36] rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#008d36]/20">
               </div>
 
               <div class="flex items-center gap-2 shrink-0">
                 <ng-container *ngIf="editingId !== opt.id">
-                  <button (click)="toggleActif(opt)" 
+                  <button *ngIf="selectedType !== 'centres_vote'" (click)="toggleActif(opt)" 
                           [title]="opt.actif ? 'Désactiver' : 'Activer'"
                           class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
                           [ngClass]="opt.actif ? 'text-gray-400 hover:text-orange-500 hover:bg-orange-50' : 'text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb]'">
@@ -149,19 +179,23 @@ export class AdminOptionsComponent implements OnInit {
   listTypes = [
     { id: 'quartier', label: 'Quartiers', icon: 'fa-solid fa-location-dot' },
     { id: 'categorie_besoin', label: 'Catégories de Besoins', icon: 'fa-solid fa-hand-holding-heart' },
-    { id: 'categorie_idee', label: 'Pôles pour Idées', icon: 'fa-solid fa-lightbulb' }
+    { id: 'categorie_idee', label: 'Pôles pour Idées', icon: 'fa-solid fa-lightbulb' },
+    { id: 'centres_vote', label: 'Centres de Vote', icon: 'fa-solid fa-building-flag' }
   ];
 
   selectedType: string = 'quartier';
   
   options: Option[] = [];
+  centresVote: CentreVote[] = [];
   isLoading = false;
   isSaving = false;
 
   newOption = { label: '' };
+  newCentreVote = { nom: '', bureaux: 1 };
   
   editingId: string | null = null;
   editLabel: string = '';
+  editBureaux: number = 1;
 
   // Alert State
   alertMessage = '';
@@ -172,7 +206,7 @@ export class AdminOptionsComponent implements OnInit {
   showConfirmDialog = false;
   confirmTitle = '';
   confirmMessage = '';
-  optionToDelete: Option | null = null;
+  optionToDelete: any = null;
 
   constructor(private adminData: AdminDataService) {}
 
@@ -188,28 +222,65 @@ export class AdminOptionsComponent implements OnInit {
     return this.options.filter(o => o.type === this.selectedType);
   }
 
+  get displayItems(): any[] {
+    if (this.selectedType === 'centres_vote') {
+      return this.centresVote;
+    }
+    return this.filteredOptions;
+  }
+
   selectType(type: string) {
     this.selectedType = type;
     this.editingId = null;
+    this.loadOptions();
   }
 
   loadOptions() {
     this.isLoading = true;
-    this.adminData.getOptions().subscribe({
-      next: (res: any) => {
-        if (res.success) {
-          this.options = res.data;
+    if (this.selectedType === 'centres_vote') {
+      this.adminData.getCentresVote().subscribe({
+        next: (res: any) => {
+          if (res.success) this.centresVote = res.data;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+          this.showAlert("Erreur lors du chargement des centres", 'error');
         }
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.showAlert("Erreur lors du chargement des options", 'error');
-      }
-    });
+      });
+    } else {
+      this.adminData.getOptions().subscribe({
+        next: (res: any) => {
+          if (res.success) this.options = res.data;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+          this.showAlert("Erreur lors du chargement des options", 'error');
+        }
+      });
+    }
   }
 
   addOption() {
+    if (this.selectedType === 'centres_vote') {
+      if (!this.newCentreVote.nom.trim() || this.newCentreVote.bureaux < 1) return;
+      this.isSaving = true;
+      this.adminData.createCentreVote({ nom: this.newCentreVote.nom, bureaux: this.newCentreVote.bureaux }).subscribe({
+        next: () => {
+          this.isSaving = false;
+          this.newCentreVote = { nom: '', bureaux: 1 };
+          this.loadOptions();
+          this.showAlert("Centre ajouté avec succès", 'success');
+        },
+        error: () => {
+          this.isSaving = false;
+          this.showAlert("Erreur lors de l'ajout", 'error');
+        }
+      });
+      return;
+    }
+
     if (!this.newOption.label.trim()) return;
     this.isSaving = true;
     
@@ -237,12 +308,28 @@ export class AdminOptionsComponent implements OnInit {
     });
   }
 
-  startEdit(opt: Option) {
+  startEdit(opt: any) {
     this.editingId = opt.id;
-    this.editLabel = opt.label;
+    this.editLabel = this.selectedType === 'centres_vote' ? opt.nom : opt.label;
+    if (this.selectedType === 'centres_vote') {
+      this.editBureaux = opt.bureaux;
+    }
   }
 
-  saveEdit(opt: Option) {
+  saveEdit(opt: any) {
+    if (this.selectedType === 'centres_vote') {
+      if (!this.editLabel.trim() || this.editBureaux < 1) return;
+      this.adminData.updateCentreVote(opt.id, { nom: this.editLabel.trim(), bureaux: this.editBureaux }).subscribe({
+        next: () => {
+          this.editingId = null;
+          this.loadOptions();
+          this.showAlert("Centre mis à jour", 'success');
+        },
+        error: () => this.showAlert("Erreur lors de la modification", 'error')
+      });
+      return;
+    }
+
     if (!this.editLabel.trim() || this.editLabel === opt.label) {
       this.editingId = null;
       return;
@@ -269,27 +356,42 @@ export class AdminOptionsComponent implements OnInit {
     });
   }
 
-  askDelete(opt: Option) {
+  askDelete(opt: any) {
     this.optionToDelete = opt;
     this.confirmTitle = "Supprimer l'élément";
-    this.confirmMessage = `Êtes-vous sûr de vouloir supprimer "${opt.label}" ? Cette action est irréversible.`;
+    const name = this.selectedType === 'centres_vote' ? opt.nom : opt.label;
+    this.confirmMessage = `Êtes-vous sûr de vouloir supprimer "${name}" ? Cette action est irréversible.`;
     this.showConfirmDialog = true;
   }
 
   onConfirmAction() {
     this.showConfirmDialog = false;
     if (this.optionToDelete) {
-      this.adminData.deleteOption(this.optionToDelete.id).subscribe({
+      const isCentre = this.selectedType === 'centres_vote';
+      const idToDelete = this.optionToDelete.id;
+      
+      // Suppression optimiste : retirer l'élément de la liste immédiatement
+      if (isCentre) {
+        this.centresVote = this.centresVote.filter(c => c.id !== idToDelete);
+      } else {
+        this.options = this.options.filter(o => o.id !== idToDelete);
+      }
+      this.showAlert("Élément supprimé", 'success');
+
+      const deleteObs = isCentre ? this.adminData.deleteCentreVote(idToDelete) : this.adminData.deleteOption(idToDelete);
+      
+      // Requête en arrière-plan
+      deleteObs.subscribe({
         next: () => {
-          this.loadOptions();
-          this.showAlert("Élément supprimé", 'success');
-          this.optionToDelete = null;
+          // L'élément est déjà retiré du UI, pas besoin de recharger toute la liste
         },
         error: () => {
-          this.showAlert("Erreur lors de la suppression", 'error');
-          this.optionToDelete = null;
+          this.showAlert("Erreur lors de la suppression. Actualisation...", 'error');
+          this.loadOptions(); // Recharger la liste depuis le serveur en cas d'erreur
         }
       });
+      
+      this.optionToDelete = null;
     }
   }
 

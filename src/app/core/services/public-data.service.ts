@@ -35,6 +35,9 @@ export class PublicDataService {
   // --- Options dynamiques (quartiers, axes, pôles, catégories) ---
   getOptions(type: string): Observable<any> { return this.http.get(`${this.apiUrl}/options?type=${type}`); }
 
+  // --- Centres de Vote ---
+  getCentresVote(): Observable<any> { return this.http.get(`${this.apiUrl}/centres-vote`); }
+
   // --- Formulaires d'engagement ---
   postAdherent(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/adherents`, data); }
   postBesoin(data: any): Observable<any> { return this.http.post(`${this.apiUrl}/besoins`, data); }

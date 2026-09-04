@@ -59,6 +59,8 @@ export class AdminDataService {
   getComptesRendus(): Observable<any> { return this.getCached('comptes-rendus', this.http.get(`${this.apiUrl}/comptes-rendus`)); }
   getPoles(): Observable<any> { return this.getCached('poles', this.http.get(`${this.apiUrl}/poles`)); }
   getAgentsTerrain(): Observable<any> { return this.getCached('agents-terrain', this.http.get(`${this.apiUrl}/agents-terrain`)); }
+  getSuperAdminTerrain(): Observable<any> { return this.getCached('super-admin-terrain', this.http.get(`${this.apiUrl}/super-admin-terrain`)); }
+  getCentresVote(): Observable<any> { return this.getCached('centres-vote', this.http.get(`${this.apiUrl}/centres-vote`)); }
 
   // POST → invalide le cache de l'endpoint concerné
   createEntity(endpoint: string, data: any): Observable<any> {
@@ -151,6 +153,23 @@ export class AdminDataService {
   deleteOption(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/options?id=${id}`).pipe(
       tap(() => this.invalidateAll())
+    );
+  }
+
+  // --- Centres de Vote ---
+  createCentreVote(data: { nom: string; bureaux: number; zone?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/centres-vote`, data).pipe(
+      tap(() => this.invalidate('centres-vote'))
+    );
+  }
+  updateCentreVote(id: string, data: { nom?: string; bureaux?: number; zone?: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/centres-vote/${id}`, data).pipe(
+      tap(() => this.invalidate('centres-vote'))
+    );
+  }
+  deleteCentreVote(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/centres-vote/${id}`).pipe(
+      tap(() => this.invalidate('centres-vote'))
     );
   }
 }

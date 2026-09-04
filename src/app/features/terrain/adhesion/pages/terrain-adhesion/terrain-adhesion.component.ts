@@ -34,13 +34,15 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
     telephone: '',
     quartier: '',
     profession: '',
+    centreVote: '',
+    bureauVote: '',
     carteRectoUrl: '',
-    carteVersoUrl: '',
-    poleId: ''
+    carteVersoUrl: ''
   };
 
   quartiers: Option[] = [];
-  poles: any[] = [];
+  centresVote: { id: string; nom: string; bureaux: number }[] = [];
+  bureauVoteOptions: string[] = [];
 
   isSubmitting = false;
   errorMsg = '';
@@ -89,25 +91,38 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.publicData.getPoles().pipe(
+    this.publicData.getCentresVote().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
-        if (res.success && res.data) {
-          this.poles = res.data
-            .filter((p: any) => p.statut === 'PUBLIE')
-            .map((p: any) => ({
-              id: p.id,
-              type: 'pole',
-              value: p.titre,
-              label: p.titre,
-              ordre: 0,
-              actif: true
-            }));
+        if (res.success) {
+          this.centresVote = res.data;
           this.cdr.markForCheck();
         }
       }
     });
+  }
+
+  onCentreVoteChange(centreName: string) {
+    this.formData.bureauVote = '';
+    if (!centreName) {
+      this.bureauVoteOptions = [];
+      return;
+    }
+    const centre = this.centresVote.find(c => c.nom === centreName);
+    if (centre && centre.bureaux > 0) {
+      this.bureauVoteOptions = Array.from({ length: centre.bureaux }, (_, i) => `Bureau N°${i + 1}`);
+    } else {
+      this.bureauVoteOptions = [];
+    }
+    this.cdr.markForCheck();
+  }
+
+  private scrollToCni(): void {
+    try {
+      const el = document.querySelector('app-terrain-adhesion form') as HTMLElement | null;
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch {}
   }
 
   trackByOption(index: number, item: any): string {
@@ -115,14 +130,45 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
   }
 
   async onSubmit() {
+    // 1. Validation des champs texte obligatoires
     if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
       this.errorMsg = 'Veuillez remplir tous les champs obligatoires (Prénom, Nom, Téléphone, Quartier).';
       this.cdr.markForCheck();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // 2. Validation des images de la carte d'identité (OBLIGATOIRE pour les agents terrain)
+    // On accepte soit un fichier local (rectoBlob/versoBlob) soit une URL déjà uploadée (carteRectoUrl/carteVersoUrl)
+    const hasRecto = !!(this.rectoBlob || this.formData.carteRectoUrl);
+    const hasVerso = !!(this.versoBlob || this.formData.carteVersoUrl);
+
+    if (!hasRecto || !hasVerso) {
+      const missing: string[] = [];
+      if (!hasRecto) missing.push('Recto');
+      if (!hasVerso) missing.push('Verso');
+      this.errorMsg = `Photo(s) de la carte d'identité manquante(s) : ${missing.join(' et ')}. Les deux faces (recto & verso) sont obligatoires pour valider l'inscription.`;
+      this.cdr.markForCheck();
+      // Mettre en évidence les zones concernées
+      if (!hasRecto) this.rectoError = "La photo du recto est obligatoire.";
+      if (!hasVerso) this.versoError = "La photo du verso est obligatoire.";
+      // Scroll vers la section carte d'identité
+      this.scrollToCni();
+      return;
+    }
+
+    // 3. Vérifier qu'il n'y a pas d'erreur en cours sur les images (mauvais type, trop lourd...)
+    if (this.rectoError || this.versoError) {
+      this.errorMsg = "Veuillez corriger les erreurs sur les photos de la carte d'identité avant de valider.";
+      this.cdr.markForCheck();
+      this.scrollToCni();
       return;
     }
 
     this.isSubmitting = true;
     this.errorMsg = '';
+    this.rectoError = '';
+    this.versoError = '';
     this.cdr.markForCheck();
 
     try {
@@ -208,7 +254,7 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
     this.success = false;
     this.successName = '';
     this.errorMsg = '';
-    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', carteRectoUrl: '', carteVersoUrl: '', poleId: '' };
+    this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', centreVote: '', bureauVote: '', carteRectoUrl: '', carteVersoUrl: '' };
     this.removeRecto();
     this.removeVerso();
     this.cdr.markForCheck();
@@ -258,6 +304,7 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
 
   async onRectoSelected(event: any) {
     this.rectoError = '';
+    this.errorMsg = '';
     const file = event.target.files[0];
     if (!file) return;
     if (!file.type.match('image.*')) { this.rectoError = 'Veuillez sélectionner une image.'; return; }
@@ -273,6 +320,7 @@ export class TerrainAdhesionComponent implements OnInit, OnDestroy {
 
   async onVersoSelected(event: any) {
     this.versoError = '';
+    this.errorMsg = '';
     const file = event.target.files[0];
     if (!file) return;
     if (!file.type.match('image.*')) { this.versoError = 'Veuillez sélectionner une image.'; return; }

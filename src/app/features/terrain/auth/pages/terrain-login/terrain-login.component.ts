@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
+import { validateSenegalPhone, normalizeSenegalPhone, validatePassword } from '../../../../../core/utils/validation.utils';
 
 @Component({
   selector: 'app-terrain-login',
@@ -103,11 +104,29 @@ export class TerrainLoginComponent {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    this.isLoading = true;
     this.errorMessage = '';
 
+    // 1. Validation du téléphone (format sénégalais)
+    const phoneCheck = validateSenegalPhone(this.telephone);
+    if (!phoneCheck.valid) {
+      this.errorMessage = phoneCheck.message || 'Numéro de téléphone invalide.';
+      return;
+    }
+
+    // 2. Validation du mot de passe
+    const pwdCheck = validatePassword(this.password);
+    if (pwdCheck) {
+      this.errorMessage = pwdCheck;
+      return;
+    }
+
+    this.isLoading = true;
+
+    // Normaliser le numéro au format +221XXXXXXXXX avant envoi
+    const normalizedPhone = normalizeSenegalPhone(this.telephone) || this.telephone;
+
     this.http.post<any>(`${environment.apiUrl}/agents-terrain/login`, {
-      telephone: this.telephone,
+      telephone: normalizedPhone,
       password: this.password
     }).subscribe({
       next: (res) => {

@@ -120,6 +120,13 @@ export class AdhererComponent implements OnInit, OnDestroy {
     });
   }
 
+  private scrollToCni(): void {
+    try {
+      const el = document.querySelector('#step-container-2') as HTMLElement | null;
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch {}
+  }
+
   // TrackBy pour les options
   trackByOption(index: number, item: Option): string {
     return item.id;
@@ -128,9 +135,36 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
 
   async onSubmit() {
+    // 1. Validation des champs texte obligatoires
     if (!this.formData.prenom || !this.formData.nom || !this.formData.telephone || !this.formData.quartier) {
-      this.errorMsg = 'Veuillez remplir tous les champs obligatoires.';
+      this.errorMsg = 'Veuillez remplir tous les champs obligatoires (Prénom, Nom, Téléphone, Quartier).';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // 2. Validation des images de la carte d'identité (OBLIGATOIRE : le titre de l'étape est marqué d'un astérisque rouge)
+    // On accepte soit un fichier local (rectoBlob/versoBlob) soit une URL déjà uploadée (carteRectoUrl/carteVersoUrl)
+    const hasRecto = !!(this.rectoBlob || this.formData.carteRectoUrl);
+    const hasVerso = !!(this.versoBlob || this.formData.carteVersoUrl);
+
+    if (!hasRecto || !hasVerso) {
+      const missing: string[] = [];
+      if (!hasRecto) missing.push('Recto');
+      if (!hasVerso) missing.push('Verso');
+      this.errorMsg = `Photo(s) de la carte d'identité manquante(s) : ${missing.join(' et ')}. Les deux faces (recto & verso) sont obligatoires pour valider l'adhésion.`;
+      // Mettre en évidence les zones concernées
+      if (!hasRecto) this.rectoError = "La photo du recto est obligatoire.";
+      if (!hasVerso) this.versoError = "La photo du verso est obligatoire.";
+      this.cdr.markForCheck();
+      this.scrollToCni();
+      return;
+    }
+
+    // 3. Vérifier qu'il n'y a pas d'erreur en cours sur les images (mauvais type, trop lourd...)
+    if (this.rectoError || this.versoError) {
+      this.errorMsg = "Veuillez corriger les erreurs sur les photos de la carte d'identité avant de valider.";
+      this.cdr.markForCheck();
+      this.scrollToCni();
       return;
     }
 
@@ -296,6 +330,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   async onRectoSelected(event: any) {
     this.rectoError = '';
+    this.errorMsg = '';
     const file = event.target.files[0];
     if (!file) return;
 
@@ -326,6 +361,7 @@ export class AdhererComponent implements OnInit, OnDestroy {
 
   async onVersoSelected(event: any) {
     this.versoError = '';
+    this.errorMsg = '';
     const file = event.target.files[0];
     if (!file) return;
 

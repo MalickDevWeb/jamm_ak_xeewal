@@ -204,6 +204,11 @@ export const routes: Routes = [
       }
     ]
   },
+  // --- Super Admin Terrain ---
+  {
+    path: 'super_admin_terrain',
+    loadChildren: () => import('./features/super-admin-terrain/super-admin-terrain.routes').then(m => m.SUPER_ADMIN_TERRAIN_ROUTES)
+  },
   // --- Super Admin Maintenance System ---
   {
     path: 'maintenance_sat',
