@@ -35,13 +35,16 @@ const vapidPublicKey = get('VITE_VAPID_PUBLIC_KEY', isProduction
   : 'BNmas-sTgL2czxhDmQ7yvSMQ4X9X_LbUYyExcB_5e6XnUMy091FPpIUhQNuKSsfWleYSHUBT0BGqVdec4tqfGOc');
 
 const sentryDsn = get('VITE_SENTRY_DSN', '');
+const publicUrl = get('VITE_PUBLIC_URL', isProduction
+  ? '(typeof window !== "undefined" && window.env?.publicUrl) || "https://jammakxeewal.sn"'
+  : 'http://localhost:4200');
 const version = get('VITE_APP_VERSION', '1.0.0-dev');
 
 const content = `// ============================================
-// FICHIER GÉNÉRÉ AUTOMATIQUEMENT PAR scripts/generate-env.js
-// NE PAS MODIFIER À LA MAIN — modifier le fichier .env à la place
+// FICHIER GENERE AUTOMATIQUEMENT PAR scripts/generate-env.js
+// NE PAS MODIFIER A LA MAIN — modifier le fichier .env a la place
 // ============================================
-// Exécuter : node scripts/generate-env.js
+// Executer : node scripts/generate-env.js
 // Ou : npm run prebuild (avant ng build)
 export const environment = {
   production: ${isProduction},
@@ -49,12 +52,14 @@ export const environment = {
   bacOfficeUrl: '${bacOfficeUrl}',
   vapidPublicKey: '${vapidPublicKey}',
   sentryDsn: '${sentryDsn}',
+  publicUrl: '${publicUrl}',
   version: '${version}'
 };
 `;
 
 const targetPath = path.resolve(__dirname, '..', 'src', 'environments', 'environment.ts');
 fs.writeFileSync(targetPath, content, 'utf8');
-console.log(`✅ environment.ts généré depuis .env (${isProduction ? 'production' : 'development'})`);
-console.log(`   apiUrl: ${apiUrl}`);
-console.log(`   bacOfficeUrl: ${bacOfficeUrl}`);
+console.log('environment.ts genere depuis .env (' + (isProduction ? 'production' : 'development') + ')');
+console.log('   apiUrl: ' + apiUrl);
+console.log('   bacOfficeUrl: ' + bacOfficeUrl);
+console.log('   publicUrl: ' + publicUrl);

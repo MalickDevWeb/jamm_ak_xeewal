@@ -354,7 +354,7 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
     const pushPayload = {
       title: `🚨 ${isNew ? 'Nouvel événement' : 'Événement mis à jour'} : ${titre}`,
       body,
-      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      icon: '${environment.publicUrl}/assets/icons/icon-192x192.png',
       url: '/'
     };
 

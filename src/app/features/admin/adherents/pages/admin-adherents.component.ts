@@ -1,6 +1,7 @@
 import { BulkDeleteService } from '../../../../core/services/bulk-delete.service';
 import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { environment } from '../../../../../../environments/environment';
 import { Subject, takeUntil } from 'rxjs';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -523,7 +524,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   isLoading = true;
   isDownloading = false;
   badgeAdherent: any = null;
-  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : environment.publicUrl;
 
   encodeURIComponent(uri: string): string {
     return encodeURIComponent(uri);

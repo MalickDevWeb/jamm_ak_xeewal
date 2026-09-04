@@ -148,7 +148,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
               <i class="fa-solid fa-circle-info text-[#008d36]"></i>
               Exemples : <code class="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded font-bold">https://wa.me/221XXXXXXXXX</code>,
               <code class="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded font-bold">https://forms.gle/xxx</code>,
-              <code class="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded font-bold">https://jammakxeewal.sn/adherer</code>
+              <code class="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded font-bold">{{ environment.publicUrl }}/adherer</code>
             </p>
           </div>
 

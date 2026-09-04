@@ -225,7 +225,7 @@ export class AdminNotificationsComponent {
       title: this.form.title,
       body: this.form.body,
       url: this.form.url || '/',
-      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png'
+      icon: '${environment.publicUrl}/assets/icons/icon-192x192.png'
     };
 
     this.http.post<any>(`${environment.apiUrl}/push/send`, payload, headers ? { headers } : {}).subscribe({

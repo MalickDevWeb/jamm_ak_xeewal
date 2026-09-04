@@ -839,7 +839,7 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
     const pushPayload = {
       title: `📸 ${isNew ? 'Nouvelle activité' : 'Activité mise à jour'} : ${titre}`,
       body: `${categorie ? `[${categorie}] ` : ''}${isNew ? 'Publiée' : 'Mise à jour'} le ${dateStr}. Découvrez-la sur notre site !`,
-      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      icon: '${environment.publicUrl}/assets/icons/icon-192x192.png',
       url: '/activites'
     };
 

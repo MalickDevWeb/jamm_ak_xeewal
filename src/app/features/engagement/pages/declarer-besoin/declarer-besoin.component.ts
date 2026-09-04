@@ -563,7 +563,7 @@ export class DeclarerBesoinComponent implements OnInit, OnDestroy {
     const pushPayload = {
       title: `🚨 Nouveau signalement — ${quartier}`,
       body: `${nom} : "${description}"`,
-      icon: 'https://www.jammakxeewal.sn/assets/icons/icon-192x192.png',
+      icon: '${environment.publicUrl}/assets/icons/icon-192x192.png',
       url: '/admin/besoins'
     };
 

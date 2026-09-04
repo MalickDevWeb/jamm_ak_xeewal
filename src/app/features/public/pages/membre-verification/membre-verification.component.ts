@@ -42,7 +42,7 @@ export class MembreVerificationComponent implements OnInit {
     return id ? 'JA-' + id.toString().substring(0, 6).toUpperCase() : 'JA-XXXX';
   }
 
-  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jammakxeewal.sn';
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : environment.publicUrl;
 
   encodeURIComponent(uri: string): string {
     return encodeURIComponent(uri);

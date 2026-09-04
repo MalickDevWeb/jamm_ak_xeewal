@@ -11,60 +11,83 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   standalone: true,
   imports: [CommonModule, FormsModule, AlertPopupComponent],
   template: `
-  <div class="min-h-screen bg-brand-dark flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-    
-    <!-- LOGIN VIEW -->
-    <div *ngIf="!loggedIn" class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in-up">
-      <div class="text-center mb-8">
-        <div class="mx-auto h-16 w-16 bg-brand-green/20 rounded-2xl flex items-center justify-center mb-4 border border-brand-green/20 shadow-sm">
-          <i class="fa-solid fa-server text-brand-green text-2xl"></i>
+  <ng-container *ngIf="!loggedIn">
+    <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50 relative overflow-hidden font-sans">
+      <!-- Background elements -->
+      <div class="absolute top-0 left-0 w-full h-[40vh] bg-[#022c16] rounded-b-[3rem] shadow-xl"></div>
+      <div class="absolute top-10 left-10 w-32 h-32 bg-[#f59e0b]/20 rounded-full blur-2xl"></div>
+      <div class="absolute top-20 right-20 w-48 h-48 bg-[#008d36]/20 rounded-full blur-3xl"></div>
+
+      <div class="w-full max-w-md relative z-10 animate-fade-in-up">
+        <!-- Logo & Title -->
+        <div class="text-center mb-8 mt-4">
+          <div class="w-20 h-20 mx-auto bg-white rounded-2xl flex items-center justify-center mb-5 shadow-lg border border-gray-100 relative overflow-hidden">
+            <i class="fa-solid fa-server text-4xl text-[#f59e0b]"></i>
+          </div>
+          <h2 class="text-3xl font-black text-white tracking-tight drop-shadow-md">Super Admin</h2>
+          <p class="text-white/90 text-sm mt-2 font-medium">Accès restreint à la maintenance système</p>
         </div>
-        <h2 class="text-3xl font-black text-white tracking-tight">Super Admin</h2>
-        <p class="mt-2 text-sm text-gray-400 font-medium">Accès restreint à la maintenance système</p>
-      </div>
 
-      <div class="bg-white/5 py-8 px-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-3xl border border-white/10 sm:px-10">
-        <form (ngSubmit)="onLogin()" class="space-y-6">
-          <div *ngIf="loginError" class="bg-red-500/100/10 text-red-400 p-4 rounded-xl text-sm font-bold flex items-center gap-3 border border-red-500/20">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            {{ loginError }}
-          </div>
-
-          <div>
-            <label for="email" class="block text-[13px] font-bold text-gray-200 mb-1.5 uppercase tracking-wider">Email Système</label>
-            <div class="mt-1 relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fa-solid fa-envelope text-gray-400"></i>
+        <!-- Login Card -->
+        <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
+          <form (ngSubmit)="onLogin()" class="space-y-6">
+            
+            <!-- Email -->
+            <div>
+              <label class="block text-gray-700 text-xs font-bold mb-2 uppercase tracking-wider">Email Système</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <i class="fa-solid fa-envelope text-gray-400"></i>
+                </div>
+                <input id="email" [(ngModel)]="email" name="email" type="email" required
+                       placeholder="admin@jammakxeewal.com"
+                       class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] transition-all font-medium" />
               </div>
-              <input id="email" [(ngModel)]="email" name="email" type="email" required
-                class="appearance-none block w-full pl-11 pr-4 py-3 bg-brand-dark border border-white/20 rounded-xl text-sm font-medium text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-green focus:border-brand-green transition-all">
             </div>
-          </div>
 
-          <div>
-            <label for="password" class="block text-[13px] font-bold text-gray-200 mb-1.5 uppercase tracking-wider">Clé de sécurité</label>
-            <div class="mt-1 relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fa-solid fa-lock text-gray-400"></i>
+            <!-- Password -->
+            <div>
+              <label class="block text-gray-700 text-xs font-bold mb-2 uppercase tracking-wider">Clé de sécurité</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <i class="fa-solid fa-lock text-gray-400"></i>
+                </div>
+                <input id="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required
+                       placeholder="••••••••"
+                       class="w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/50 focus:border-[#f59e0b] transition-all font-medium" />
+                <button type="button" (click)="showPassword = !showPassword"
+                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+                  <i [class]="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+                </button>
               </div>
-              <input id="password" [(ngModel)]="password" name="password" type="password" required
-                class="appearance-none block w-full pl-11 pr-4 py-3 bg-brand-dark border border-white/20 rounded-xl text-sm font-medium text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-green focus:border-brand-green transition-all">
             </div>
-          </div>
 
-          <div>
+            <!-- Error -->
+            <div *ngIf="loginError" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl animate-[fadeIn_0.3s_ease]">
+              <i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i>
+              <span class="text-sm text-red-700 font-medium">{{ loginError }}</span>
+            </div>
+
+            <!-- Submit -->
             <button type="submit" [disabled]="isLoggingIn"
-              class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-black text-white bg-brand-green hover:bg-brand-greenLight focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-greenLight transition-all disabled:opacity-70">
-              <i [class]="isLoggingIn ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-arrow-right-to-bracket'"></i>
-              {{ isLoggingIn ? 'Vérification...' : 'Déverrouiller le système' }}
+                    class="w-full py-4 mt-2 bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-[#022c16] font-black rounded-xl hover:from-[#fbbf24] hover:to-[#f59e0b] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm uppercase tracking-wider shadow-xl shadow-[#f59e0b]/20">
+              <i [class]="isLoggingIn ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-arrow-right-to-bracket'"></i>
+              <span>{{ isLoggingIn ? 'Vérification...' : 'Déverrouiller le système' }}</span>
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-gray-500 text-xs mt-8 font-medium">
+          Zone réservée. Toute tentative non autorisée est enregistrée.
+        </p>
       </div>
     </div>
+  </ng-container>
 
-    <!-- DASHBOARD VIEW -->
-    <div *ngIf="loggedIn" class="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 animate-fade-in-up">
+  <!-- DASHBOARD VIEW -->
+  <ng-container *ngIf="loggedIn">
+    <div class="min-h-screen bg-brand-dark flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white/5 border border-white/10 p-6 rounded-2xl border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
         <div class="flex items-center gap-4">
@@ -200,7 +223,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
       </div>
     </div>
-  </div>
+  </ng-container>
   `
 })
 export class MaintenanceSatComponent implements OnInit {
@@ -210,6 +233,7 @@ export class MaintenanceSatComponent implements OnInit {
   password = '';
   isLoggingIn = false;
   loginError = '';
+  showPassword = false;
   token = '';
 
   // Dashboard State
