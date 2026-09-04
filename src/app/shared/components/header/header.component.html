@@ -13,14 +13,17 @@
         </div>
         <div class="flex items-center gap-4 sm:gap-5">
             <span class="uppercase tracking-widest text-[10px] font-bold text-gray-400">Rejoignez-nous :</span>
-            <a href="https://wa.me/" target="_blank" class="w-8 h-8 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all hover:scale-110 shadow-sm" title="WhatsApp">
+            <a [href]="socialLinks.whatsapp" target="_blank" class="w-8 h-8 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all hover:scale-110 shadow-sm" title="WhatsApp">
                 <i class="fa-brands fa-whatsapp text-lg"></i>
             </a>
-            <a href="#" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2]/20 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all hover:scale-110 shadow-sm" title="Facebook">
+            <a [href]="socialLinks.facebook" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2]/20 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all hover:scale-110 shadow-sm" title="Facebook">
                 <i class="fa-brands fa-facebook-f"></i>
             </a>
-            <a href="#" target="_blank" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white hover:bg-black transition-all hover:scale-110 shadow-sm" title="TikTok">
+            <a [href]="socialLinks.tiktok" target="_blank" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white hover:bg-black transition-all hover:scale-110 shadow-sm" title="TikTok">
                 <i class="fa-brands fa-tiktok"></i>
+            </a>
+            <a [href]="socialLinks.youtube" target="_blank" class="w-8 h-8 rounded-full bg-[#FF0000]/20 flex items-center justify-center text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-all hover:scale-110 shadow-sm" title="YouTube">
+                <i class="fa-brands fa-youtube"></i>
             </a>
         </div>
     </div>
@@ -340,7 +343,7 @@
         <!-- Réseaux sociaux redesignés -->
         <div class="mt-8 mb-4 flex justify-center relative z-10">
             <div class="bg-white border border-gray-100 rounded-full py-3 px-6 flex items-center gap-6 shadow-[0_5px_20px_-5px_rgba(0,0,0,0.08)]">
-                <a href="https://wa.me/" target="_blank" aria-label="WhatsApp"
+                <a [href]="socialLinks.whatsapp" target="_blank" aria-label="WhatsApp"
                    class="relative text-[#25D366] hover:scale-110 transition-transform">
                     <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75"></span>
@@ -349,14 +352,18 @@
                     <i class="fa-brands fa-whatsapp text-[22px]"></i>
                 </a>
                 <div class="w-px h-5 bg-gray-100"></div>
-                <a href="#" aria-label="Facebook"
+                <a [href]="socialLinks.facebook" aria-label="Facebook"
                    class="text-[#1877F2] hover:scale-110 transition-transform">
                     <i class="fa-brands fa-facebook-f text-[20px]"></i>
                 </a>
                 <div class="w-px h-5 bg-gray-100"></div>
-                <a href="#" aria-label="TikTok"
+                <a [href]="socialLinks.tiktok" aria-label="TikTok"
                    class="text-gray-800 hover:scale-110 transition-transform">
                     <i class="fa-brands fa-tiktok text-[20px]"></i>
+                </a>
+                <a [href]="socialLinks.youtube" target="_blank" aria-label="YouTube"
+                   class="w-10 h-10 rounded-full bg-[#FF0000]/20 flex items-center justify-center text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-all">
+                    <i class="fa-brands fa-youtube text-[20px]"></i>
                 </a>
             </div>
         </div>

@@ -10,5 +10,7 @@ export const environment = {
   vapidPublicKey: (typeof window !== 'undefined' && (window as any).env?.vapidPublicKey) || '',
   sentryDsn: (typeof window !== 'undefined' && (window as any).env?.sentryDsn) || '',
   publicUrl: (typeof window !== 'undefined' && (window as any).env?.publicUrl) || '',
+  publicEmail: (typeof window !== 'undefined' && (window as any).env?.publicEmail) || '',
+  publicSiteUrl: (typeof window !== 'undefined' && (window as any).env?.publicSiteUrl) || '',
   version: (typeof window !== 'undefined' && (window as any).env?.version) || '1.0.0'
 };

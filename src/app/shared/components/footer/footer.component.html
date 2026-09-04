@@ -17,7 +17,7 @@
                         </p>
                         <div class="flex gap-4">
                             <!-- Emphasized WhatsApp -->
-                            <a href="https://wa.me/" target="_blank" class="w-12 h-12 rounded-2xl bg-[#25D366]/20 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1 shadow-[0_0_15px_rgba(37,211,102,0.3)] text-3xl border border-[#25D366]/50 relative group">
+                            <a [href]="socialLinks.whatsapp" target="_blank" class="w-12 h-12 rounded-2xl bg-[#25D366]/20 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1 shadow-[0_0_15px_rgba(37,211,102,0.3)] text-3xl border border-[#25D366]/50 relative group">
                                 <span class="absolute -top-1.5 -right-1.5 flex h-4 w-4">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-4 w-4 bg-[#25D366]"></span>
@@ -25,12 +25,15 @@
                                 <i class="fa-brands fa-whatsapp"></i>
                             </a>
                             <!-- Emphasized Facebook -->
-                            <a href="#" class="w-12 h-12 rounded-2xl bg-[#1877F2]/20 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1 shadow-[0_0_15px_rgba(24,119,242,0.3)] text-3xl border border-[#1877F2]/50">
+                            <a [href]="socialLinks.facebook" class="w-12 h-12 rounded-2xl bg-[#1877F2]/20 flex items-center justify-center text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1 shadow-[0_0_15px_rgba(24,119,242,0.3)] text-3xl border border-[#1877F2]/50">
                                 <i class="fa-brands fa-facebook-f"></i>
                             </a>
                             <!-- Emphasized TikTok -->
-                            <a href="#" class="w-12 h-12 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:bg-black transition-all transform hover:scale-110 hover:-translate-y-1 shadow-lg text-3xl border border-gray-600">
+                            <a [href]="socialLinks.tiktok" class="w-12 h-12 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:bg-black transition-all transform hover:scale-110 hover:-translate-y-1 shadow-lg text-3xl border border-gray-600">
                                 <i class="fa-brands fa-tiktok"></i>
+                            </a>
+                            <a [href]="socialLinks.youtube" class="w-12 h-12 rounded-2xl bg-[#FF0000]/20 flex items-center justify-center text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1 shadow-lg text-3xl border border-[#FF0000]/50">
+                                <i class="fa-brands fa-youtube"></i>
                             </a>
                         </div>
                     </div>
@@ -69,7 +72,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fa-solid fa-envelope text-brand-yellow"></i>
-                            <span>contact&#64;jammakxeewal.sn</span>
+                            <span>{{ environment.publicEmail }}</span>
                         </li>
                     </ul>
                 </div>

@@ -2,6 +2,7 @@
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
@@ -87,7 +88,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-share-nodes"></i></div>
             Liens Réseaux Sociaux (Header & Footer)
           </h3>
-          <p class="text-[11px] font-medium text-gray-500 mb-5 ml-9">Les liens des icônes WhatsApp, Facebook et TikTok du site public.</p>
+          <p class="text-[11px] font-medium text-gray-500 mb-5 ml-9">Les liens des icônes WhatsApp, Facebook, TikTok et YouTube du site public.</p>
           <div class="space-y-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-[#25D366] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
@@ -102,6 +103,11 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-tiktok"></i></div>
               <input [(ngModel)]="settings.tiktok" type="url" placeholder="https://tiktok.com/@jammakxeewal"
+                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-[#FF0000] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-youtube"></i></div>
+              <input [(ngModel)]="settings.youtube" type="url" placeholder="https://youtube.com/@jammakxeewal"
                 class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
             </div>
           </div>
@@ -358,6 +364,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   `
 })
 export class AdminSettingsComponent implements OnInit {
+  public environment = environment;
   readonly Math = Math;
   saved = false;
   isLoading = true;
@@ -367,11 +374,12 @@ export class AdminSettingsComponent implements OnInit {
 
   settings: any = {
     telephone: '+221 77 123 45 67',
-    email: 'contact@jammakxeewal.sn',
+    email: environment.publicEmail,
     adresse: 'Siège social JÀMM AK XÉEWAL\nThiès-Nord, Sénégal',
     whatsapp: 'https://wa.me/',
     facebook: '#',
     tiktok: '#',
+    youtube: '#',
     qr_code_url: '',
     vocal_max_seconds: 120,
     currentPassword: '',

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, signal, HostListener } from '@angular/cor
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PushNotificationService } from '../../../core/services/push-notification.service';
+import { PublicDataService } from '../../../core/services/public-data.service';
 import { Subscription } from 'rxjs';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 
@@ -35,11 +36,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isSubscribed = signal(false);
   isSubscribing = signal(false);
   showSubscribeSuccess = signal(false);
+  socialLinks: any = { whatsapp: 'https://wa.me/', facebook: '#', tiktok: '#', youtube: '#' };
   private sub?: Subscription;
 
-  constructor(private pushService: PushNotificationService) {}
+  constructor(private pushService: PushNotificationService, private publicData: PublicDataService) {}
 
   ngOnInit() {
+    this.publicData.getSettings().subscribe({
+      next: (res: any) => { this.socialLinks = { ...this.socialLinks, ...(res.data || {}) }; },
+      error: () => {}
+    });
     this.sub = this.pushService.notifications$.subscribe(notifs => {
       this.notifications = notifs;
       this.unreadCount = this.pushService.getUnreadCount();

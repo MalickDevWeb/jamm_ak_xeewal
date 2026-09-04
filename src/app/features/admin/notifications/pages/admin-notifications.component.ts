@@ -123,7 +123,7 @@ interface NotifTemplate {
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between">
-                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">jammakxeewal.sn</p>
+                  <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{{ environment.publicEmail.split('@')[1] }}</p>
                   <span class="text-[9px] text-gray-400">maintenant</span>
                 </div>
                 <p class="text-[12px] font-bold text-gray-900 mt-0.5 leading-tight break-words">
@@ -169,6 +169,7 @@ interface NotifTemplate {
   `
 })
 export class AdminNotificationsComponent {
+  public environment = environment;
   form = { title: '', body: '', url: '' };
   isSending = false;
   subscriberCount = 0;

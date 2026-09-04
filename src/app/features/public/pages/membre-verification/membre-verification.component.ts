@@ -11,6 +11,7 @@ import { environment } from '../../../../../environments/environment';
   templateUrl: './membre-verification.component.html',
 })
 export class MembreVerificationComponent implements OnInit {
+  public environment = environment;
   adherent = signal<any>(null);
   isLoading = signal(true);
   notFound = signal(false);

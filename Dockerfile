@@ -1,31 +1,41 @@
-# Étape 1 : Build Angular (URL injectée au runtime, pas en dur)
+# ---------- Build ----------
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Install dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --silent
 
+# Copy source and build Angular (production)
 COPY . .
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 RUN npx ng build --configuration=production
 
-# Étape 2 : Serveur Nginx
+# ---------- Runtime (Nginx) ----------
 FROM nginx:stable-alpine
 RUN apk add --no-cache gettext
 
-# Supprimer config par défaut
+# Remove default Nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copier fichiers build
+# Copy built files
 COPY --from=builder /app/dist/jamm-angular/browser /usr/share/nginx/html
 
-# Copier template env + config Nginx
+# Copy env template and custom Nginx config
 COPY src/assets/env.template.js /usr/share/nginx/html/assets/env.template.js
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.template.conf /etc/nginx/conf.d/nginx.template.conf
 
-# Variables d'environnement (fallback Vercel)
-ENV API_URL="https://backofficexammakxeewal.vercel.app/api/v1"
-ENV SENTRY_DSN="https://2fbcffec5a5f1c0b0423f2ad48264833@o4512013434683392.ingest.de.sentry.io/4512013443530832"
-ENV VAPID_PUBLIC_KEY="BNmas-sTgL2czxhDmQ7yvSMQ4X9X_LbUYyExcB_5e6XnUMy091FPpIUhQNuKSsfWleYSHUBT0BGqVdec4tqfGOc"
+# Environment variables (will be injected at runtime)
+ENV API_URL=""
+ENV BAC_OFFICE_URL=""
+ENV VAPID_PUBLIC_KEY=""
+ENV SENTRY_DSN=""
+ENV PUBLIC_URL=""
+ENV PUBLIC_EMAIL=""
+ENV PUBLIC_SITE_URL=""
+ENV VERSION=""
+ENV PORT="80"
 
-EXPOSE 80
-CMD ["sh", "-c", "envsubst '${API_URL} ${SENTRY_DSN} ${VAPID_PUBLIC_KEY}' < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && nginx -g 'daemon off;'"]
+# Substitute variables into env.js and nginx.conf, then start Nginx
+CMD ["sh", "-c", "envsubst '${API_URL} ${BAC_OFFICE_URL} ${VAPID_PUBLIC_KEY} ${SENTRY_DSN} ${PUBLIC_URL} ${PUBLIC_EMAIL} ${PUBLIC_SITE_URL} ${VERSION}' < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && envsubst '${PORT}' < /etc/nginx/conf.d/nginx.template.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'" ]

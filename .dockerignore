@@ -1,13 +1,38 @@
+# Dépendances
 node_modules
+npm-debug.log
+
+# Build Angular
+dist
+.angular
+
+# Tests
+coverage
+src/**/*.spec.ts
+
+
+# Git
 .git
 .gitignore
+
+# Documentation
 README.md
+*.md
+
+# Docker
 Dockerfile
+docker-compose.yml
 .dockerignore
 
-src/**/*.spec.ts
-src/**/*.test.ts
-e2e
-*.md
-tmp
-dist
+# Scripts
+scripts/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -11,5 +11,7 @@ export const environment = {
   vapidPublicKey: 'BNmas-sTgL2czxhDmQ7yvSMQ4X9X_LbUYyExcB_5e6XnUMy091FPpIUhQNuKSsfWleYSHUBT0BGqVdec4tqfGOc',
   sentryDsn: '',
   publicUrl: 'https://jammakxeewal.sn',
+  publicEmail: 'contact@jammakxeewal.sn',
+  publicSiteUrl: 'https://jammakxeewal.sn',
   version: '1.0.0-dev'
 };

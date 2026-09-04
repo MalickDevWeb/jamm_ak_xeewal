@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   evenements: any[] = [];
   qrTargetUrl = '';
   qrImageUrl = '';
-  baseUrl = typeof window !== 'undefined' ? window.location.origin : environment.publicUrl;
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : environment.publicSiteUrl;
   readonly encodeURIComponent = encodeURIComponent;
 
   readonly defaultHeroTitle = `Écouter les besoins, <br/>\n<span class='text-brand-yellow'>Construire Ensemble.</span>`;
@@ -401,7 +401,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
 
-    const uid = event.id + "@jammakxeewal.sn";
+    const uid = event.id + "@" + environment.publicEmail.split("@")[1];
     const now = new Date();
     const nowStr = now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     const start = formatDate(event.date, event.heureDebut);

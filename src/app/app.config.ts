@@ -4,6 +4,7 @@ import { ApplicationConfig, ErrorHandler } from '@angular/core';
 import { provideRouter, Router, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideServiceWorker } from '@angular/service-worker';
 import * as Sentry from '@sentry/angular';
 import { environment } from '../environments/environment';
 
@@ -15,6 +16,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
 
     // Intercepter toutes les erreurs Angular et les envoyer a Sentry
     {
