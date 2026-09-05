@@ -1,17 +1,15 @@
 // ============================================
 // FICHIER GENERE AUTOMATIQUEMENT PAR scripts/generate-env.js
-// NE PAS MODIFIER A LA MAIN — modifier le fichier .env a la place
+// NE PAS MODIFIER A LA MAIN — valeurs injectees depuis l'environnement
 // ============================================
-// Executer : node scripts/generate-env.js
-// Ou : npm run prebuild (avant ng build)
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3001/api/v1',
-  bacOfficeUrl: 'http://localhost:3001',
-  vapidPublicKey: 'BNmas-sTgL2czxhDmQ7yvSMQ4X9X_LbUYyExcB_5e6XnUMy091FPpIUhQNuKSsfWleYSHUBT0BGqVdec4tqfGOc',
-  sentryDsn: '',
-  publicUrl: 'https://jammakxeewal.sn',
-  publicEmail: 'contact@jammakxeewal.sn',
-  publicSiteUrl: 'https://jammakxeewal.sn',
-  version: '1.0.0-dev'
+  apiUrl: (typeof window !== 'undefined' && (window as any).env?.apiUrl) || 'http://localhost:3001/api/v1',
+  bacOfficeUrl: (typeof window !== 'undefined' && (window as any).env?.bacOfficeUrl) || 'http://localhost:3001',
+  vapidPublicKey: (typeof window !== 'undefined' && (window as any).env?.vapidPublicKey) || 'BNmas-sTgL2czxhDmQ7yvSMQ4X9X_LbUYyExcB_5e6XnUMy091FPpIUhQNuKSsfWleYSHUBT0BGqVdec4tqfGOc',
+  sentryDsn: (typeof window !== 'undefined' && (window as any).env?.sentryDsn) || '',
+  publicUrl: (typeof window !== 'undefined' && (window as any).env?.publicUrl) || 'https://jammakxeewal.sn',
+  publicEmail: (typeof window !== 'undefined' && (window as any).env?.publicEmail) || 'contact@jammakxeewal.sn',
+  publicSiteUrl: (typeof window !== 'undefined' && (window as any).env?.publicSiteUrl) || 'https://jammakxeewal.sn',
+  version: (typeof window !== 'undefined' && (window as any).env?.version) || '1.0.0-dev'
 };

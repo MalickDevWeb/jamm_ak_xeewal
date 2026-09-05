@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx ng build --configuration production",
+  "buildCommand": "node scripts/generate-env.js && npx ng build --configuration production",
   "installCommand": "npm install",
   "outputDirectory": "dist/jamm-angular/browser",
   "rewrites": [
