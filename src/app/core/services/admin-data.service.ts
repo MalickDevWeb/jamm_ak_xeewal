@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, shareReplay } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of, shareReplay, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 
@@ -25,6 +25,7 @@ const CACHE_TTL_MS = 30 * 1000; // 30 secondes
 export class AdminDataService {
   private apiUrl = environment.apiUrl;
   private cache = new Map<string, CacheEntry>();
+  private inFlight = new Map<string, Observable<any>>();
 
   constructor(private http: HttpClient) {}
 
@@ -33,21 +34,45 @@ export class AdminDataService {
     if (entry && (Date.now() - entry.timestamp) < CACHE_TTL_MS) {
       return of(entry.data); // Données en cache → instantané
     }
-    return request$.pipe(
-      tap(data => this.cache.set(key, { data, timestamp: Date.now() }))
+
+    const running = this.inFlight.get(key);
+    if (running) {
+      return running; // Mutualise les requêtes en vol
+    }
+
+    const req$ = request$.pipe(
+      tap(data => {
+        this.cache.set(key, { data, timestamp: Date.now() });
+        this.inFlight.delete(key);
+      }),
+      catchError(err => {
+        this.inFlight.delete(key);
+        return throwError(() => err);
+      }),
+      shareReplay(1)
     );
+
+    this.inFlight.set(key, req$);
+    return req$;
   }
 
   invalidate(key: string) {
     this.cache.delete(key);
+    this.inFlight.delete(key);
   }
 
   invalidateAll() {
     this.cache.clear();
+    this.inFlight.clear();
   }
 
   // GET avec cache
-  getAdherents(): Observable<any> { return this.getCached('adherents', this.http.get(`${this.apiUrl}/adherents`)); }
+  getAdherents(forceRefresh: boolean = false): Observable<any> {
+    if (forceRefresh) {
+      this.invalidate('adherents');
+    }
+    return this.getCached('adherents', this.http.get(`${this.apiUrl}/adherents`));
+  }
   getBesoins(): Observable<any> { return this.getCached('besoins', this.http.get(`${this.apiUrl}/besoins`)); }
   getIdees(): Observable<any> { return this.getCached('idees', this.http.get(`${this.apiUrl}/idees`)); }
   getMessages(): Observable<any> { return this.getCached('messages', this.http.get(`${this.apiUrl}/messages`)); }

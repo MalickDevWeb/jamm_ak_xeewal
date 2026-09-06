@@ -25,6 +25,10 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       <p class="text-[15px] text-gray-500 mt-1"><span class="font-bold text-[#008d36]">{{ total }}</span> membres inscrits au mouvement.</p>
     </div>
     <div class="flex items-center gap-3 flex-wrap justify-end">
+      <button (click)="refreshData(true)" [disabled]="isLoading" title="Actualiser la liste"
+        class="w-11 h-11 bg-white border border-gray-200 text-gray-600 rounded-xl hover:text-[#008d36] hover:border-[#008d36] transition-all flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] shrink-0 disabled:opacity-50">
+        <i class="fa-solid fa-arrows-rotate text-sm" [class.fa-spin]="isLoading"></i>
+      </button>
       <button (click)="downloadSelectedBadges()" [disabled]="selectedIds.size === 0 || isDownloading"
         class="px-4 py-3 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-amber-600 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
         <i class="fa-solid fa-id-badge"></i> Badges sélectionnés ({{ selectedIds.size }})
@@ -157,7 +161,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             <th class="p-4 py-3 pl-2">ADHÉRENT</th>
             <th class="p-4 py-3">CONTACT</th>
             <th class="p-4 py-3">QUARTIER</th>
-            <th class="p-4 py-3">DATE D'ADHÉSION</th>
+            <th class="p-4 py-3">DATE & HEURE D'ADHÉSION</th>
             <th class="p-4 py-3">STATUT</th>
             <th class="p-4 py-3">PIÈCE D'IDENTITÉ</th>
             <th class="p-4 py-3 text-center w-20 pr-6">ACTIONS</th>
@@ -181,7 +185,13 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </td>
             <td class="p-4 text-gray-500 font-medium text-[13px]">{{ a.telephone }}</td>
             <td class="p-4 text-gray-600 font-medium text-[13px]">{{ a.quartier }}</td>
-            <td class="p-4 text-gray-500 font-medium text-[13px]">{{ a.createdAt | date: 'dd/MM/yyyy' }}</td>
+            <td class="p-4 whitespace-nowrap">
+              <span class="text-gray-900 font-bold text-[13px] block">{{ a.createdAt | date: 'dd/MM/yyyy' }}</span>
+              <span class="text-gray-400 font-mono text-[11px] flex items-center gap-1 mt-0.5">
+                <i class="fa-regular fa-clock text-[10px] text-[#008d36]"></i>
+                {{ a.createdAt | date: 'HH:mm:ss' }}
+              </span>
+            </td>
             <td class="p-4">
               <span [class]="getStatutClass(a.statut)" class="text-[10px] font-bold px-2.5 py-1 rounded-md">{{ a.statut }}</span>
             </td>
@@ -193,23 +203,38 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </td>
             <td class="p-4 text-center pr-6">
               <div class="flex items-center justify-end gap-1.5">
-                <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1">
-                  <i class="fa-solid fa-check"></i> Activer
+                <!-- Bouton Activer si non actif -->
+                <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Activer la carte">
+                  <i class="fa-solid fa-check text-[10px]"></i> Activer
+                </button>
+                <!-- Bouton Désactiver si actif -->
+                <button *ngIf="a.statut === 'ACTIF'" (click)="action('Désactiver', a.id)" class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Désactiver la carte">
+                  <i class="fa-solid fa-ban text-[10px]"></i> Désactiver
                 </button>
                 <button (click)="downloadBadge(a)" [disabled]="isDownloading" title="Télécharger le badge PNG"
                   class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors disabled:opacity-50" >
                   <i class="fa-solid fa-id-badge text-xs"></i>
                 </button>
-                <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Détails">
+                <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Modifier / Détails">
                   <i class="fa-regular fa-eye text-xs"></i>
                 </button>
                 <div class="relative group/dropdown">
                   <button class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-gray-700 hover:bg-gray-100 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-ellipsis text-xs"></i>
                   </button>
-                  <div class="absolute right-0 top-full mt-1 bg-white border border-gray-100 shadow-lg rounded-xl py-2 w-32 hidden group-hover/dropdown:block z-10 text-left">
-                    <button (click)="openEditModal(a)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36]">Modifier</button>
-                    <button (click)="action('Supprimer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50">Supprimer</button>
+                  <div class="absolute right-0 top-full mt-1 bg-white border border-gray-100 shadow-lg rounded-xl py-2 w-36 hidden group-hover/dropdown:block z-10 text-left">
+                    <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-[#008d36] hover:bg-green-50 flex items-center gap-2">
+                      <i class="fa-solid fa-check text-[10px]"></i> Activer carte
+                    </button>
+                    <button *ngIf="a.statut === 'ACTIF'" (click)="action('Désactiver', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 flex items-center gap-2">
+                      <i class="fa-solid fa-ban text-[10px]"></i> Désactiver carte
+                    </button>
+                    <button (click)="openEditModal(a)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36] flex items-center gap-2">
+                      <i class="fa-solid fa-pen text-[10px]"></i> Modifier
+                    </button>
+                    <button (click)="action('Supprimer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 flex items-center gap-2">
+                      <i class="fa-solid fa-trash text-[10px]"></i> Supprimer
+                    </button>
                   </div>
                 </div>
               </div>
@@ -288,20 +313,49 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             </select>
           </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1.5">Compétences / Motivation</label>
-          <textarea [(ngModel)]="formData.competences" rows="2" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#008d36] focus:ring-1 focus:ring-[#008d36] transition-all text-gray-800 placeholder-gray-400 resize-none" placeholder="Compétences ou motivation..."></textarea>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">Compétences / Motivation</label>
+            <textarea [(ngModel)]="formData.competences" rows="2" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#008d36] focus:ring-1 focus:ring-[#008d36] transition-all text-gray-800 placeholder-gray-400 resize-none" placeholder="Compétences ou motivation..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">Statut de la carte</label>
+            <select [(ngModel)]="formData.statut" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#008d36] focus:ring-1 focus:ring-[#008d36] transition-all text-gray-800 font-bold">
+              <option value="ACTIF">🟢 ACTIF (Carte activée)</option>
+              <option value="SUSPENDU">🟠 SUSPENDU (Carte désactivée)</option>
+              <option value="NOUVEAU">🟡 NOUVEAU (Nouveau membre)</option>
+              <option value="EN ATTENTE">🔵 EN ATTENTE</option>
+            </select>
+          </div>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-2">Pièce d'identité (optionnel)</label>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Recto</label>
-              <input type="text" [(ngModel)]="formData.carteRectoUrl" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#008d36] focus:ring-1 focus:ring-[#008d36] transition-all text-gray-800 placeholder-gray-400" placeholder="URL image recto">
+              <div *ngIf="formData.carteRectoUrl" class="mb-2 relative w-full h-24 rounded-xl border border-gray-200 overflow-hidden group">
+                 <img [src]="formData.carteRectoUrl" class="w-full h-full object-cover">
+                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                   <button (click)="formData.carteRectoUrl = ''" class="text-white text-xs font-bold px-3 py-1 bg-red-500 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                 </div>
+              </div>
+              <input type="file" (change)="onUploadIdCard($event, 'recto')" accept="image/*" class="hidden" #rectoInput>
+              <button *ngIf="!formData.carteRectoUrl" (click)="rectoInput.click()" [disabled]="isUploadingRecto" class="w-full px-4 py-2.5 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up text-lg"></i> {{ isUploadingRecto ? 'Upload en cours...' : 'Uploader Recto' }}
+              </button>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Verso</label>
-              <input type="text" [(ngModel)]="formData.carteVersoUrl" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#008d36] focus:ring-1 focus:ring-[#008d36] transition-all text-gray-800 placeholder-gray-400" placeholder="URL image verso">
+              <div *ngIf="formData.carteVersoUrl" class="mb-2 relative w-full h-24 rounded-xl border border-gray-200 overflow-hidden group">
+                 <img [src]="formData.carteVersoUrl" class="w-full h-full object-cover">
+                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                   <button (click)="formData.carteVersoUrl = ''" class="text-white text-xs font-bold px-3 py-1 bg-red-500 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                 </div>
+              </div>
+              <input type="file" (change)="onUploadIdCard($event, 'verso')" accept="image/*" class="hidden" #versoInput>
+              <button *ngIf="!formData.carteVersoUrl" (click)="versoInput.click()" [disabled]="isUploadingVerso" class="w-full px-4 py-2.5 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up text-lg"></i> {{ isUploadingVerso ? 'Upload en cours...' : 'Uploader Verso' }}
+              </button>
             </div>
           </div>
         </div>
@@ -351,16 +405,6 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
       <div class="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
         <div class="flex gap-3 flex-wrap">
-          <button (click)="downloadIdCard('png')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-[#008d36] hover:bg-[#022c16] rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
-            <i class="fa-solid fa-image" *ngIf="!isDownloading"></i>
-            <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
-            Pièce identité PNG
-          </button>
-          <button (click)="downloadIdCard('pdf')" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-[#008d36] bg-[#e6f3eb] hover:bg-[#d1e8d9] rounded-xl transition-all flex items-center gap-2 disabled:opacity-50">
-            <i class="fa-solid fa-file-pdf" *ngIf="!isDownloading"></i>
-            <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
-            Pièce identité PDF
-          </button>
           <button (click)="downloadBadge(selectedAdherent)" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
             <i class="fa-solid fa-id-badge" *ngIf="!isDownloading"></i>
             <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
@@ -594,9 +638,36 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     statut: 'NOUVEAU'
   };
 
-  
+  isUploadingRecto = false;
+  isUploadingVerso = false;
 
+  onUploadIdCard(event: Event, side: 'recto' | 'verso') {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+       if (side === 'recto') this.isUploadingRecto = true;
+       else this.isUploadingVerso = true;
+       this.cdr.markForCheck();
 
+       this.adminData.uploadMedia(file).subscribe({
+         next: (res: any) => {
+           if (res.success) {
+             if (side === 'recto') this.formData.carteRectoUrl = res.data.url;
+             else this.formData.carteVersoUrl = res.data.url;
+             this.showAlertMethod('success', 'Succès', 'Image uploadée avec succès !');
+           }
+           if (side === 'recto') this.isUploadingRecto = false;
+           else this.isUploadingVerso = false;
+           this.cdr.markForCheck();
+         },
+         error: () => {
+           this.showAlertMethod('error', 'Erreur', "Erreur lors de l'upload de l'image");
+           if (side === 'recto') this.isUploadingRecto = false;
+           else this.isUploadingVerso = false;
+           this.cdr.markForCheck();
+         }
+       });
+    }
+  }
   constructor(private adminData: AdminDataService,
     private bulkDelete: BulkDeleteService, private cdr: ChangeDetectorRef) {}
 
@@ -604,10 +675,22 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     this.refreshData();
   }
 
-  refreshData() {
-    this.adminData.getAdherents().subscribe({
-      next: (res: any) => { this.adherents = res.data; this.total = res.total; this.isLoading = false; },
-      error: () => { this.isLoading = false; }
+  refreshData(forceRefresh: boolean = false) {
+    if (this.adherents.length === 0 || forceRefresh) {
+      this.isLoading = true;
+      this.cdr.markForCheck();
+    }
+    this.adminData.getAdherents(forceRefresh).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.adherents = res?.data || [];
+        this.total = res?.total ?? this.adherents.length;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -616,7 +699,9 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       'ACTIF': 'text-[#008d36] bg-[#e6f3eb]', 
       'NOUVEAU': 'text-orange-600 bg-orange-100', 
       'EN ATTENTE': 'text-blue-600 bg-blue-100',
-      'SUSPENDU': 'text-gray-500 bg-gray-100' 
+      'SUSPENDU': 'text-amber-700 bg-amber-100',
+      'DESACTIVE': 'text-red-700 bg-red-100',
+      'INACTIF': 'text-red-700 bg-red-100'
     };
     return map[statut] || 'text-gray-500 bg-gray-100';
   }
@@ -718,6 +803,28 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
       }
       
       this.adminData.updateEntity('adherents', id, { statut: 'ACTIF' }).subscribe({
+        next: () => {
+          // Success background save
+        },
+        error: () => {
+          if (adherent) {
+            adherent.statut = prevStatut;
+            this.cdr.markForCheck();
+            this.showAlertMethod('error', 'Erreur', 'Échec de synchronisation avec le serveur.');
+          }
+        }
+      });
+    } else if ((type === 'Désactiver' || type === 'Suspendre') && id) {
+      const adherent = this.adherents.find((a: any) => a.id === id);
+      const prevStatut = adherent ? adherent.statut : 'ACTIF';
+      
+      if (adherent) {
+        adherent.statut = 'SUSPENDU';
+        this.cdr.markForCheck();
+        this.showAlertMethod('info', 'Carte désactivée', 'La carte de cet adhérent a été désactivée.');
+      }
+      
+      this.adminData.updateEntity('adherents', id, { statut: 'SUSPENDU' }).subscribe({
         next: () => {
           // Success background save
         },

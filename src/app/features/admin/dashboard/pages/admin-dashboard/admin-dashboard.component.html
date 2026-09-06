@@ -161,7 +161,7 @@
         <!-- Mockup items since we may not have media loaded quickly or beautifully formatted -->
         <div class="flex gap-4 items-start group cursor-pointer">
           <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
-            <img src="assets/jamm_ak_xeewal_ui_1787571007726.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+            <img src="assets/jamm_ak_xeewal_ui_1787571007726.jpg" alt="Activité récente" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">Rencontre avec Khadim Gning</h4>
@@ -174,7 +174,7 @@
 
         <div class="flex gap-4 items-start group cursor-pointer">
           <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
-            <img src="assets/set_setal_image_1787576910323.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+            <img src="assets/set_setal_image_1787576910323.jpg" alt="Activité récente" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2">Rencontre avec le responsable du mouvement à Keur</h4>
@@ -187,7 +187,7 @@
 
         <div class="flex gap-4 items-start group cursor-pointer">
           <div class="w-[100px] h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
-            <img src="assets/media_1787573242548.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+            <img src="assets/media_1787573242548.jpg" alt="Illustration de la rencontre" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-2">Rencontre avec LI à celluie de Baye Cheikh Gning</h4>
@@ -252,7 +252,7 @@
                 </button>
               </td>
               <td class="p-3 text-center">
-                <button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                <button aria-label="Options" class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
               </td>
             </tr>
             <!-- Fill in remaining rows if less than 3 for mockup accuracy -->
@@ -272,7 +272,7 @@
                   <i class="fa-solid fa-id-card"></i> Voir pièce
                 </button>
               </td>
-              <td class="p-3 text-center"><button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+              <td class="p-3 text-center"><button aria-label="Options" class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
             </tr>
             <tr *ngIf="recentAdherents.length < 2" class="hover:bg-gray-50/50 transition-colors">
               <td class="p-3 py-4">
@@ -290,7 +290,7 @@
                   <i class="fa-solid fa-id-card"></i> Voir pièce
                 </button>
               </td>
-              <td class="p-3 text-center"><button class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+              <td class="p-3 text-center"><button aria-label="Options" class="text-gray-400 hover:text-gray-700 transition-colors p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
             </tr>
           </tbody>
         </table>

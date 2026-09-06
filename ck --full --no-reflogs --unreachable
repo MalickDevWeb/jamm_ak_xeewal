@@ -1,0 +1,39 @@
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m HEAD@{Sat Sep 5 18:20:04 2026}: checkout: moving from version2 to main
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m HEAD@{Sat Sep 5 18:18:30 2026}: reset: moving to origin/version2
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m refs/remotes/origin/version2@{Sat Sep 5 02:10:40 2026}: update by push
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m refs/heads/version2@{Sat Sep 5 02:10:37 2026}: branch: Created from HEAD
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m HEAD@{Sat Sep 5 02:10:37 2026}: checkout: moving from main to version2
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m refs/remotes/origin/main@{Sat Sep 5 01:51:32 2026}: update by push
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m refs/heads/main@{Sat Sep 5 01:51:30 2026}: commit: ci: declenchement du pipeline Docker Hub avec la nouvelle cle
+[33m529401d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/version2[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mversion2[m[33m)[m HEAD@{Sat Sep 5 01:51:30 2026}: commit: ci: declenchement du pipeline Docker Hub avec la nouvelle cle
+[33m507a022[m refs/remotes/origin/main@{Sat Sep 5 01:46:52 2026}: update by push
+[33m507a022[m refs/heads/main@{Sat Sep 5 01:46:50 2026}: commit: fix(ui): limiter la hauteur du popup quartiers avec scroll interne propre
+[33m507a022[m HEAD@{Sat Sep 5 01:46:50 2026}: commit: fix(ui): limiter la hauteur du popup quartiers avec scroll interne propre
+[33m5d05b63[m refs/remotes/origin/main@{Sat Sep 5 01:19:06 2026}: update by push
+[33m5d05b63[m refs/heads/main@{Sat Sep 5 01:19:04 2026}: commit: fix(frontend): auto-sanitization des protocoles URL et priorite de process.env
+[33m5d05b63[m HEAD@{Sat Sep 5 01:19:04 2026}: commit: fix(frontend): auto-sanitization des protocoles URL et priorite de process.env
+[33md5e305a[m refs/remotes/origin/main@{Sat Sep 5 01:15:40 2026}: update by push
+[33md5e305a[m refs/heads/main@{Sat Sep 5 01:15:38 2026}: commit: ci: ajout du workflow GitHub Actions pour build et push Docker Hub
+[33md5e305a[m HEAD@{Sat Sep 5 01:15:38 2026}: commit: ci: ajout du workflow GitHub Actions pour build et push Docker Hub
+[33md323509[m refs/remotes/origin/main@{Sat Sep 5 01:09:00 2026}: update by push
+[33md323509[m refs/heads/main@{Sat Sep 5 01:07:45 2026}: commit: fix(frontend): lecture dynamique des variables d'environnement Vercel lors du build
+[33md323509[m HEAD@{Sat Sep 5 01:07:45 2026}: commit: fix(frontend): lecture dynamique des variables d'environnement Vercel lors du build
+[33m2b3fb30[m refs/remotes/origin/main@{Fri Sep 4 23:38:38 2026}: update by push
+[33m2b3fb30[m refs/heads/main@{Fri Sep 4 23:38:30 2026}: commit: ajoutr de youtube
+[33m2b3fb30[m HEAD@{Fri Sep 4 23:38:30 2026}: commit: ajoutr de youtube
+[33me44e899[m refs/remotes/origin/main@{Fri Sep 4 20:15:56 2026}: update by push
+[33me44e899[m refs/heads/main@{Fri Sep 4 20:15:18 2026}: commit: feat: design harmonisé pour le login super admin maintenance
+[33me44e899[m HEAD@{Fri Sep 4 20:15:18 2026}: commit: feat: design harmonisé pour le login super admin maintenance
+[33m4ec1c17[m refs/remotes/origin/main@{Fri Sep 4 20:04:14 2026}: update by push
+[33m4ec1c17[m refs/heads/main@{Fri Sep 4 20:04:11 2026}: commit: feat: mise à jour du frontend (PWA, Admin Terrain)
+[33m4ec1c17[m HEAD@{Fri Sep 4 20:04:11 2026}: commit: feat: mise à jour du frontend (PWA, Admin Terrain)
+[33m6ed93c2[m refs/remotes/origin/main@{Fri Sep 4 12:46:01 2026}: update by push
+[33m6ed93c2[m refs/heads/main@{Fri Sep 4 12:45:52 2026}: commit: feat: interface Super Admin Terrain, refonte UI selects dynamiques, validation téléphone
+[33m6ed93c2[m HEAD@{Fri Sep 4 12:45:52 2026}: commit: feat: interface Super Admin Terrain, refonte UI selects dynamiques, validation téléphone
+[33m1720029[m refs/remotes/origin/main@{Thu Sep 3 21:51:55 2026}: update by push
+[33m1720029[m refs/heads/main@{Thu Sep 3 21:51:52 2026}: commit: fix: toujours afficher l'avatar par défaut sur les badges et masquer badge blanc
+[33m1720029[m HEAD@{Thu Sep 3 21:51:52 2026}: commit: fix: toujours afficher l'avatar par défaut sur les badges et masquer badge blanc
+[33mb209152[m refs/remotes/origin/main@{Thu Sep 3 21:44:22 2026}: update by push
+[33mb209152[m refs/heads/main@{Thu Sep 3 21:44:20 2026}: commit: feat: design carte horizontale pour la page de vérification
+[33mb209152[m HEAD@{Thu Sep 3 21:44:20 2026}: commit: feat: design carte horizontale pour la page de vérification
+[33m436385e[m refs/remotes/origin/main@{Thu Sep 3 21:21:16 2026}: update by push

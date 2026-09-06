@@ -65,11 +65,14 @@ import { environment } from '../../../../../environments/environment';
               <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold" [ngClass]="getStatutClass(e.statut)">
                 {{ e.statut }}
               </span>
-              <div class="flex gap-2">
-                <button (click)="openEditModal(e)" class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all" title="Modifier">
+              <div class="flex gap-1.5">
+                <button (click)="viewEvenement(e)" class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-[#022c16] hover:text-white flex items-center justify-center transition-all shadow-sm" title="Voir les détails">
+                  <i class="fa-solid fa-eye text-sm"></i>
+                </button>
+                <button (click)="openEditModal(e)" class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Modifier">
                   <i class="fa-solid fa-pen text-sm"></i>
                 </button>
-                <button (click)="deleteItem(e.id)" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all" title="Supprimer">
+                <button (click)="deleteItem(e.id)" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Supprimer">
                   <i class="fa-solid fa-trash text-sm"></i>
                 </button>
               </div>
@@ -78,70 +81,164 @@ import { environment } from '../../../../../environments/environment';
         </div>
       </div>
 
-      <!-- Modal -->
-      <div *ngIf="showModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl animate-fade-in-up my-4">
-          <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-3xl">
-            <div class="flex items-center justify-between">
-              <h3 class="font-black text-2xl text-gray-900">{{ isEditing ? 'Modifier' : 'Nouvel événement' }}</h3>
-              <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-all">
-                <i class="fa-solid fa-xmark text-xl"></i>
-              </button>
-            </div>
-          </div>
-          <div class="p-6 space-y-4">
-            <div>
-              <label class="block text-sm font-black text-gray-700 mb-2">Titre *</label>
-              <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-black text-gray-700 mb-2">Description</label>
-              <textarea [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none resize-none"></textarea>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-black text-gray-700 mb-2">Date *</label>
-                <input type="date" [(ngModel)]="formData.date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+      <!-- Modal Création / Modification -->
+      <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 sm:p-6" (click)="closeModal()">
+        <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl animate-fade-in-up flex flex-col max-h-[90vh] overflow-hidden border border-gray-100" (click)="$event.stopPropagation()">
+          <!-- Modal Header (Fixe) -->
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50/80 to-white shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-[#e6f3eb] text-[#008d36] flex items-center justify-center font-bold shadow-sm border border-[#008d36]/10">
+                <i class="fa-solid text-base" [class.fa-calendar-plus]="!isEditing" [class.fa-calendar-check]="isEditing"></i>
               </div>
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2">Catégorie</label>
-                <select [(ngModel)]="formData.categorie" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
+                <h3 class="font-black text-lg text-gray-900 leading-tight">
+                  {{ isEditing ? "Modifier l'événement" : 'Nouvel événement' }}
+                </h3>
+                <p class="text-xs text-gray-500 font-medium">Programmation et gestion de l'événement</p>
+              </div>
+            </div>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+
+          <!-- Modal Body (Défilable, compact, très joli) -->
+          <div class="p-6 space-y-4 overflow-y-auto flex-1">
+            <!-- Titre -->
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre de l'événement <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.titre" placeholder="Ex: Rencontre citoyenne, Campagne de reboisement..." class="w-full px-4 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none">
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Description</label>
+              <textarea [(ngModel)]="formData.description" rows="2" placeholder="Brève description ou ordre du jour de l'événement..." class="w-full px-4 py-2 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none resize-none"></textarea>
+            </div>
+
+            <!-- Date & Catégorie (2 colonnes) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Date <span class="text-red-500">*</span></label>
+                <input type="date" [(ngModel)]="formData.date" class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none">
+              </div>
+              <div>
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Catégorie</label>
+                <select [(ngModel)]="formData.categorie" class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none cursor-pointer">
                   <option value="">Général</option>
                   <option value="Causerie">Causerie</option>
                   <option value="Rencontre">Rencontre</option>
                   <option value="Formation">Formation</option>
                   <option value="Sport">Sport</option>
+                  <option value="Culture">Culture</option>
+                  <option value="Autre">Autre</option>
                 </select>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Heure début & Heure fin (2 colonnes) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2">Heure début</label>
-                <input type="time" [(ngModel)]="formData.heureDebut" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Heure de début</label>
+                <input type="time" [(ngModel)]="formData.heureDebut" class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none">
               </div>
               <div>
-                <label class="block text-sm font-black text-gray-700 mb-2">Heure fin</label>
-                <input type="time" [(ngModel)]="formData.heureFin" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Heure de fin</label>
+                <input type="time" [(ngModel)]="formData.heureFin" class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none">
               </div>
             </div>
-            <div>
-              <label class="block text-sm font-black text-gray-700 mb-2">Lieu</label>
-              <input type="text" [(ngModel)]="formData.lieu" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none">
-            </div>
-            <div>
-              <label class="block text-sm font-black text-gray-700 mb-2">Statut</label>
-              <select [(ngModel)]="formData.statut" class="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/20 transition-all outline-none bg-white">
-                <option value="A_VENIR">À venir</option>
-                <option value="EN_COURS">En cours</option>
-                <option value="TERMINE">Terminé</option>
-                <option value="ANNULE">Annulé</option>
-              </select>
+
+            <!-- Lieu & Statut (2 colonnes) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Lieu</label>
+                <input type="text" [(ngModel)]="formData.lieu" placeholder="Ex: Maison de quartier..." class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none">
+              </div>
+              <div>
+                <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Statut</label>
+                <select [(ngModel)]="formData.statut" class="w-full px-3.5 py-2.5 bg-gray-50/60 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:bg-white focus:border-[#022c16] focus:ring-2 focus:ring-[#022c16]/15 transition-all outline-none cursor-pointer">
+                  <option value="A_VENIR">À venir</option>
+                  <option value="EN_COURS">En cours</option>
+                  <option value="TERMINE">Terminé</option>
+                  <option value="ANNULE">Annulé</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-3xl">
-            <button (click)="closeModal()" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">Annuler</button>
-            <button (click)="submitForm()" [disabled]="isSubmitting" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-70">
-              {{ isEditing ? 'Enregistrer' : 'Créer' }}
+
+          <!-- Modal Footer (Fixe) -->
+          <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/60 shrink-0">
+            <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition-all shadow-sm">
+              Annuler
+            </button>
+            <button (click)="submitForm()" [disabled]="isSubmitting || !formData.titre || !formData.date" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#022c16] to-[#034256] hover:opacity-95 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i *ngIf="isSubmitting" class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+              <i *ngIf="!isSubmitting" class="fa-solid" [class.fa-check]="isEditing" [class.fa-plus]="!isEditing"></i>
+              <span>{{ isEditing ? 'Enregistrer' : 'Créer l\'événement' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Affichage Détails Événement -->
+      <div *ngIf="showViewModal && selectedEvenementForView" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 sm:p-6" (click)="closeViewModal()">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in-up flex flex-col max-h-[90vh] overflow-hidden border border-gray-100" (click)="$event.stopPropagation()">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50/80 to-white shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-[#e6f3eb] text-[#008d36] flex items-center justify-center font-bold shadow-sm border border-[#008d36]/10">
+                <i class="fa-solid fa-calendar-day text-base"></i>
+              </div>
+              <div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                  {{ selectedEvenementForView.categorie || 'Général' }}
+                </span>
+                <h3 class="font-black text-base text-gray-900 leading-tight mt-0.5">Détails de l'événement</h3>
+              </div>
+            </div>
+            <button (click)="closeViewModal()" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+
+          <!-- Body -->
+          <div class="p-6 space-y-4 overflow-y-auto flex-1">
+            <div>
+              <h2 class="text-xl font-black text-gray-900 mb-2">{{ selectedEvenementForView.titre }}</h2>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold" [ngClass]="getStatutClass(selectedEvenementForView.statut)">
+                {{ selectedEvenementForView.statut }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 py-3 border-y border-gray-100">
+              <div class="flex items-center gap-2.5 text-gray-700 text-sm">
+                <i class="fa-solid fa-calendar-days text-[#008d36] w-4"></i>
+                <span class="font-medium">{{ selectedEvenementForView.date | date:'dd MMMM yyyy' }}</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-gray-700 text-sm" *ngIf="selectedEvenementForView.heureDebut">
+                <i class="fa-solid fa-clock text-[#008d36] w-4"></i>
+                <span class="font-medium">{{ selectedEvenementForView.heureDebut }} <span *ngIf="selectedEvenementForView.heureFin">- {{ selectedEvenementForView.heureFin }}</span></span>
+              </div>
+              <div class="col-span-2 flex items-center gap-2.5 text-gray-700 text-sm" *ngIf="selectedEvenementForView.lieu">
+                <i class="fa-solid fa-location-dot text-[#008d36] w-4"></i>
+                <span class="font-medium">{{ selectedEvenementForView.lieu }}</span>
+              </div>
+            </div>
+
+            <div *ngIf="selectedEvenementForView.description">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Description</h4>
+              <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-gray-50/50 p-4 rounded-2xl border border-gray-100">{{ selectedEvenementForView.description }}</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/60 shrink-0">
+            <button (click)="closeViewModal()" class="px-4 py-2 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-all shadow-sm">
+              Fermer
+            </button>
+            <button (click)="openEditFromView()" class="px-5 py-2 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl shadow-sm transition-all flex items-center gap-2">
+              <i class="fa-solid fa-pen text-xs"></i>
+              <span>Modifier</span>
             </button>
           </div>
         </div>
@@ -182,6 +279,8 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   showModal = false;
   isEditing = false;
   editingId: string | null = null;
+  showViewModal = false;
+  selectedEvenementForView: any = null;
 
   // === BULK DELETE STATE ===
   selectedIds: Set<string> = new Set();
@@ -274,6 +373,26 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   }
 
   closeModal() { this.showModal = false; this.isSubmitting = false; }
+  
+  viewEvenement(e: any) {
+    this.selectedEvenementForView = e;
+    this.showViewModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedEvenementForView = null;
+    this.cdr.markForCheck();
+  }
+
+  openEditFromView() {
+    if (this.selectedEvenementForView) {
+      const item = this.selectedEvenementForView;
+      this.closeViewModal();
+      this.openEditModal(item);
+    }
+  }
 
   submitForm() {
     if (!this.formData.titre || !this.formData.date) {

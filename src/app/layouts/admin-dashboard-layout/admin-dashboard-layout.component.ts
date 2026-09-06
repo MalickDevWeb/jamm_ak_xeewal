@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { RbacService } from '../../core/services/rbac.service';
 import { AdminDataService } from '../../core/services/admin-data.service';
 import { Subject, forkJoin, takeUntil, finalize } from 'rxjs';
 
@@ -20,6 +21,8 @@ interface NavItem {
   label: string;
   icon: string;
   badge?: number;
+  permission?: string;
+  category?: string;
 }
 
 @Component({
@@ -46,18 +49,25 @@ interface NavItem {
         </div>
         
         <!-- Navigation -->
-        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-          <a *ngFor="let item of navItems; trackBy: trackByPath"
-             [routerLink]="item.path"
-             routerLinkActive="bg-[#e6f3eb] text-[#022c16] font-bold"
-             [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
-             class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[14px] font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all group">
-            <i [class]="item.icon + ' w-5 text-center text-lg'" 
-               [routerLinkActive]="'text-[#022c16]'" 
-               class="text-gray-400 group-hover:text-gray-600 transition-colors"></i>
-            <span class="flex-1">{{ item.label }}</span>
-            <span *ngIf="item.badge" class="px-2 py-0.5 text-[11px] font-bold bg-[#e6f3eb] text-[#022c16] rounded-full">{{ item.badge }}</span>
-          </a>
+        <nav class="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar">
+          <ng-container *ngFor="let group of groupedNavItems">
+            <div *ngIf="group.title" class="px-2 mt-6 mb-2">
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ group.title }}</span>
+            </div>
+            <div class="space-y-1.5">
+              <a *ngFor="let item of group.items; trackBy: trackByPath"
+                 [routerLink]="item.path"
+                 routerLinkActive="bg-[#e6f3eb] text-[#022c16] font-bold"
+                 [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
+                 class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[14px] font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all group">
+                <i [class]="item.icon + ' w-5 text-center text-lg'" 
+                   [routerLinkActive]="'text-[#022c16]'" 
+                   class="text-gray-400 group-hover:text-gray-600 transition-colors"></i>
+                <span class="flex-1">{{ item.label }}</span>
+                <span *ngIf="item.badge" class="px-2 py-0.5 text-[11px] font-bold bg-[#e6f3eb] text-[#022c16] rounded-full">{{ item.badge }}</span>
+              </a>
+            </div>
+          </ng-container>
         </nav>
         
         <!-- Logout -->
@@ -104,17 +114,24 @@ interface NavItem {
               </div>
             </div>
           </div>
-          <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-            <a *ngFor="let item of navItems; trackBy: trackByPath"
-               [routerLink]="item.path"
-               (click)="mobileMenuOpen = false"
-               routerLinkActive="bg-[#e6f3eb] text-[#022c16] font-bold"
-               [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
-               class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[14px] font-medium text-gray-500 hover:bg-gray-50 transition-all">
-              <i [class]="item.icon + ' w-5 text-center text-lg'" [routerLinkActive]="'text-[#022c16]'"></i>
-              <span class="flex-1">{{ item.label }}</span>
-              <span *ngIf="item.badge" class="px-2 py-0.5 text-[11px] font-bold bg-[#e6f3eb] text-[#022c16] rounded-full">{{ item.badge }}</span>
-            </a>
+          <nav class="flex-1 px-4 py-6 overflow-y-auto">
+            <ng-container *ngFor="let group of groupedNavItems">
+              <div *ngIf="group.title" class="px-2 mt-6 mb-2">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ group.title }}</span>
+              </div>
+              <div class="space-y-1.5">
+                <a *ngFor="let item of group.items; trackBy: trackByPath"
+                   [routerLink]="item.path"
+                   (click)="mobileMenuOpen = false"
+                   routerLinkActive="bg-[#e6f3eb] text-[#022c16] font-bold"
+                   [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
+                   class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[14px] font-medium text-gray-500 hover:bg-gray-50 transition-all">
+                  <i [class]="item.icon + ' w-5 text-center text-lg'" [routerLinkActive]="'text-[#022c16]'"></i>
+                  <span class="flex-1">{{ item.label }}</span>
+                  <span *ngIf="item.badge" class="px-2 py-0.5 text-[11px] font-bold bg-[#e6f3eb] text-[#022c16] rounded-full">{{ item.badge }}</span>
+                </a>
+              </div>
+            </ng-container>
           </nav>
           <div class="p-4 border-t border-gray-100">
             <button (click)="logout()" class="flex items-center gap-3.5 w-full px-4 py-3 rounded-xl text-[14px] font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all">
@@ -205,38 +222,87 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   notifications: AdminNotification[] = [];
   notificationsOpen = false;
+  notificationsLoaded = false;
   isLoading = false;
+  userName = 'Admin';
+  userInitial = 'A';
+  userProfileName = 'Gestionnaire';
   private destroy$ = new Subject<void>();
   private readonly readStorageKey = 'jamm-admin-read-notifications';
 
   navItems: NavItem[] = [
     { path: '/admin/dashboard', label: 'Tableau de bord', icon: 'fa-solid fa-chart-pie' },
-    { path: '/admin/adherents', label: 'Adhérents', icon: 'fa-solid fa-users' },
-    { path: '/admin/besoins', label: 'Besoins', icon: 'fa-solid fa-hand-holding-heart' },
-    { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb' },
-    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', badge: 8 },
-    { path: '/admin/activites', label: 'Activités', icon: 'fa-solid fa-calendar-days' },
-    { path: '/admin/evenements', label: 'Agenda (Événements)', icon: 'fa-solid fa-calendar-check' },
-    { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical' },
-    { path: '/admin/commissions', label: 'Commissions', icon: 'fa-solid fa-sitemap' },
-    { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines' },
-    { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib' },
-    { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell' },
-    { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear' },
-    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul' },
-    { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group' },
-    { path: '/admin/agents-terrain', label: 'Agents Terrain', icon: 'fa-solid fa-street-view' },
+    
+    // Citoyens & Interactions
+    { path: '/admin/adherents', label: 'Adhérents', icon: 'fa-solid fa-users', category: 'Citoyens & Interactions' },
+    { path: '/admin/besoins', label: 'Besoins', icon: 'fa-solid fa-hand-holding-heart', category: 'Citoyens & Interactions' },
+    { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb', category: 'Citoyens & Interactions' },
+    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', badge: 8, category: 'Citoyens & Interactions' },
+    { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical', category: 'Citoyens & Interactions' },
+
+    // Terrain & Actions
+    { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group', category: 'Terrain & Actions' },
+    { path: '/admin/activites', label: 'Activités', icon: 'fa-solid fa-calendar-days', category: 'Terrain & Actions' },
+    { path: '/admin/evenements', label: 'Agenda (Événements)', icon: 'fa-solid fa-calendar-check', category: 'Terrain & Actions' },
+    { path: '/admin/commissions', label: 'Commissions', icon: 'fa-solid fa-sitemap', category: 'Terrain & Actions' },
+    { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines', category: 'Terrain & Actions' },
+    { path: '/admin/agents-terrain', label: 'Agents Terrain', icon: 'fa-solid fa-street-view', category: 'Terrain & Actions' },
+
+    // Communication
+    { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib', category: 'Communication' },
+    { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell', category: 'Communication' },
+
+    // Administration & Finances
+    { path: '/admin/finances', label: 'Finances', icon: 'fa-solid fa-sack-dollar', permission: 'finances:read', category: 'Administration & Finances' },
+    { path: '/admin/membres', label: 'Équipe & Profils', icon: 'fa-solid fa-user-shield', permission: 'admin:read', category: 'Administration & Finances' },
+    { path: '/admin/groups', label: 'Groupes', icon: 'fa-solid fa-users-rectangle', permission: 'admin:read', category: 'Administration & Finances' },
+    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul', category: 'Administration & Finances' },
+
+    // Système
+    { path: '/admin/audit', label: 'Audit & Logs', icon: 'fa-solid fa-clipboard-list', permission: 'admin:read', category: 'Système' },
+    { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear', permission: 'admin:read', category: 'Système' },
+    { path: '/admin/settings/providers', label: 'API & Providers', icon: 'fa-solid fa-server', permission: 'admin:read', category: 'Système' }
   ];
 
   constructor(
     private authService: AuthService,
+    private rbacService: RbacService,
     private router: Router,
     private adminData: AdminDataService,
     private cdr: ChangeDetectorRef
   ) {}
 
+  private _groupedNavItems: { title: string | null, items: NavItem[] }[] | null = null;
+
+  get groupedNavItems(): { title: string | null, items: NavItem[] }[] {
+    if (this._groupedNavItems) return this._groupedNavItems;
+
+    const items = this.navItems.filter(item => !item.permission || this.rbacService.hasPermission(item.permission));
+    const groups: { title: string | null, items: NavItem[] }[] = [];
+    const categoryOrder = [null, 'Citoyens & Interactions', 'Terrain & Actions', 'Communication', 'Administration & Finances', 'Système'];
+    
+    for (const category of categoryOrder) {
+      const categoryItems = items.filter(i => (i.category || null) === category);
+      if (categoryItems.length > 0) {
+        groups.push({ title: category, items: categoryItems });
+      }
+    }
+    this._groupedNavItems = groups;
+    return groups;
+  }
+
   ngOnInit() {
+    this.initUser();
     this.refreshNotifications();
+  }
+
+  private initUser() {
+    const user = this.authService.currentUserValue;
+    if (user) {
+      this.userName = user.name || 'Admin';
+      this.userInitial = (this.userName.charAt(0) || 'A').toUpperCase();
+      this.userProfileName = user.profile?.name || (user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Gestionnaire');
+    }
   }
 
   ngOnDestroy() {
@@ -289,6 +355,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
       this.addNotifications(items, comptesRendus?.data, 'Nouveau compte-rendu', (item: any) => item.titre, 'fa-solid fa-file-lines', 'teal', '/admin/comptes-rendus');
       
       this.notifications = items.sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()).slice(0, 40);
+      this.notificationsLoaded = true;
     } catch (err) {
       console.error('Erreur lors de la récupération des notifications', err);
     } finally {
@@ -324,6 +391,9 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
       event.stopPropagation();
     }
     this.notificationsOpen = !this.notificationsOpen; 
+    if (this.notificationsOpen && (!this.notificationsLoaded || this.notifications.length === 0)) {
+      this.refreshNotifications();
+    }
   }
 
   openNotification(notification: AdminNotification) {

@@ -66,6 +66,26 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/settings/pages/admin-settings.component')
           .then(m => m.AdminSettingsComponent)
       },
+      {
+        path: 'settings/roles',
+        loadComponent: () => import('./features/super-admin/rbac/pages/role-manager.component').then(m => m.RoleManagerComponent),
+        title: 'Gestion des Profils & Modules - JÀMM AK XÉEWAL'
+      },
+      {
+        path: 'finance/providers',
+        loadComponent: () => import('./features/super-admin/finance/pages/provider-manager.component').then(m => m.ProviderManagerComponent),
+        title: 'Moyens de Paiement - JÀMM AK XÉEWAL'
+      },
+      {
+        path: 'finance/dashboard',
+        loadComponent: () => import('./features/admin/finance/pages/finance-dashboard.component').then(m => m.FinanceDashboardComponent),
+        title: 'Tableau de bord financier - JÀMM AK XÉEWAL'
+      },
+      { 
+        path: 'settings/providers', 
+        loadComponent: () => import('./features/admin/settings/pages/admin-providers-config.component')
+          .then(m => m.AdminProvidersConfigComponent)
+      },
       { 
         path: 'options', 
         loadComponent: () => import('./features/admin/options/pages/admin-options.component')
@@ -105,6 +125,26 @@ export const routes: Routes = [
         path: 'agents-terrain', 
         loadComponent: () => import('./features/admin/agents-terrain/pages/admin-agents-terrain.component')
           .then(m => m.AdminAgentsTerrainComponent)
+      },
+      { 
+        path: 'membres', 
+        loadComponent: () => import('./features/admin/membres/pages/admin-membres.component')
+          .then(m => m.AdminMembresComponent)
+      },
+      { 
+        path: 'audit', 
+        loadComponent: () => import('./features/admin/audit/pages/admin-audit.component')
+          .then(m => m.AdminAuditComponent)
+      },
+      { 
+        path: 'finances', 
+        loadComponent: () => import('./features/admin/finances/pages/admin-finances.component')
+          .then(m => m.AdminFinancesComponent)
+      },
+      {
+        path: 'groups',
+        loadComponent: () => import('./features/admin/groups/pages/admin-groups.component')
+          .then(m => m.AdminGroupsComponent)
       }
     ]
   },
