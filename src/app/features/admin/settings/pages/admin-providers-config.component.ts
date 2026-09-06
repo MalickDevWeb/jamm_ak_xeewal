@@ -26,7 +26,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <!-- SMTP Configuration -->
     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden">
@@ -123,6 +123,41 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
     </div>
 
+    <!-- WhatsApp Configuration -->
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+      
+      <div class="flex items-center justify-between mb-6 relative z-10">
+        <h3 class="text-lg font-black text-gray-800 flex items-center gap-2">
+          <i class="fa-brands fa-whatsapp text-green-500"></i> API WhatsApp
+        </h3>
+        <span class="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] font-black tracking-wider uppercase rounded-full">
+          {{ hasConfig('WHATSAPP') ? 'Configuré' : 'Non configuré' }}
+        </span>
+      </div>
+
+      <div class="space-y-4 relative z-10">
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Token d'accès (Access Token)</label>
+          <input type="password" [(ngModel)]="whatsappConfig.accessToken" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-all">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">ID du numéro de téléphone (Phone Number ID)</label>
+          <input type="text" [(ngModel)]="whatsappConfig.phoneNumberId" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-all">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">ID du compte WhatsApp Business</label>
+          <input type="text" [(ngModel)]="whatsappConfig.businessAccountId" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-all">
+        </div>
+
+        <button (click)="saveProvider('WHATSAPP', whatsappConfig)" [disabled]="isSaving" class="mt-4 w-full py-3 bg-green-500 text-white text-sm font-black rounded-xl hover:bg-green-600 transition-colors disabled:opacity-50">
+          Sauvegarder WhatsApp
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
   `
@@ -141,6 +176,8 @@ export class AdminProvidersConfigComponent implements OnInit {
   
   smsProviderType = 'MOCK_SMS';
   smsConfig = { apiKey: '', senderId: '' };
+
+  whatsappConfig = { accessToken: '', phoneNumberId: '', businessAccountId: '' };
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 

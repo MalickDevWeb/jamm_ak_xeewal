@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
 
 @Component({
   selector: 'app-admin-sondages',
@@ -32,9 +33,6 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
       (confirm)="onConfirmAction()"
       (cancel)="showConfirmDialog = false">
     </app-confirm-dialog>
-
-
-    
 
     <!-- Bulk Actions Bar -->
     <app-bulk-actions-bar
@@ -89,58 +87,66 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     <!-- Cards Grid -->
     <div *ngIf="!isLoading && sondages.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div *ngFor="let s of sondages; trackBy: trackById" 
-           class="relative bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 p-6 transition-all border-l-[6px]"
+           class="relative bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border-y border-r border-y-gray-100 border-r-gray-100 p-0 transition-all border-l-[6px] overflow-hidden flex flex-col"
            [class.bg-red-50]="isSelected(s.id)"
            [ngClass]="isSelected(s.id) ? 'border-l-red-500' : (s.statut === 'ACTIF' ? 'border-l-[#008d36]' : 'border-l-gray-300')">
-        <input type="checkbox" [checked]="isSelected(s.id)" (change)="toggleSelection(s.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
+        <input type="checkbox" [checked]="isSelected(s.id)" (change)="toggleSelection(s.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10 bg-white rounded">
         
-        <!-- Header carte -->
-        <div class="flex items-start justify-between gap-4 mb-5">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-2">
-              <span *ngIf="s.statut === 'ACTIF'" class="bg-[#e6f3eb] text-[#008d36] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center">
-                <i class="fa-solid fa-circle-dot text-[8px] mr-1.5 animate-pulse"></i> ACTIF
-              </span>
-              <span *ngIf="s.statut !== 'ACTIF'" class="bg-gray-100 text-gray-500 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center">
-                <i class="fa-solid fa-circle-xmark mr-1.5"></i> CLÔTURÉ
-              </span>
-              <span class="text-xs text-gray-500 font-medium bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">{{ s.participants }} participants</span>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 leading-snug">{{ s.question }}</h3>
-          </div>
+        <!-- Image Bannière Optionnelle -->
+        <div *ngIf="s.imageUrl" class="w-full h-32 bg-gray-100 relative">
+          <img [src]="s.imageUrl" alt="Image du sondage" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
         </div>
 
-        <!-- Options / Barres -->
-        <div class="space-y-4 mb-6">
-          <div *ngFor="let option of s.options; trackBy: trackByOptionId" class="group">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[13px] font-bold text-gray-700">{{ option.texte }}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-[13px] font-black text-gray-900">{{ option.votes }}</span>
-                <span class="text-xs font-bold text-gray-400 w-10 text-right">({{ getPct(option.votes, s.participants) }}%)</span>
+        <div class="p-6 flex-1 flex flex-col">
+          <!-- Header carte -->
+          <div class="flex items-start justify-between gap-4 mb-5" [ngClass]="{'mt-[-40px] relative z-10': s.imageUrl}">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <span *ngIf="s.statut === 'ACTIF'" class="bg-[#e6f3eb] text-[#008d36] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center shadow-sm">
+                  <i class="fa-solid fa-circle-dot text-[8px] mr-1.5 animate-pulse"></i> ACTIF
+                </span>
+                <span *ngIf="s.statut !== 'ACTIF'" class="bg-gray-100 text-gray-500 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center shadow-sm">
+                  <i class="fa-solid fa-circle-xmark mr-1.5"></i> CLÔTURÉ
+                </span>
+                <span class="text-xs text-gray-600 font-medium bg-white px-2.5 py-1 rounded-full border border-gray-200 shadow-sm">{{ s.participants }} participants</span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 leading-snug" [ngClass]="{'mt-2': s.imageUrl}">{{ s.question }}</h3>
+            </div>
+          </div>
+
+          <!-- Options / Barres -->
+          <div class="space-y-4 mb-6 flex-1">
+            <div *ngFor="let option of s.options; trackBy: trackByOptionId" class="group">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[13px] font-bold text-gray-700">{{ option.texte }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[13px] font-black text-gray-900">{{ option.votes }}</span>
+                  <span class="text-xs font-bold text-gray-400 w-10 text-right">({{ getPct(option.votes, s.participants) }}%)</span>
+                </div>
+              </div>
+              <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-1000 ease-out"
+                     [ngClass]="s.statut === 'ACTIF' ? 'bg-[#008d36]' : 'bg-gray-400'"
+                     [style.width]="getPct(option.votes, s.participants) + '%'"></div>
               </div>
             </div>
-            <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-              <div class="h-full rounded-full transition-all duration-1000 ease-out"
-                   [ngClass]="s.statut === 'ACTIF' ? 'bg-[#008d36]' : 'bg-gray-400'"
-                   [style.width]="getPct(option.votes, s.participants) + '%'"></div>
-            </div>
           </div>
-        </div>
 
-        <!-- Footer carte -->
-        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div class="flex items-center gap-2 text-xs font-medium text-gray-400">
-            <i class="fa-regular fa-calendar"></i>
-            Créé le {{ s.createdAt | date:'dd/MM/yyyy' }}
-          </div>
-          <div class="flex gap-2">
-            <button (click)="action('Clôturer', s.id)" *ngIf="s.statut === 'ACTIF'" class="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
-              Clôturer
-            </button>
-            <button (click)="action('Supprimer', s.id)" class="w-9 h-9 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
-              <i class="fa-solid fa-trash text-xs"></i>
-            </button>
+          <!-- Footer carte -->
+          <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+            <div class="flex items-center gap-2 text-xs font-medium text-gray-400">
+              <i class="fa-regular fa-calendar"></i>
+              Créé le {{ s.createdAt | date:'dd/MM/yyyy' }}
+            </div>
+            <div class="flex gap-2">
+              <button (click)="action('Clôturer', s.id)" *ngIf="s.statut === 'ACTIF'" class="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                Clôturer
+              </button>
+              <button (click)="action('Supprimer', s.id)" class="w-9 h-9 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -156,12 +162,40 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
              </div>
              Créer un sondage
           </h3>
-          <button (click)="showModal = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+          <button (click)="showModal = false" [disabled]="isSubmitting" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
         
         <div class="p-6 space-y-5">
+          <!-- Image Upload (Optionnel) -->
+          <div>
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Image d'illustration <span class="text-gray-400 font-normal">(Optionnel)</span></label>
+            <div class="relative group cursor-pointer" (click)="fileInput.click()">
+              <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" [disabled]="isUploadingImage">
+              
+              <div *ngIf="!selectedImagePreview && !formData.imageUrl" class="w-full h-32 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 flex flex-col items-center justify-center transition-colors">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-400 mb-2"></i>
+                <span class="text-sm font-medium text-gray-500">Cliquez pour ajouter une image</span>
+              </div>
+              
+              <div *ngIf="selectedImagePreview || formData.imageUrl" class="w-full h-32 border border-gray-200 rounded-xl relative overflow-hidden group-hover:border-[#022c16] transition-colors">
+                <img [src]="selectedImagePreview || formData.imageUrl" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span class="text-white text-sm font-bold"><i class="fa-solid fa-pen mr-2"></i>Changer l'image</span>
+                </div>
+              </div>
+              
+              <div *ngIf="isUploadingImage" class="absolute inset-0 bg-white/80 rounded-xl flex flex-col items-center justify-center backdrop-blur-sm border border-gray-200">
+                <div class="w-8 h-8 border-4 border-gray-200 border-t-[#008d36] rounded-full animate-spin mb-2"></div>
+                <span class="text-xs font-bold text-gray-600">{{ uploadProgress }}%</span>
+              </div>
+            </div>
+            <button *ngIf="(selectedImagePreview || formData.imageUrl) && !isUploadingImage" (click)="removeImage($event)" class="mt-2 text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1">
+              <i class="fa-solid fa-trash-can"></i> Supprimer l'image
+            </button>
+          </div>
+
           <div>
             <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Question du sondage <span class="text-red-500">*</span></label>
             <input type="text" [(ngModel)]="formData.question" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Ex: Quel est le projet prioritaire ?">
@@ -174,9 +208,10 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
           
           <div class="flex justify-end gap-3 pt-2">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
-            <button (click)="submitForm()" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2">
-              <i class="fa-solid fa-check"></i> Publier
+            <button (click)="showModal = false" [disabled]="isSubmitting" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm disabled:opacity-50">Annuler</button>
+            <button (click)="submitForm()" [disabled]="isSubmitting || isUploadingImage" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
+              <span *ngIf="isSubmitting" class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+              <i *ngIf="!isSubmitting" class="fa-solid fa-check"></i> {{ isSubmitting ? 'Publication...' : 'Publier' }}
             </button>
           </div>
         </div>
@@ -191,13 +226,20 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
   sondages: any[] = [];
   total = 0;
   isLoading = true;
+  isSubmitting = false;
 
   showModal = false;
   formData = {
     question: '',
-    optionsStr: ''
+    optionsStr: '',
+    imageUrl: ''
   };
 
+  // Upload State
+  selectedImageFile: File | null = null;
+  selectedImagePreview: string | null = null;
+  isUploadingImage = false;
+  uploadProgress = 0;
   
   // Alert State
   alertMessage = '';
@@ -209,6 +251,7 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
     this.alertType = type;
     this.showAlertPopup = true;
     setTimeout(() => this.showAlertPopup = false, 3000);
+    this.cdr.markForCheck();
   }
 
 
@@ -261,6 +304,7 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminData: AdminDataService,
+    private uploadService: CloudinaryUploadService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -297,13 +341,18 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
 
   action(type: string, id?: string) {
     if (type === 'Créer un sondage') {
-      this.formData = { question: '', optionsStr: '' };
+      this.formData = { question: '', optionsStr: '', imageUrl: '' };
+      this.selectedImageFile = null;
+      this.selectedImagePreview = null;
       this.showModal = true;
     } else if (type === 'Clôturer' && id) {
       this.isLoading = true;
       this.adminData.updateEntity('sondages', id, { statut: 'CLOTURE' }).pipe(
         takeUntil(this.destroy$)
-      ).subscribe(() => this.refreshData());
+      ).subscribe(() => {
+        this.showAlert('Sondage clôturé avec succès', 'success');
+        this.refreshData();
+      });
     } else if (type === 'Supprimer' && id) {
       this.openConfirm('Supprimer', 'Voulez-vous vraiment supprimer ce sondage ?', 'Supprimer', id);
     }
@@ -347,17 +396,87 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
     }
   }
 
-  submitForm() {
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (file) {
+      this.selectedImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedImagePreview = e.target.result;
+        this.cdr.markForCheck();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.selectedImageFile = null;
+    this.selectedImagePreview = null;
+    this.formData.imageUrl = '';
+    this.cdr.markForCheck();
+  }
+
+  async submitForm() {
     if (!this.formData.question || !this.formData.optionsStr) {
-      this.showAlert('Veuillez remplir tous les champs', 'error');
+      this.showAlert('Veuillez remplir tous les champs obligatoires', 'error');
       return;
     }
+    
     const options = this.formData.optionsStr.split(',').map(o => o.trim()).filter(o => o.length > 0);
-      this.isLoading = true;
-    this.showModal = false;
-    this.adminData.createEntity('sondages', { question: this.formData.question, options }).pipe(
+    if (options.length < 2) {
+      this.showAlert('Veuillez renseigner au moins 2 options', 'error');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.cdr.markForCheck();
+
+    // 1. Upload de l'image si elle a été sélectionnée
+    if (this.selectedImageFile) {
+      this.isUploadingImage = true;
+      try {
+        const result = await this.uploadService.uploadDirect(
+          this.selectedImageFile, 
+          this.selectedImageFile.name,
+          (percent) => {
+            this.uploadProgress = percent;
+            this.cdr.markForCheck();
+          }
+        );
+        this.formData.imageUrl = result.url;
+      } catch (err: any) {
+        this.showAlert(err.message || 'Erreur lors du téléchargement de l\'image', 'error');
+        this.isUploadingImage = false;
+        this.isSubmitting = false;
+        this.cdr.markForCheck();
+        return; // on arrête l'enregistrement du sondage si l'image plante
+      }
+      this.isUploadingImage = false;
+    }
+
+    // 2. Enregistrement du sondage
+    this.adminData.createEntity('sondages', { 
+      question: this.formData.question, 
+      options,
+      imageUrl: this.formData.imageUrl || undefined
+    }).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(() => this.refreshData());
+    ).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.showModal = false;
+        this.showAlert('Sondage créé avec succès', 'success');
+        this.refreshData();
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.showAlert('Erreur lors de la création du sondage', 'error');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy() {
