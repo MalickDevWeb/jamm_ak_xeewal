@@ -47,6 +47,10 @@ export class GroupService {
     );
   }
 
+  updateGroup(id: string, data: any): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/groups/${id}`, data);
+  }
+
   getGroupMembers(groupId: string): Observable<any> {
     return this.http.get(
       `${environment.apiUrl}/groups/${groupId}/members?organizationId=${this.organizationId}`

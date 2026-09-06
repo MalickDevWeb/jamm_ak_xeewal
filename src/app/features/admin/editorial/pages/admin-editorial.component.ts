@@ -166,9 +166,15 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
 
       <div class="flex items-center gap-3">
+        <button (click)="toggleStatus('home')"
+          [ngClass]="home.status !== 'DRAFT' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+          class="px-5 py-3 font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm border-none cursor-pointer">
+          <i class="fa-solid" [ngClass]="home.status !== 'DRAFT' ? 'fa-globe' : 'fa-lock'"></i>
+          {{ home.status !== 'DRAFT' ? 'Publié' : 'Brouillon' }}
+        </button>
         <button (click)="onSave('home')"
           class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
-          <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Accueil"
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer l'Accueil
         </button>
         <a href="/" target="_blank"
           class="px-5 py-3 text-sm font-bold text-[#022c16] bg-[#e6f3eb] rounded-xl hover:bg-[#d1e8d9] transition-colors flex items-center gap-2">
@@ -246,6 +252,12 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
 
       <div class="flex items-center gap-3">
+        <button (click)="toggleStatus('mouvement')"
+          [ngClass]="mouvement.status !== 'DRAFT' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+          class="px-5 py-3 font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm border-none cursor-pointer">
+          <i class="fa-solid" [ngClass]="mouvement.status !== 'DRAFT' ? 'fa-globe' : 'fa-lock'"></i>
+          {{ mouvement.status !== 'DRAFT' ? 'Publié' : 'Brouillon' }}
+        </button>
         <button (click)="onSave('mouvement')"
           class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Le Mouvement"
@@ -308,6 +320,12 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
 
       <div class="flex items-center gap-3">
+        <button (click)="toggleStatus('axes')"
+          [ngClass]="axes.status !== 'DRAFT' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+          class="px-5 py-3 font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm border-none cursor-pointer">
+          <i class="fa-solid" [ngClass]="axes.status !== 'DRAFT' ? 'fa-globe' : 'fa-lock'"></i>
+          {{ axes.status !== 'DRAFT' ? 'Publié' : 'Brouillon' }}
+        </button>
         <button (click)="onSave('axes')"
           class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer "Nos Axes"
@@ -439,5 +457,11 @@ export class AdminEditorialComponent implements OnInit {
       },
       error: () => this.showAlert("Erreur de sauvegarde", 'error')
     });
+  }
+
+  toggleStatus(section: string) {
+    const content = section === 'home' ? this.home : section === 'mouvement' ? this.mouvement : this.axes;
+    content.status = content.status === 'DRAFT' ? 'PUBLISHED' : 'DRAFT';
+    this.onSave(section);
   }
 }

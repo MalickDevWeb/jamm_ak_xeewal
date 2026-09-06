@@ -59,16 +59,25 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#e6f3eb] text-[#008d36]">
                   <i class="fa-solid fa-users text-xl"></i>
                 </div>
-                <div>
-                  <h3 class="font-bold text-gray-900 text-base leading-tight">{{ g.name }}</h3>
-                  <p class="text-xs text-gray-500 font-semibold">{{ g.type }}</p>
+                <div class="min-w-0">
+                  <h3 class="font-bold text-gray-900 text-base leading-tight truncate" [title]="g.name">{{ g.name }}</h3>
+                  <p class="text-xs text-gray-500 font-semibold truncate">{{ g.type }}</p>
                 </div>
               </div>
-              <span class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-gray-100 text-gray-600 rounded-md">
-                {{ g._count?.GroupMember || 0 }} Membres
-              </span>
+              <div class="flex gap-2 items-center">
+                <span class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-gray-100 text-gray-600 rounded-md">
+                  {{ g._count?.GroupMember || 0 }} Membres
+                </span>
+                <button (click)="toggleStatus(g)"
+                  [ngClass]="g.status !== 'INACTIF' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-red-100 text-red-700 hover:bg-red-200'"
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors cursor-pointer border-none"
+                  title="Changer le statut">
+                  <i class="fa-solid mr-1.5" [ngClass]="g.status !== 'INACTIF' ? 'fa-check-circle' : 'fa-ban'"></i>
+                  {{ g.status || 'ACTIF' }}
+                </button>
+              </div>
             </div>
-            <p class="text-xs text-gray-500 mb-4 line-clamp-2 min-h-[32px]">{{ g.description || 'Aucune description' }}</p>
+            <p class="text-xs text-gray-500 mb-4 line-clamp-2 min-h-[32px] break-words">{{ g.description || 'Aucune description' }}</p>
           </div>
           
           <div class="pt-4 border-t border-gray-100 flex justify-between">
@@ -246,6 +255,27 @@ export class AdminGroupsComponent implements OnInit {
         this.isLoading = false;
         this.triggerAlert('Erreur de chargement des groupes', 'error');
         this.cdr.markForCheck();
+      }
+    });
+  }
+
+  toggleStatus(g: GroupItem) {
+    const currentStatus = g.status || 'ACTIF';
+    const newStatus = currentStatus === 'INACTIF' ? 'ACTIF' : 'INACTIF';
+    
+    // Optimistic update
+    const previous = [...this.groups];
+    this.groups = this.groups.map(grp => grp.id === g.id ? { ...grp, status: newStatus } : grp);
+    this.cdr.markForCheck();
+    
+    this.groupService.updateGroup(g.id, { ...g, status: newStatus }).subscribe({
+      next: () => {
+        // Success
+      },
+      error: () => {
+        this.groups = previous;
+        this.cdr.markForCheck();
+        this.triggerAlert('Erreur lors du changement de statut', 'error');
       }
     });
   }

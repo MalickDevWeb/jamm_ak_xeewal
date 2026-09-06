@@ -306,6 +306,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             <!-- Footer Actions -->
             <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
               <button
+                *ngIf="!p.isSystem"
                 (click)="openEditProfileModal(p)"
                 class="px-4 py-2 text-xs font-bold text-[#022c16] bg-[#e6f3eb] hover:bg-[#008d36] hover:text-white rounded-xl transition-all flex items-center gap-1.5">
                 <i class="fa-solid fa-sliders"></i>
@@ -728,7 +729,13 @@ export class AdminMembresComponent implements OnInit, OnDestroy {
 
   getPermissionLabel(permId: string): string {
     const item = this.permissionsCatalog.find(p => p.id === permId);
-    return item?.label || permId;
+    if (item?.label) return item.label;
+    
+    // Fallback: format raw permission string (e.g. "finance.read" -> "Finance Read")
+    return permId
+      .split('.')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
   }
 
   getPermissionIcon(permId: string): string {

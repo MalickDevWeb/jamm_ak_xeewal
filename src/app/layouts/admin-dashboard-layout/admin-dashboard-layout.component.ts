@@ -252,13 +252,21 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib', category: 'Communication' },
     { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell', category: 'Communication' },
 
-    // Administration & Finances
-    { path: '/admin/finances', label: 'Finances', icon: 'fa-solid fa-sack-dollar', permission: 'finances:read', category: 'Administration & Finances' },
-    { path: '/admin/membres', label: 'Équipe & Profils', icon: 'fa-solid fa-user-shield', permission: 'admin:read', category: 'Administration & Finances' },
-    { path: '/admin/groups', label: 'Groupes', icon: 'fa-solid fa-users-rectangle', permission: 'admin:read', category: 'Administration & Finances' },
-    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul', category: 'Administration & Finances' },
+    // Finances
+    { path: '/admin/finance/dashboard', label: 'Tableau Financier', icon: 'fa-solid fa-chart-line', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finance/contributions', label: 'Cotisations', icon: 'fa-solid fa-hand-holding-dollar', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finance/expenses', label: 'Dépenses', icon: 'fa-solid fa-file-invoice-dollar', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finance/manual-payments', label: 'Paiements manuels', icon: 'fa-solid fa-money-bill-transfer', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finance/movements', label: 'Journal des mouvements', icon: 'fa-solid fa-clock-rotate-left', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finances', label: 'Comptes & API', icon: 'fa-solid fa-sack-dollar', permission: 'finances:read', category: 'Finances' },
+
+    // Administration
+    { path: '/admin/membres', label: 'Équipe & Profils', icon: 'fa-solid fa-user-shield', permission: 'admin:read', category: 'Administration' },
+    { path: '/admin/groups', label: 'Groupes', icon: 'fa-solid fa-users-rectangle', permission: 'admin:read', category: 'Administration' },
+    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul', category: 'Administration' },
 
     // Système
+    { path: '/admin/settings/roles', label: 'Profils & Modules', icon: 'fa-solid fa-user-lock', permission: 'admin:read', category: 'Système' },
     { path: '/admin/audit', label: 'Audit & Logs', icon: 'fa-solid fa-clipboard-list', permission: 'admin:read', category: 'Système' },
     { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear', permission: 'admin:read', category: 'Système' },
     { path: '/admin/settings/providers', label: 'API & Providers', icon: 'fa-solid fa-server', permission: 'admin:read', category: 'Système' }
@@ -279,7 +287,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
 
     const items = this.navItems.filter(item => !item.permission || this.rbacService.hasPermission(item.permission));
     const groups: { title: string | null, items: NavItem[] }[] = [];
-    const categoryOrder = [null, 'Citoyens & Interactions', 'Terrain & Actions', 'Communication', 'Administration & Finances', 'Système'];
+    const categoryOrder = [null, 'Citoyens & Interactions', 'Terrain & Actions', 'Communication', 'Finances', 'Administration', 'Système'];
     
     for (const category of categoryOrder) {
       const categoryItems = items.filter(i => (i.category || null) === category);

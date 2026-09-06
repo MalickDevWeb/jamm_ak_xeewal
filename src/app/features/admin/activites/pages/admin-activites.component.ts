@@ -159,7 +159,13 @@ import { environment } from '../../../../../environments/environment';
             <h3 class="text-[15px] font-bold text-gray-900 mb-4 line-clamp-2 leading-tight">{{ a.titre }}</h3>
             
             <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-              <span *ngIf="a.statut === 'PUBLIE'" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2 py-1 rounded flex items-center gap-1.5"><i class="fa-solid fa-check-circle"></i> PUBLIÉE</span>
+              <button (click)="toggleStatus(a)" 
+                [ngClass]="a.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
+                class="text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase transition-colors"
+                title="Cliquer pour changer le statut">
+                <i class="fa-solid" [ngClass]="a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-pen'"></i> 
+                {{ a.statut === 'PUBLIE' ? 'PUBLIÉE' : 'BROUILLON' }}
+              </button>
               <button (click)="openEditModal(a)" class="text-gray-500 text-xs font-bold hover:text-[#022c16] flex items-center gap-1.5 transition-colors"><i class="fa-solid fa-pen"></i> Modifier</button>
             </div>
           </div>
@@ -217,7 +223,13 @@ import { environment } from '../../../../../environments/environment';
                 <td class="p-4 text-gray-500 font-medium text-[13px]">{{ a.date | date:'dd/MM/yyyy' }}</td>
                 <td class="p-4 text-gray-500 text-[13px] font-medium">{{ a.mediaCount > 0 ? a.mediaCount + ' médias' : '-' }}</td>
                 <td class="p-4">
-                   <span *ngIf="a.statut === 'PUBLIE'" class="text-[10px] font-bold text-[#008d36] bg-[#e6f3eb] px-2.5 py-1 rounded flex items-center gap-1.5 w-max"><i class="fa-solid fa-check-circle"></i> PUBLIÉE</span>
+                   <button (click)="toggleStatus(a)" 
+                     [ngClass]="a.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
+                     class="text-[10px] font-bold px-2.5 py-1 rounded flex items-center gap-1.5 w-max uppercase transition-colors"
+                     title="Cliquer pour changer le statut">
+                     <i class="fa-solid" [ngClass]="a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-pen'"></i> 
+                     {{ a.statut === 'PUBLIE' ? 'PUBLIÉE' : 'BROUILLON' }}
+                   </button>
                 </td>
                 <td class="p-4 text-gray-500 text-[13px]">Admin</td>
                 <td class="p-4 pr-6">
@@ -582,6 +594,22 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
 
   playVideo(a: any) {
     a._videoPlaying = true;
+  }
+
+  toggleStatus(activite: any) {
+    const newStatus = activite.statut === 'PUBLIE' ? 'BROUILLON' : 'PUBLIE';
+    this.activites.update(list => list.map(a => a.id === activite.id ? { ...a, statut: newStatus } : a));
+    
+    const dataToSend = { ...activite, statut: newStatus };
+    this.adminData.updateEntity('activites', activite.id, dataToSend).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        // Succès silencieux
+      },
+      error: () => {
+        this.activites.update(list => list.map(a => a.id === activite.id ? { ...a, statut: activite.statut } : a));
+        alert('Erreur lors du changement de statut');
+      }
+    });
   }
 
   openCreateModal() {

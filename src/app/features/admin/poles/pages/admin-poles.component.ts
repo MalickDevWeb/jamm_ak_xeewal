@@ -49,8 +49,14 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
         <div *ngFor="let pole of poles()" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
           <div class="p-5 flex-1 flex flex-col">
             <div class="flex items-center justify-between mb-3">
-              <span *ngIf="pole.statut === 'PUBLIE'" class="bg-[#e6f3eb] text-[#008d36] text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase"><i class="fa-solid fa-check-circle"></i> Publié</span>
-              <span *ngIf="pole.statut !== 'PUBLIE'" class="bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase"><i class="fa-solid fa-pen"></i> Brouillon</span>
+              <!-- Toggle Button -->
+              <button (click)="toggleStatus(pole)" 
+                [ngClass]="pole.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
+                class="text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase transition-colors"
+                title="Cliquer pour changer le statut">
+                <i class="fa-solid" [ngClass]="pole.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-pen'"></i> 
+                {{ pole.statut === 'PUBLIE' ? 'Publié' : 'Brouillon' }}
+              </button>
               
               <div class="flex gap-2">
                 <button (click)="openEditModal(pole)" class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-[#e6f3eb] text-gray-500 hover:text-[#008d36] flex items-center justify-center transition-colors">
@@ -261,6 +267,24 @@ export class AdminPolesComponent implements OnInit {
       next: () => {
         this.poles.update(list => list.filter(p => p.id !== id));
         this.showConfirmDialog.set(false);
+      }
+    });
+  }
+
+  toggleStatus(pole: any) {
+    const newStatus = pole.statut === 'PUBLIE' ? 'BROUILLON' : 'PUBLIE';
+    // Mise à jour optimiste
+    this.poles.update(list => list.map(p => p.id === pole.id ? { ...p, statut: newStatus } : p));
+    
+    const dataToSend = { ...pole, statut: newStatus };
+    this.adminData.updateEntity('poles', pole.id, dataToSend).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        // Succès silencieux
+      },
+      error: () => {
+        // En cas d'erreur on annule le changement local
+        this.poles.update(list => list.map(p => p.id === pole.id ? { ...p, statut: pole.statut } : p));
+        alert('Erreur lors du changement de statut');
       }
     });
   }

@@ -62,9 +62,13 @@ import { environment } from '../../../../../environments/environment';
             <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">{{ e.titre }}</h3>
             <p *ngIf="e.description" class="text-sm text-gray-600 line-clamp-3 mb-4 flex-1">{{ e.description }}</p>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold" [ngClass]="getStatutClass(e.statut)">
+              <button (click)="toggleStatus(e)"
+                [ngClass]="e.statut !== 'ANNULE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-red-100 text-red-700 hover:bg-red-200'"
+                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer border-none"
+                title="Changer le statut">
+                <i class="fa-solid mr-1.5" [ngClass]="e.statut !== 'ANNULE' ? 'fa-check-circle' : 'fa-ban'"></i>
                 {{ e.statut }}
-              </span>
+              </button>
               <div class="flex gap-1.5">
                 <button (click)="viewEvenement(e)" class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-[#022c16] hover:text-white flex items-center justify-center transition-all shadow-sm" title="Voir les détails">
                   <i class="fa-solid fa-eye text-sm"></i>
@@ -498,6 +502,27 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
         this.evenements = previous;
         this.total = previous.length;
         this.showAlertMethod('error', 'Erreur', 'Impossible de supprimer.');
+      }
+    });
+  }
+
+  toggleStatus(e: any) {
+    const newStatus = e.statut === 'ANNULE' ? 'A_VENIR' : 'ANNULE';
+    
+    // Mise à jour optimiste
+    const previous = [...this.evenements];
+    this.evenements = this.evenements.map(ev => ev.id === e.id ? { ...ev, statut: newStatus } : ev);
+    this.cdr.markForCheck();
+    
+    const dataToSend = { ...e, statut: newStatus };
+    this.adminData.updateEntity('evenements', e.id, dataToSend).subscribe({
+      next: () => {
+        // Succès silencieux
+      },
+      error: () => {
+        this.evenements = previous;
+        this.cdr.markForCheck();
+        this.showAlertMethod('error', 'Erreur', 'Impossible de changer le statut.');
       }
     });
   }

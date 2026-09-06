@@ -81,6 +81,26 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/finance/pages/finance-dashboard.component').then(m => m.FinanceDashboardComponent),
         title: 'Tableau de bord financier - JÀMM AK XÉEWAL'
       },
+      {
+        path: 'finance/contributions',
+        loadComponent: () => import('./features/admin/finance/pages/admin-finance-contributions.component').then(m => m.AdminFinanceContributionsComponent),
+        title: 'Cotisations - JÀMM AK XÉEWAL'
+      },
+      {
+        path: 'finance/expenses',
+        loadComponent: () => import('./features/admin/finance/pages/admin-finance-expenses.component').then(m => m.AdminFinanceExpensesComponent),
+        title: 'Dépenses - JÀMM AK XÉEWAL'
+      },
+      {
+        path: 'finance/movements',
+        loadComponent: () => import('./features/admin/finance/pages/admin-finance-movements.component').then(m => m.AdminFinanceMovementsComponent),
+        title: 'Journal des mouvements - JÀMM AK XÉEWAL'
+      },
+      {
+        path: 'finance/manual-payments',
+        loadComponent: () => import('./features/admin/finance/pages/admin-finance-manual-payments.component').then(m => m.AdminFinanceManualPaymentsComponent),
+        title: 'Paiements Manuels - JÀMM AK XÉEWAL'
+      },
       { 
         path: 'settings/providers', 
         loadComponent: () => import('./features/admin/settings/pages/admin-providers-config.component')
