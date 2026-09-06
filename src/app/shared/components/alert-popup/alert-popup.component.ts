@@ -19,6 +19,10 @@ export type AlertType = 'success' | 'error' | 'warning' | 'info';
       <p class="text-gray-600 text-center mb-8">{{ message }}</p>
       <div class="flex gap-3">
         <button (click)="onClose()" class="flex-1 px-6 py-3 rounded-xl text-sm font-bold transition-all" [ngClass]="buttonClass">Fermer</button>
+        <a *ngIf="actionLink" [href]="actionLink" target="_blank" (click)="onClose()" class="flex-1 px-6 py-3 rounded-xl text-sm font-bold transition-all bg-[#008d36] text-white hover:bg-[#022c16] text-center flex items-center justify-center gap-2">
+          <i *ngIf="actionIcon" [class]="actionIcon"></i>
+          {{ actionLabel }}
+        </a>
       </div>
     </div>
   </div>
@@ -36,6 +40,9 @@ export class AlertPopupComponent {
   @Input() type: AlertType = 'info';
   @Input() title = 'Information';
   @Input() message = '';
+  @Input() actionLink?: string;
+  @Input() actionLabel?: string;
+  @Input() actionIcon?: string;
   @Output() close = new EventEmitter<void>();
 
   get iconClass(): string {

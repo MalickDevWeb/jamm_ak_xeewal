@@ -277,9 +277,9 @@ export class RoleManagerComponent implements OnInit {
     
     const idx = this.formData.permissions.indexOf(id);
     if (idx > -1) {
-      this.formData.permissions.splice(idx, 1);
+      this.formData.permissions = this.formData.permissions.filter(p => p !== id);
     } else {
-      this.formData.permissions.push(id);
+      this.formData.permissions = [...this.formData.permissions, id];
     }
   }
 

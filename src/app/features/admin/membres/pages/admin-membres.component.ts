@@ -23,6 +23,9 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
         [message]="alertMessage"
         [type]="alertType"
         [visible]="showAlertPopup"
+        [actionLink]="alertActionLink"
+        [actionLabel]="alertActionLabel"
+        [actionIcon]="alertActionIcon"
         (close)="showAlertPopup = false">
       </app-alert-popup>
 
@@ -633,6 +636,9 @@ export class AdminMembresComponent implements OnInit, OnDestroy {
   showAlertPopup = false;
   alertMessage = '';
   alertType: AlertType = 'success';
+  alertActionLink?: string;
+  alertActionLabel?: string;
+  alertActionIcon?: string;
 
   showConfirmDialog = false;
   confirmTitle = '';
@@ -951,7 +957,25 @@ export class AdminMembresComponent implements OnInit, OnDestroy {
           next: () => {
             this.isSaving = false;
             this.showUserModal = false;
-            this.triggerAlert('Membre créé avec succès', 'success');
+            
+            let actionLink = undefined;
+            if (this.userForm.telephone) {
+              const loginUrl = window.location.origin + '/admin/login';
+              const msg = `Bonjour ${this.userForm.name.trim()},\n\nVoici vos identifiants pour accéder à la plateforme Jamm Ak Xeewal :\n\n📍 URL : ${loginUrl}\n✉️ Email : ${this.userForm.email.trim()}\n🔑 Mot de passe : ${this.userForm.password.trim()}\n\nMerci de vous connecter.`;
+              
+              let phone = this.userForm.telephone.replace(/\s+/g, '');
+              if (phone.length === 9) {
+                phone = '221' + phone;
+              } else if (phone.startsWith('+')) {
+                phone = phone.substring(1);
+              } else if (phone.startsWith('00')) {
+                phone = phone.substring(2);
+              }
+              
+              actionLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+            }
+            
+            this.triggerAlert('Membre créé avec succès', 'success', actionLink, 'Envoyer via WhatsApp', 'fa-brands fa-whatsapp');
             this.loadAllData();
           },
           error: err => {
@@ -1009,9 +1033,12 @@ export class AdminMembresComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerAlert(message: string, type: AlertType = 'success') {
+  triggerAlert(message: string, type: AlertType = 'success', actionLink?: string, actionLabel?: string, actionIcon?: string) {
     this.alertMessage = message;
     this.alertType = type;
+    this.alertActionLink = actionLink;
+    this.alertActionLabel = actionLabel;
+    this.alertActionIcon = actionIcon;
     this.showAlertPopup = true;
     this.cdr.markForCheck();
   }

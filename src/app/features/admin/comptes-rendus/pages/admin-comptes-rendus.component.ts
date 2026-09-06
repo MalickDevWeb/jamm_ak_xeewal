@@ -13,6 +13,20 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, AlertPopupComponent, ConfirmDialogComponent, BulkActionsBarComponent],
+  styles: [`
+    ::ng-deep #cr-editor { font-size: 15px; line-height: 1.6; color: #1f2937; }
+    ::ng-deep #cr-editor h1 { font-size: 2em !important; font-weight: 800 !important; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2; display: block; }
+    ::ng-deep #cr-editor h2 { font-size: 1.5em !important; font-weight: 700 !important; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.3; display: block; }
+    ::ng-deep #cr-editor h3 { font-size: 1.25em !important; font-weight: 600 !important; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.4; display: block; }
+    ::ng-deep #cr-editor h4 { font-size: 1.1em !important; font-weight: 600 !important; margin-top: 1em; margin-bottom: 0.5em; display: block; }
+    ::ng-deep #cr-editor p { margin-bottom: 1em; display: block; }
+    ::ng-deep #cr-editor ul { list-style-type: disc !important; margin-left: 1.5em !important; margin-bottom: 1em; display: block; }
+    ::ng-deep #cr-editor ol { list-style-type: decimal !important; margin-left: 1.5em !important; margin-bottom: 1em; display: block; }
+    ::ng-deep #cr-editor li { margin-bottom: 0.25em; display: list-item; }
+    ::ng-deep #cr-editor blockquote { border-left: 4px solid #e5e7eb; padding-left: 1em; color: #4b5563; font-style: italic; display: block; }
+    ::ng-deep #cr-editor a { color: #2563eb; text-decoration: underline; }
+    ::ng-deep #cr-editor img { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; border: 1px solid #e5e7eb; }
+  `],
   template: `
   <div class="animate-fade-in-up max-w-[1600px] mx-auto">
 
@@ -57,6 +71,9 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
       </div>
       <div class="flex items-center gap-3">
+        <button (click)="exportExcel()" class="px-5 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#0c5e31] transition-colors flex items-center gap-2" title="Exporter la liste en Excel">
+          <i class="fa-solid fa-file-excel"></i> Excel
+        </button>
         <button (click)="action('Rédiger')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
           <i class="fa-solid fa-pen-nib"></i> Rédiger
         </button>
@@ -90,9 +107,15 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
            [class.bg-red-50]="isSelected(cr.id)"
            [class.ring-2]="isSelected(cr.id)"
            [class.ring-red-400]="isSelected(cr.id)">
-        <input type="checkbox" [checked]="isSelected(cr.id)" (change)="toggleSelection(cr.id)" class="absolute top-3 right-3 w-4 h-4 cursor-pointer accent-[#008d36] z-10">
         
-        <div class="flex items-start justify-between gap-4 mb-4">
+        <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
+          <button (click)="exportPDF(cr)" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors" title="Exporter en PDF">
+            <i class="fa-solid fa-file-pdf"></i>
+          </button>
+          <input type="checkbox" [checked]="isSelected(cr.id)" (change)="toggleSelection(cr.id)" class="w-4 h-4 cursor-pointer accent-[#008d36]">
+        </div>
+        
+        <div class="flex items-start justify-between gap-4 mb-4 mt-2">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
               <span [class]="getStatutClass(cr.statut)" class="text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">{{ cr.statut }}</span>
@@ -165,23 +188,61 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
               <span class="text-[10px] font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Copier-collez depuis Word supporté</span>
             </label>
             <div class="border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#022c16] focus-within:ring-1 focus-within:ring-[#022c16] transition-all">
+              
               <!-- Toolbar WYSIWYG -->
-              <div class="bg-gray-50 border-b border-gray-200 p-2 flex flex-wrap gap-1">
+              <div class="bg-gray-50 border-b border-gray-200 p-2 flex flex-wrap items-center gap-1">
+                <!-- Text formatting -->
                 <button (click)="execCommand('bold')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Gras (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
                 <button (click)="execCommand('italic')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Italique (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
                 <button (click)="execCommand('underline')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Souligné (Ctrl+U)"><i class="fa-solid fa-underline"></i></button>
-                <div class="w-px h-6 bg-gray-300 mx-1 self-center"></div>
+                
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                
+                <!-- Alignments -->
+                <button (click)="execCommand('justifyLeft')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Aligner à gauche"><i class="fa-solid fa-align-left"></i></button>
+                <button (click)="execCommand('justifyCenter')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
+                <button (click)="execCommand('justifyRight')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
+                <button (click)="execCommand('justifyFull')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Justifier"><i class="fa-solid fa-align-justify"></i></button>
+
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                
+                <!-- Lists -->
                 <button (click)="execCommand('insertUnorderedList')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
                 <button (click)="execCommand('insertOrderedList')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
-                <div class="w-px h-6 bg-gray-300 mx-1 self-center"></div>
-                <button (click)="execCommand('formatBlock', 'H2')" class="px-2 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors text-xs font-bold" title="Titre 2">Titre 1</button>
-                <button (click)="execCommand('formatBlock', 'H3')" class="px-2 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors text-xs font-bold" title="Titre 3">Titre 2</button>
+                
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                
+                <!-- Colors -->
+                <div class="flex items-center gap-1 relative group cursor-pointer h-8 px-1 hover:bg-gray-200 rounded" title="Couleur du texte">
+                  <i class="fa-solid fa-palette text-gray-700"></i>
+                  <input type="color" (input)="onColorChange($event)" class="w-5 h-5 p-0 border-0 cursor-pointer bg-transparent">
+                </div>
+                
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+
+                <!-- Media -->
+                <button (click)="fileInputImage.click()" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Insérer une image">
+                  <i class="fa-solid fa-image"></i>
+                </button>
+                <input #fileInputImage type="file" accept="image/*" class="hidden" (change)="insertImageEditor($event)">
+
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+
+                <!-- Headings -->
+                <select (change)="onFormatBlockChange($event)" class="h-8 px-2 bg-transparent border-none text-sm text-gray-700 hover:bg-gray-200 rounded cursor-pointer outline-none">
+                  <option value="P">Paragraphe</option>
+                  <option value="H1">Grand Titre (H1)</option>
+                  <option value="H2">Titre Moyen (H2)</option>
+                  <option value="H3">Petit Titre (H3)</option>
+                  <option value="BLOCKQUOTE">Citation</option>
+                </select>
+
                 <button (click)="execCommand('removeFormat')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-red-500 transition-colors ml-auto" title="Effacer le formatage"><i class="fa-solid fa-eraser"></i></button>
               </div>
+              
               <!-- Zone Editable -->
               <div #editor id="cr-editor" contenteditable="true" (input)="onEditorInput()" (paste)="onEditorPaste($event)"
-                   class="p-4 min-h-[300px] max-h-[500px] overflow-y-auto bg-white outline-none prose prose-sm sm:prose-base max-w-none text-gray-800"
-                   [innerHTML]="formData.contenu">
+                   class="p-4 min-h-[300px] max-h-[500px] overflow-y-auto bg-white outline-none text-gray-800 text-left" dir="ltr">
               </div>
             </div>
           </div>
@@ -434,9 +495,120 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     if (type === 'Rédiger') {
       this.formData = { titre: '', lieu: '', auteur: 'Admin', contenu: '', visibilite: 'PUBLIC', groupesCibles: [], personnesCibles: [], attachments: [] };
       this.showModal = true;
+      setTimeout(() => {
+        const editor = document.getElementById('cr-editor');
+        if (editor) editor.innerHTML = '';
+      }, 50);
     } else if (type === 'Supprimer' && id) {
       this.openConfirm('Supprimer ce compte-rendu ?', 'Êtes-vous sûr de vouloir supprimer définitivement ce compte-rendu ?', 'delete', id);
     }
+  }
+
+  // === EXPORT LOGIC ===
+
+  exportExcel() {
+    if (!this.comptesRendus || this.comptesRendus.length === 0) {
+      this.showAlert('Aucun compte-rendu à exporter', 'info');
+      return;
+    }
+    
+    // Create CSV content
+    const headers = ['ID', 'Titre', 'Auteur', 'Lieu', 'Date', 'Statut', 'Visibilité'];
+    const rows = this.comptesRendus.map(cr => [
+      cr.id,
+      `"${(cr.titre || '').replace(/"/g, '""')}"`,
+      `"${(cr.auteur || '').replace(/"/g, '""')}"`,
+      `"${(cr.lieu || '').replace(/"/g, '""')}"`,
+      cr.createdAt,
+      cr.statut,
+      cr.visibilite || 'PUBLIC'
+    ]);
+    
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    
+    // Download
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel UTF-8
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `comptes_rendus_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    this.showAlert('Export Excel réussi !');
+  }
+
+  exportPDF(cr: any) {
+    // Generate an HTML page to print
+    const printWindow = window.open('', '', 'width=800,height=900');
+    if (!printWindow) {
+      this.showAlert('Veuillez autoriser les pop-ups pour imprimer', 'error');
+      return;
+    }
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Compte Rendu - ${cr.titre}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1f2937; line-height: 1.6; }
+            .header { border-bottom: 2px solid #008d36; padding-bottom: 20px; margin-bottom: 30px; }
+            h1.title { color: #022c16; font-size: 28px; margin: 0 0 10px 0; }
+            .meta { font-size: 14px; color: #6b7280; display: flex; gap: 20px; flex-wrap: wrap; }
+            .meta div { background: #f3f4f6; padding: 5px 10px; border-radius: 5px; }
+            .content { margin-top: 30px; }
+            .content h1 { font-size: 24px; font-weight: bold; margin-top: 1.5em; margin-bottom: 0.5em; }
+            .content h2 { font-size: 20px; font-weight: bold; margin-top: 1.2em; margin-bottom: 0.5em; }
+            .content h3 { font-size: 18px; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; }
+            .content p { margin-bottom: 1em; }
+            .content ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+            .content ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
+            .content blockquote { border-left: 4px solid #e5e7eb; padding-left: 1em; font-style: italic; color: #4b5563; }
+            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+            @media print {
+              body { padding: 0; }
+              @page { margin: 2cm; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">${cr.titre}</h1>
+            <div class="meta">
+              <div><strong>Auteur :</strong> ${cr.auteur || 'N/A'}</div>
+              <div><strong>Lieu :</strong> ${cr.lieu || 'N/A'}</div>
+              <div><strong>Date :</strong> ${new Date(cr.createdAt).toLocaleDateString()}</div>
+              <div><strong>Statut :</strong> ${cr.statut}</div>
+            </div>
+          </div>
+          <div class="content">
+            ${cr.contenu || '<p>Aucun contenu détaillé.</p>'}
+          </div>
+          
+          ${cr.attachments && cr.attachments.length > 0 ? `
+          <div style="margin-top: 40px; border: 1px dashed #ccc; padding: 15px;">
+            <strong>Pièces jointes (${cr.attachments.length}) :</strong> 
+            ${cr.attachments.map((a: any) => a.name).join(', ')}
+          </div>
+          ` : ''}
+
+          <div class="footer">
+            Document généré le ${new Date().toLocaleString()} par le système d'administration.
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            }
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   }
 
   // === WYSISYG & UPLOAD LOGIC ===
@@ -444,6 +616,31 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
   execCommand(command: string, value: string = '') {
     document.execCommand(command, false, value);
     this.onEditorInput();
+  }
+
+  onColorChange(event: any) {
+    const color = event.target.value;
+    this.execCommand('foreColor', color);
+  }
+
+  onFormatBlockChange(event: any) {
+    const format = event.target.value;
+    this.execCommand('formatBlock', format);
+  }
+
+  insertImageEditor(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        // Automatically focuses and inserts image at the cursor position
+        document.getElementById('cr-editor')?.focus();
+        document.execCommand('insertImage', false, e.target.result);
+        this.onEditorInput();
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = ''; // Reset input
   }
 
   onEditorInput() {

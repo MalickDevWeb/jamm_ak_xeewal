@@ -237,7 +237,7 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
     { path: '/admin/adherents', label: 'Adhérents', icon: 'fa-solid fa-users', category: 'Citoyens & Interactions' },
     { path: '/admin/besoins', label: 'Besoins', icon: 'fa-solid fa-hand-holding-heart', category: 'Citoyens & Interactions' },
     { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb', category: 'Citoyens & Interactions' },
-    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', badge: 8, category: 'Citoyens & Interactions' },
+    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', category: 'Citoyens & Interactions' },
     { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical', category: 'Citoyens & Interactions' },
 
     // Terrain & Actions
@@ -364,6 +364,15 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
       
       this.notifications = items.sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()).slice(0, 40);
       this.notificationsLoaded = true;
+
+      // Update Messages badge dynamically based on 'lu' field
+      if (messages?.data) {
+        const unreadMessagesCount = messages.data.filter((m: any) => !m.lu).length;
+        const msgNav = this.navItems.find(nav => nav.path === '/admin/messages');
+        if (msgNav) {
+          msgNav.badge = unreadMessagesCount > 0 ? unreadMessagesCount : undefined;
+        }
+      }
     } catch (err) {
       console.error('Erreur lors de la récupération des notifications', err);
     } finally {
