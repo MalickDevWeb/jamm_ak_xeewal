@@ -161,13 +161,13 @@ interface SuperAdminTerrain {
                      placeholder="Nom" />
             </div>
           </div>
-          <div *ngIf="!createSuccess">
+          <div>
             <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone *</label>
             <input type="tel" [(ngModel)]="newAdmin.telephone" name="telephone" required
                    class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#022c16]/20 focus:border-[#022c16] transition-all font-bold"
                    placeholder="77 123 45 67" />
           </div>
-          <div *ngIf="!createSuccess">
+          <div>
             <label class="block text-sm font-bold text-gray-700 mb-1">Mot de passe *</label>
             <div class="relative">
               <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newAdmin.password" name="password" required minlength="6"
@@ -186,25 +186,7 @@ interface SuperAdminTerrain {
             <span class="text-sm text-red-600">{{ createError }}</span>
           </div>
 
-          <!-- Create Success with WhatsApp -->
-          <div *ngIf="createSuccess" class="flex flex-col gap-3 p-4 bg-green-50 border border-green-100 rounded-xl">
-            <div class="flex items-center gap-2 mb-2">
-              <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
-              <span class="text-sm text-green-800 font-bold">Agent créé avec succès !</span>
-            </div>
-            
-            <a [href]="getWhatsappShareLink()" target="_blank"
-               class="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white font-bold py-3 px-4 rounded-xl shadow-sm hover:bg-[#1DA851] hover:shadow-md transition-all active:scale-95">
-              <i class="fa-brands fa-whatsapp text-xl"></i>
-              Envoyer les accès par WhatsApp
-            </a>
-            
-            <button type="button" (click)="closeModal()" class="mt-2 text-sm text-gray-500 underline hover:text-gray-800 transition-colors">
-              Fermer la fenêtre
-            </button>
-          </div>
-
-          <button *ngIf="!createSuccess" type="submit" [disabled]="isCreating"
+          <button type="submit" [disabled]="isCreating"
                   class="w-full py-3 bg-[#022c16] text-white font-bold rounded-xl hover:bg-[#034a28] transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm shadow-md">
             <i *ngIf="isCreating" class="fa-solid fa-circle-notch fa-spin"></i>
             <span>{{ isCreating ? 'Création...' : 'Créer l\\'admin' }}</span>
@@ -222,7 +204,6 @@ export class AdminAgentsTerrainComponent implements OnInit {
   newAdmin = { prenom: '', nom: '', telephone: '', password: '' };
   isCreating = false;
   createError = '';
-  createSuccess = false;
   showNewPassword = false;
 
   // Alert
@@ -271,7 +252,6 @@ export class AdminAgentsTerrainComponent implements OnInit {
   onCreateAgent(event: Event) {
     event.preventDefault();
     this.createError = '';
-    this.createSuccess = false;
 
     // 1. Validation des champs texte obligatoires
     const prenomErr = requireText(this.newAdmin.prenom, 'Le prénom');
@@ -307,8 +287,13 @@ export class AdminAgentsTerrainComponent implements OnInit {
       next: (res: any) => {
         this.isCreating = false;
         if (res.success) {
-          this.createSuccess = true;
           this.admins.unshift(res.data);
+          // Ouvrir WhatsApp directement avec les identifiants
+          const whatsappUrl = this.getWhatsappShareLink();
+          window.open(whatsappUrl, '_blank');
+          // Fermer le modal et réinitialiser
+          this.closeModal();
+          this.triggerAlert('Admin créé — identifiants envoyés via WhatsApp ✓', 'success');
         } else {
           this.createError = res.message || 'Erreur lors de la création.';
         }
@@ -324,7 +309,6 @@ export class AdminAgentsTerrainComponent implements OnInit {
 
   closeModal() {
     this.showCreateModal = false;
-    this.createSuccess = false;
     this.newAdmin = { prenom: '', nom: '', telephone: '', password: '' };
     this.createError = '';
     this.cdr.markForCheck();

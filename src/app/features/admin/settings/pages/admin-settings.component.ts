@@ -88,27 +88,25 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-share-nodes"></i></div>
             Liens Réseaux Sociaux (Header & Footer)
           </h3>
-          <p class="text-[11px] font-medium text-gray-500 mb-5 ml-9">Les liens des icônes WhatsApp, Facebook, TikTok et YouTube du site public.</p>
-          <div class="space-y-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[#25D366] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
-              <input [(ngModel)]="settings.whatsapp" type="url" placeholder="https://wa.me/221770000000"
-                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[#1877F2] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-facebook-f"></i></div>
-              <input [(ngModel)]="settings.facebook" type="url" placeholder="https://facebook.com/jammakxeewal"
-                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-tiktok"></i></div>
-              <input [(ngModel)]="settings.tiktok" type="url" placeholder="https://tiktok.com/@jammakxeewal"
-                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[#FF0000] text-white rounded-xl flex items-center justify-center text-sm shrink-0"><i class="fa-brands fa-youtube"></i></div>
-              <input [(ngModel)]="settings.youtube" type="url" placeholder="https://youtube.com/@jammakxeewal"
-                class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none">
+          <p class="text-[11px] font-medium text-gray-500 mb-5 ml-9">Activez et configurez les réseaux sociaux qui apparaîtront sur le site public.</p>
+          
+          <div class="space-y-3">
+            <div *ngFor="let social of availableSocials; let i = index" class="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-xl transition-all" [ngClass]="{'opacity-60': !social.active}">
+              <!-- Toggle & Icon -->
+              <div class="flex items-center gap-3 w-40 shrink-0">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="social.active" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+                <div class="w-8 h-8 text-white rounded-lg flex items-center justify-center text-sm shadow-sm" [style.background-color]="social.active ? social.color : '#9ca3af'">
+                  <i [class]="social.icon"></i>
+                </div>
+                <span class="text-[13px] font-bold text-gray-700">{{ social.name }}</span>
+              </div>
+              
+              <!-- URL Input -->
+              <input [(ngModel)]="social.url" [disabled]="!social.active" type="url" [placeholder]="'URL de votre profil ' + social.name"
+                class="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none disabled:bg-gray-100 disabled:text-gray-400">
             </div>
           </div>
         </div>
@@ -327,9 +325,9 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <div class="flex items-center gap-2"><i class="fa-solid fa-envelope text-[#008d36]"></i><span class="font-medium">{{ settings.email }}</span></div>
             <div class="flex items-center gap-3 pt-2 border-t border-white/10 mt-1">
               <span class="text-white/60 font-medium">Réseaux :</span>
-              <i class="fa-brands fa-whatsapp text-[#25D366] text-sm"></i>
-              <i class="fa-brands fa-facebook-f text-[#1877F2] text-sm"></i>
-              <i class="fa-brands fa-tiktok text-white text-sm"></i>
+              <ng-container *ngFor="let social of availableSocials">
+                <i *ngIf="social.active" [class]="social.icon" [style.color]="social.color" class="text-sm"></i>
+              </ng-container>
             </div>
           </div>
 
@@ -372,6 +370,18 @@ export class AdminSettingsComponent implements OnInit {
   previewQrUrl = '';
   private qrDebounceTimer: any;
 
+  availableSocials = [
+    { id: 'whatsapp', name: 'WhatsApp', icon: 'fa-brands fa-whatsapp', color: '#25D366', active: true, url: '' },
+    { id: 'facebook', name: 'Facebook', icon: 'fa-brands fa-facebook-f', color: '#1877F2', active: true, url: '' },
+    { id: 'tiktok', name: 'TikTok', icon: 'fa-brands fa-tiktok', color: '#000000', active: true, url: '' },
+    { id: 'youtube', name: 'YouTube', icon: 'fa-brands fa-youtube', color: '#FF0000', active: true, url: '' },
+    { id: 'instagram', name: 'Instagram', icon: 'fa-brands fa-instagram', color: '#E4405F', active: false, url: '' },
+    { id: 'twitter', name: 'X (Twitter)', icon: 'fa-brands fa-x-twitter', color: '#000000', active: false, url: '' },
+    { id: 'linkedin', name: 'LinkedIn', icon: 'fa-brands fa-linkedin-in', color: '#0A66C2', active: false, url: '' },
+    { id: 'telegram', name: 'Telegram', icon: 'fa-brands fa-telegram', color: '#26A5E4', active: false, url: '' },
+    { id: 'snapchat', name: 'Snapchat', icon: 'fa-brands fa-snapchat', color: '#FFFC00', active: false, url: '' }
+  ];
+
   settings: any = {
     telephone: '+221 77 123 45 67',
     email: environment.publicEmail,
@@ -380,6 +390,7 @@ export class AdminSettingsComponent implements OnInit {
     facebook: '#',
     tiktok: '#',
     youtube: '#',
+    social_links: [],
     qr_code_url: '',
     vocal_max_seconds: 120,
     currentPassword: '',
@@ -438,6 +449,32 @@ export class AdminSettingsComponent implements OnInit {
           if (this.settings.vocal_max_seconds) {
             this.settings.vocal_max_seconds = +this.settings.vocal_max_seconds;
           }
+          
+          // Hydrater availableSocials
+          if (this.settings.social_links && Array.isArray(this.settings.social_links)) {
+            // Merge des settings existants
+            this.availableSocials.forEach(social => {
+              const saved = this.settings.social_links.find((s: any) => s.id === social.id);
+              if (saved) {
+                social.url = saved.url;
+                social.active = saved.active;
+              }
+            });
+          } else {
+            // Compatibilité avec l'ancien format hardcodé
+            const mapOld: Record<string, string> = {
+              'whatsapp': this.settings.whatsapp,
+              'facebook': this.settings.facebook,
+              'tiktok': this.settings.tiktok,
+              'youtube': this.settings.youtube
+            };
+            this.availableSocials.forEach(social => {
+              if (mapOld[social.id] !== undefined) {
+                social.url = mapOld[social.id] || '';
+                social.active = !!social.url && social.url !== '#';
+              }
+            });
+          }
         }
         this.isLoading = false;
         if (this.settings.qr_code_url) {
@@ -471,6 +508,19 @@ export class AdminSettingsComponent implements OnInit {
 
   onSave() {
     this.isSaving = true;
+    
+    // Synchro de availableSocials vers settings
+    this.settings.social_links = this.availableSocials.map(s => ({
+      id: s.id, name: s.name, icon: s.icon, color: s.color, active: s.active, url: s.url
+    }));
+    
+    // Retro-compatibilité pour l'ancien header (au cas où)
+    const getUrl = (id: string) => { const f = this.availableSocials.find(x => x.id === id); return (f && f.active && f.url) ? f.url : '#'; };
+    this.settings.whatsapp = getUrl('whatsapp');
+    this.settings.facebook = getUrl('facebook');
+    this.settings.tiktok = getUrl('tiktok');
+    this.settings.youtube = getUrl('youtube');
+
     const dataToSave = { ...this.settings };
     delete dataToSave.newPassword;
     delete dataToSave.confirmPassword;

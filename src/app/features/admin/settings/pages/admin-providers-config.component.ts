@@ -95,7 +95,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       <div class="space-y-4 relative z-10">
         <div class="mb-4">
           <label class="block text-xs font-bold text-gray-600 mb-2">Choisir le fournisseur</label>
-          <div class="flex gap-4">
+          <div class="flex flex-wrap gap-4">
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="radio" name="smsProv" value="MOCK_SMS" [(ngModel)]="smsProviderType" class="text-orange-500 focus:ring-orange-500">
               <span class="text-sm font-bold text-gray-800">Mock (Simulation)</span>
@@ -104,16 +104,28 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
               <input type="radio" name="smsProv" value="ORANGE_SMS" [(ngModel)]="smsProviderType" class="text-orange-500 focus:ring-orange-500">
               <span class="text-sm font-bold text-gray-800">Orange SMS</span>
             </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="smsProv" value="CUSTOM_SMS" [(ngModel)]="smsProviderType" class="text-orange-500 focus:ring-orange-500">
+              <span class="text-sm font-bold text-gray-800">API Personnalisée (Custom)</span>
+            </label>
           </div>
         </div>
 
-        <div>
+        <div *ngIf="smsProviderType === 'CUSTOM_SMS'" class="mb-4 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+          <label class="block text-xs font-bold text-gray-600 mb-1">URL de l'API (Endpoint)</label>
+          <input type="text" [(ngModel)]="smsConfig.endpoint" placeholder="https://api.fournisseur.com/send" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-all mb-3">
+          
+          <label class="block text-xs font-bold text-gray-600 mb-1">Clé d'API (Bearer Token / Header)</label>
+          <input type="password" [(ngModel)]="smsConfig.apiKey" placeholder="Token d'authentification" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-all">
+        </div>
+
+        <div *ngIf="smsProviderType === 'ORANGE_SMS'">
           <label class="block text-xs font-bold text-gray-600 mb-1">Clé d'API (API Key / Token)</label>
           <input type="password" [(ngModel)]="smsConfig.apiKey" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-all">
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">Nom de l'Expéditeur (Sender ID)</label>
+        <div *ngIf="smsProviderType !== 'MOCK_SMS'">
+          <label class="block text-xs font-bold text-gray-600 mb-1 mt-3">Nom de l'Expéditeur (Sender ID)</label>
           <input type="text" [(ngModel)]="smsConfig.senderId" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 transition-all">
         </div>
 
@@ -175,7 +187,7 @@ export class AdminProvidersConfigComponent implements OnInit {
   smtpConfig = { host: '', port: 587, secure: false, user: '', pass: '', from: '' };
   
   smsProviderType = 'MOCK_SMS';
-  smsConfig = { apiKey: '', senderId: '' };
+  smsConfig: any = { apiKey: '', senderId: '', endpoint: '' };
 
   whatsappConfig = { accessToken: '', phoneNumberId: '', businessAccountId: '' };
 

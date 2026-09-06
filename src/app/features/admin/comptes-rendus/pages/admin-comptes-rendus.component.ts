@@ -122,39 +122,150 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     
     <!-- Modal Création -->
     <div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in-up my-4 overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+      <div class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl animate-fade-in-up my-4 overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Header Modale -->
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 shrink-0">
           <h3 class="font-black text-xl text-gray-900 flex items-center gap-3">
              <div class="w-10 h-10 rounded-xl bg-[#e6f3eb] flex items-center justify-center">
                <i class="fa-solid fa-pen-nib text-[#008d36]"></i>
              </div>
-             Nouveau compte-rendu
+             Nouveau compte-rendu détaillé
           </h3>
           <button (click)="showModal = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
         
-        <div class="p-6 space-y-4">
+        <!-- Corps de la Modale -->
+        <div class="p-6 overflow-y-auto flex-1 custom-scrollbar space-y-6">
+          
+          <!-- Infos de base -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Titre du rapport (ex: Réunion de Bureau)">
+            </div>
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Auteur</label>
+              <input type="text" [(ngModel)]="formData.auteur" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Nom de l'auteur">
+            </div>
+            <div class="md:col-span-3">
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Lieu / Date</label>
+              <input type="text" [(ngModel)]="formData.lieu" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Lieu, Réunion Zoom, etc.">
+            </div>
+          </div>
+
+          <hr class="border-gray-100">
+
+          <!-- Éditeur de Texte Riche (Style Word) -->
           <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Titre <span class="text-red-500">*</span></label>
-            <input type="text" [(ngModel)]="formData.titre" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Titre du rapport">
+            <label class="block text-[13px] font-bold text-gray-700 mb-1.5 flex justify-between items-center">
+              <span>Contenu du rapport <span class="text-red-500">*</span></span>
+              <span class="text-[10px] font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Copier-collez depuis Word supporté</span>
+            </label>
+            <div class="border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#022c16] focus-within:ring-1 focus-within:ring-[#022c16] transition-all">
+              <!-- Toolbar WYSIWYG -->
+              <div class="bg-gray-50 border-b border-gray-200 p-2 flex flex-wrap gap-1">
+                <button (click)="execCommand('bold')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Gras (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
+                <button (click)="execCommand('italic')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Italique (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
+                <button (click)="execCommand('underline')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Souligné (Ctrl+U)"><i class="fa-solid fa-underline"></i></button>
+                <div class="w-px h-6 bg-gray-300 mx-1 self-center"></div>
+                <button (click)="execCommand('insertUnorderedList')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+                <button (click)="execCommand('insertOrderedList')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
+                <div class="w-px h-6 bg-gray-300 mx-1 self-center"></div>
+                <button (click)="execCommand('formatBlock', 'H2')" class="px-2 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors text-xs font-bold" title="Titre 2">Titre 1</button>
+                <button (click)="execCommand('formatBlock', 'H3')" class="px-2 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors text-xs font-bold" title="Titre 3">Titre 2</button>
+                <button (click)="execCommand('removeFormat')" class="w-8 h-8 rounded hover:bg-gray-200 flex items-center justify-center text-red-500 transition-colors ml-auto" title="Effacer le formatage"><i class="fa-solid fa-eraser"></i></button>
+              </div>
+              <!-- Zone Editable -->
+              <div #editor id="cr-editor" contenteditable="true" (input)="onEditorInput()" (paste)="onEditorPaste($event)"
+                   class="p-4 min-h-[300px] max-h-[500px] overflow-y-auto bg-white outline-none prose prose-sm sm:prose-base max-w-none text-gray-800"
+                   [innerHTML]="formData.contenu">
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Lieu</label>
-            <input type="text" [(ngModel)]="formData.lieu" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Siège, Mairie, etc.">
+
+          <hr class="border-gray-100">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Pièces jointes -->
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-1.5 flex items-center gap-2">
+                <i class="fa-solid fa-paperclip text-blue-500"></i> Pièces jointes (PDF, Word, etc.)
+              </label>
+              <div class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors relative">
+                <input type="file" multiple (change)="onFilesSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                <i class="fa-regular fa-file-pdf text-3xl text-gray-400 mb-2"></i>
+                <p class="text-sm font-bold text-gray-700">Cliquez ou glissez vos fichiers ici</p>
+                <p class="text-xs text-gray-500 mt-1">Taille max : 5Mo par fichier</p>
+              </div>
+              <!-- Liste des fichiers -->
+              <div *ngIf="formData.attachments.length > 0" class="mt-3 space-y-2">
+                <div *ngFor="let file of formData.attachments; let i = index" class="flex items-center justify-between bg-blue-50/50 border border-blue-100 rounded-lg p-2 px-3">
+                  <div class="flex items-center gap-2 truncate">
+                    <i class="fa-regular fa-file-lines text-blue-500"></i>
+                    <span class="text-xs font-bold text-gray-700 truncate max-w-[150px]">{{ file.name }}</span>
+                  </div>
+                  <button (click)="removeFile(i)" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Audience (Ciblage) -->
+            <div>
+              <label class="block text-[13px] font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-bullseye text-orange-500"></i> Visibilité et Audience
+              </label>
+              <div class="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="visibilite" value="PUBLIC" [(ngModel)]="formData.visibilite" class="text-[#008d36] focus:ring-[#008d36] w-4 h-4">
+                  <span class="text-sm font-bold text-gray-800">Public (Tout le monde)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="visibilite" value="GROUPES" [(ngModel)]="formData.visibilite" class="text-[#008d36] focus:ring-[#008d36] w-4 h-4">
+                  <span class="text-sm font-bold text-gray-800">Seulement certains rôles</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="visibilite" value="PERSONNES" [(ngModel)]="formData.visibilite" class="text-[#008d36] focus:ring-[#008d36] w-4 h-4">
+                  <span class="text-sm font-bold text-gray-800">Personnes spécifiques</span>
+                </label>
+                
+                <!-- Si Groupes -->
+                <div *ngIf="formData.visibilite === 'GROUPES'" class="pl-6 pt-2 animate-fade-in-up">
+                  <p class="text-[11px] text-gray-500 mb-2">Sélectionnez les rôles autorisés :</p>
+                  <div class="flex flex-wrap gap-2">
+                    <label *ngFor="let role of ['Admin', 'Agent', 'Adhérent']" class="flex items-center gap-1.5 bg-white px-2 py-1 border border-gray-200 rounded shadow-sm cursor-pointer">
+                      <input type="checkbox" (change)="toggleRole(role)" [checked]="formData.groupesCibles.includes(role)" class="rounded text-[#008d36] focus:ring-[#008d36]">
+                      <span class="text-xs font-bold text-gray-700">{{ role }}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Si Personnes -->
+                <div *ngIf="formData.visibilite === 'PERSONNES'" class="pl-6 pt-2 animate-fade-in-up">
+                  <p class="text-[11px] text-gray-500 mb-2">Identifiants ou Noms des personnes :</p>
+                  <input type="text" placeholder="Entrez les noms séparés par des virgules..."
+                         (change)="updatePersonnesCibles($event)"
+                         [value]="formData.personnesCibles.join(', ')"
+                         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] outline-none">
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-[13px] font-bold text-gray-700 mb-1.5">Auteur</label>
-            <input type="text" [(ngModel)]="formData.auteur" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium focus:border-[#022c16] focus:ring-1 focus:ring-[#022c16] transition-all outline-none" placeholder="Nom de l'auteur">
-          </div>
-          <div class="flex justify-end gap-3 pt-3">
-            <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
-            <button (click)="submitForm()" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2">
-              <i class="fa-solid fa-check"></i> Enregistrer
-            </button>
-          </div>
+          
         </div>
+        
+        <!-- Footer Modale -->
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50 shrink-0">
+          <button (click)="showModal = false" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors shadow-sm">Annuler</button>
+          <button (click)="submitForm()" [disabled]="isLoading" class="px-6 py-2.5 text-sm font-bold text-white bg-[#022c16] hover:bg-[#008d36] rounded-xl transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
+            <i *ngIf="!isLoading" class="fa-solid fa-paper-plane"></i>
+            <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+            {{ isLoading ? 'Enregistrement...' : 'Publier le compte-rendu' }}
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -167,13 +278,17 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   showModal = false;
-  formData = {
+  formData: any = {
     titre: '',
     lieu: '',
-    auteur: 'Admin'
+    auteur: 'Admin',
+    contenu: '',
+    visibilite: 'PUBLIC',
+    groupesCibles: [],
+    personnesCibles: [],
+    attachments: []
   };
 
-  
   // Alert State
   alertMessage = '';
   alertType: AlertType = 'success';
@@ -185,7 +300,6 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
     this.showAlertPopup = true;
     setTimeout(() => this.showAlertPopup = false, 3000);
   }
-
 
   // === BULK DELETE STATE ===
   selectedIds: Set<string> = new Set();
@@ -318,11 +432,70 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
 
   action(type: string, id?: string) {
     if (type === 'Rédiger') {
-      this.formData = { titre: '', lieu: '', auteur: 'Admin' };
+      this.formData = { titre: '', lieu: '', auteur: 'Admin', contenu: '', visibilite: 'PUBLIC', groupesCibles: [], personnesCibles: [], attachments: [] };
       this.showModal = true;
     } else if (type === 'Supprimer' && id) {
       this.openConfirm('Supprimer ce compte-rendu ?', 'Êtes-vous sûr de vouloir supprimer définitivement ce compte-rendu ?', 'delete', id);
     }
+  }
+
+  // === WYSISYG & UPLOAD LOGIC ===
+  
+  execCommand(command: string, value: string = '') {
+    document.execCommand(command, false, value);
+    this.onEditorInput();
+  }
+
+  onEditorInput() {
+    const editor = document.getElementById('cr-editor');
+    if (editor) {
+      this.formData.contenu = editor.innerHTML;
+    }
+  }
+
+  onEditorPaste(e: ClipboardEvent) {
+    // Laisse le navigateur gérer le paste HTML natif de Word
+    setTimeout(() => this.onEditorInput(), 10);
+  }
+
+  onFilesSelected(event: any) {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.size > 5 * 1024 * 1024) {
+          this.showAlert(`Le fichier ${file.name} dépasse 5Mo`, 'error');
+          continue;
+        }
+        // Simulation encodage b64 ou simple reference
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.formData.attachments.push({
+            name: file.name,
+            type: file.type,
+            url: e.target.result // Base64 content
+          });
+          this.cdr.markForCheck();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    event.target.value = '';
+  }
+
+  removeFile(index: number) {
+    this.formData.attachments.splice(index, 1);
+  }
+
+  toggleRole(role: string) {
+    const idx = this.formData.groupesCibles.indexOf(role);
+    if (idx > -1) this.formData.groupesCibles.splice(idx, 1);
+    else this.formData.groupesCibles.push(role);
+  }
+
+  updatePersonnesCibles(event: any) {
+    const val = event.target.value;
+    this.formData.personnesCibles = val.split(',').map((s: string) => s.trim()).filter((s: string) => !!s);
   }
 
   submitForm() {
@@ -330,17 +503,37 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
       this.showAlert('Veuillez saisir un titre', 'info');
       return;
     }
-      this.isLoading = true;
-    this.showModal = false;
+    if (!this.formData.contenu || this.formData.contenu.trim() === '') {
+      this.showAlert('Veuillez rédiger un contenu', 'info');
+      return;
+    }
+    this.isLoading = true;
+    
     this.adminData.createEntity('comptes-rendus', { 
       titre: this.formData.titre, 
-      contenu: 'Contenu généré...', 
+      contenu: this.formData.contenu, 
       lieu: this.formData.lieu,
       auteur: this.formData.auteur, 
-      date: new Date().toISOString() 
+      statut: 'PUBLIE',
+      date: new Date().toISOString(),
+      visibilite: this.formData.visibilite,
+      groupesCibles: this.formData.groupesCibles,
+      personnesCibles: this.formData.personnesCibles,
+      attachments: this.formData.attachments
     }).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(() => this.refreshData());
+    ).subscribe({
+      next: () => {
+        this.showModal = false;
+        this.refreshData();
+        this.showAlert('Compte-rendu publié avec succès !');
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showAlert('Erreur lors de la publication', 'error');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy() {
