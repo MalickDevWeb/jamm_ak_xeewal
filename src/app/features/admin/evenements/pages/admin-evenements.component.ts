@@ -3,9 +3,10 @@ import { BulkActionsBarComponent } from '../../../../shared/components/bulk-acti
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Subject, takeUntil } from 'rxjs';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 import { environment } from '../../../../../environments/environment';
@@ -25,7 +26,7 @@ import { environment } from '../../../../../environments/environment';
           </h2>
           <p class="text-sm text-gray-500 mt-1">{{ total }} événement(s)</p>
         </div>
-        <button (click)="openCreateModal()" class="px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
+        <button *ngIf="rbac.hasPermission('events.create')" (click)="openCreateModal()" class="px-6 py-3 bg-gradient-to-r from-[#022c16] to-[#034256] text-white rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
           <i class="fa-solid fa-plus text-lg"></i>
           <span>Nouvel événement</span>
         </button>
@@ -41,7 +42,7 @@ import { environment } from '../../../../../environments/environment';
       <div *ngIf="!isLoading && evenements.length === 0" class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
         <i class="fa-solid fa-calendar text-7xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-xl mb-2">Aucun événement</p>
-        <button (click)="openCreateModal()" class="text-[#022c16] font-bold hover:underline text-lg">Créer le premier événement →</button>
+        <button *ngIf="rbac.hasPermission('events.create')" (click)="openCreateModal()" class="text-[#022c16] font-bold hover:underline text-lg">Créer le premier événement →</button>
       </div>
 
       <!-- Select All Bar -->
@@ -62,7 +63,7 @@ import { environment } from '../../../../../environments/environment';
             <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">{{ e.titre }}</h3>
             <p *ngIf="e.description" class="text-sm text-gray-600 line-clamp-3 mb-4 flex-1">{{ e.description }}</p>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <button (click)="toggleStatus(e)"
+              <button *ngIf="rbac.hasPermission('events.update')" (click)="toggleStatus(e)"
                 [ngClass]="e.statut !== 'ANNULE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-red-100 text-red-700 hover:bg-red-200'"
                 class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer border-none"
                 title="Changer le statut">
@@ -73,10 +74,10 @@ import { environment } from '../../../../../environments/environment';
                 <button (click)="viewEvenement(e)" class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-[#022c16] hover:text-white flex items-center justify-center transition-all shadow-sm" title="Voir les détails">
                   <i class="fa-solid fa-eye text-sm"></i>
                 </button>
-                <button (click)="openEditModal(e)" class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Modifier">
+                <button *ngIf="rbac.hasPermission('events.update')" (click)="openEditModal(e)" class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Modifier">
                   <i class="fa-solid fa-pen text-sm"></i>
                 </button>
-                <button (click)="deleteItem(e.id)" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Supprimer">
+                <button *ngIf="rbac.hasPermission('events.delete')" (click)="deleteItem(e.id)" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Supprimer">
                   <i class="fa-solid fa-trash text-sm"></i>
                 </button>
               </div>
@@ -252,7 +253,7 @@ import { environment } from '../../../../../environments/environment';
       
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('events.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -342,6 +343,7 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminData: AdminDataService,
+    public rbac: RbacService,
     private bulkDelete: BulkDeleteService,
     private cdr: ChangeDetectorRef,
     private http: HttpClient
@@ -363,6 +365,7 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   }
 
   openCreateModal() {
+    if (!this.rbac.hasPermission('events.create')) return;
     this.isEditing = false;
     this.editingId = null;
     this.formData = { titre: '', description: '', date: new Date().toISOString().split('T')[0], heureDebut: '', heureFin: '', lieu: '', categorie: '', statut: 'A_VENIR' };
@@ -370,6 +373,7 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   }
 
   openEditModal(e: any) {
+    if (!this.rbac.hasPermission('events.update')) return;
     this.isEditing = true;
     this.editingId = e.id;
     this.formData = { ...e, date: e.date ? new Date(e.date).toISOString().split('T')[0] : '' };
@@ -491,6 +495,7 @@ export class AdminEvenementsComponent implements OnInit, OnDestroy {
   }
 
   deleteItem(id: string) {
+    if (!this.rbac.hasPermission('events.delete')) return;
     const previous = [...this.evenements];
     this.evenements = this.evenements.filter(e => e.id !== id);
     this.total = Math.max(0, this.total - 1);

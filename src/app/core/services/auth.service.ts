@@ -136,6 +136,15 @@ export class AuthService {
   }
 
   logout() {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      // Notifier le backend pour blacklister le token
+      this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
+        next: () => {},
+        error: () => {}
+      });
+    }
+
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     this.currentUserSubject.next(null);

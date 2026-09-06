@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 
 @Component({
   selector: 'app-admin-comptes-rendus',
@@ -51,7 +52,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
     
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('comptes_rendus.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -71,10 +72,10 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <button (click)="exportExcel()" class="px-5 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#0c5e31] transition-colors flex items-center gap-2" title="Exporter la liste en Excel">
+        <button *ngIf="rbac.hasPermission('comptes_rendus.export')" (click)="exportExcel()" class="px-5 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#0c5e31] transition-colors flex items-center gap-2" title="Exporter la liste en Excel">
           <i class="fa-solid fa-file-excel"></i> Excel
         </button>
-        <button (click)="action('Rédiger')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
+        <button *ngIf="rbac.hasPermission('comptes_rendus.create')" (click)="action('Rédiger')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
           <i class="fa-solid fa-pen-nib"></i> Rédiger
         </button>
       </div>
@@ -109,7 +110,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
            [class.ring-red-400]="isSelected(cr.id)">
         
         <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
-          <button (click)="exportPDF(cr)" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors" title="Exporter en PDF">
+          <button *ngIf="rbac.hasPermission('comptes_rendus.export')" (click)="exportPDF(cr)" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors" title="Exporter en PDF">
             <i class="fa-solid fa-file-pdf"></i>
           </button>
           <input type="checkbox" [checked]="isSelected(cr.id)" (change)="toggleSelection(cr.id)" class="w-4 h-4 cursor-pointer accent-[#008d36]">
@@ -135,7 +136,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
             <button class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors">
                <i class="fa-solid fa-eye text-xs"></i>
             </button>
-            <button (click)="action('Supprimer', cr.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition-colors">
+            <button *ngIf="rbac.hasPermission('comptes_rendus.delete')" (click)="action('Supprimer', cr.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition-colors">
               <i class="fa-solid fa-trash text-xs"></i>
             </button>
           </div>
@@ -456,6 +457,7 @@ export class AdminComptesRendusComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminData: AdminDataService,
+    public rbac: RbacService,
     private cdr: ChangeDetectorRef
   ) {}
 

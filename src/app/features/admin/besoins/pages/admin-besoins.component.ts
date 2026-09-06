@@ -7,6 +7,7 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -44,7 +45,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
         <button (click)="loadBesoins()" class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-[#022c16] text-sm font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
           <i [class]="isLoading ? 'fa-solid fa-circle-notch fa-spin text-[#008d36]' : 'fa-solid fa-rotate text-[#008d36]'"></i> Actualiser
         </button>
-        <button (click)="openModal()" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
+        <button *ngIf="rbac.hasPermission('besoins.create')" (click)="openModal()" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Nouveau besoin
         </button>
       </div>
@@ -219,13 +220,13 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
             <i class="fa-regular fa-calendar"></i> {{ b.createdAt | date:'dd/MM/yyyy à HH:mm' }}
           </span>
           <div class="flex items-center gap-2">
-            <button *ngIf="b.statut === 'EN_ATTENTE' || b.statut === 'EN_COURS'" (click)="updateStatut(b, 'RESOLU')" class="px-3.5 py-1.5 bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9] rounded-lg text-[11px] font-black uppercase transition-colors flex items-center gap-1.5">
+            <button *ngIf="b.statut === 'EN_ATTENTE' || b.statut === 'EN_COURS'" (click)="rbac.hasPermission('besoins.update') && updateStatut(b, 'RESOLU')" [class.opacity-50]="!rbac.hasPermission('besoins.update')" class="px-3.5 py-1.5 bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9] rounded-lg text-[11px] font-black uppercase transition-colors flex items-center gap-1.5">
               <i class="fa-solid fa-gears"></i> Traiter
             </button>
-            <button *ngIf="b.statut === 'RESOLU'" (click)="updateStatut(b, 'EN_ATTENTE')" class="px-3.5 py-1.5 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-lg text-[11px] font-black uppercase transition-colors flex items-center gap-1.5">
+            <button *ngIf="b.statut === 'RESOLU' && rbac.hasPermission('besoins.update')" (click)="updateStatut(b, 'EN_ATTENTE')" class="px-3.5 py-1.5 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-lg text-[11px] font-black uppercase transition-colors flex items-center gap-1.5">
               <i class="fa-solid fa-rotate-left"></i> Réouvrir
             </button>
-            <button (click)="deleteBesoin(b)" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+            <button *ngIf="rbac.hasPermission('besoins.delete')" (click)="deleteBesoin(b)" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
               <i class="fa-solid fa-trash text-xs"></i>
             </button>
           </div>
@@ -300,7 +301,7 @@ type BesoinType = 'ALL' | 'VOCAL' | 'TEXT';
   
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('besoins.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -410,6 +411,7 @@ export class AdminbesoinsComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminData: AdminDataService,
+    public rbac: RbacService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}

@@ -148,7 +148,7 @@ interface NavItem {
         <header class="hidden lg:flex h-24 items-center justify-between px-8 bg-[#f8fafc] sticky top-0 z-20">
           <div>
             <h2 class="text-[28px] font-bold text-gray-900 flex items-center gap-2">
-              Bienvenue, Admin <span class="text-2xl">👋</span>
+              Bienvenue, {{ userName }} <span class="text-2xl">👋</span>
             </h2>
             <p class="text-sm text-gray-500 mt-1">Voici un aperçu général de la plateforme.</p>
           </div>
@@ -199,11 +199,11 @@ interface NavItem {
             <!-- User Profile -->
             <div class="flex items-center gap-3 pl-6 border-l border-gray-200">
               <div class="w-10 h-10 rounded-full bg-[#022c16] text-white flex items-center justify-center font-bold shadow-sm">
-                A
+                {{ userInitial }}
               </div>
               <div class="hidden sm:block text-left">
-                <p class="text-sm font-bold text-gray-900 leading-tight">Admin</p>
-                <p class="text-[11px] text-gray-500 font-medium">Super Admin</p>
+                <p class="text-sm font-bold text-gray-900 leading-tight">{{ userName }}</p>
+                <p class="text-[11px] text-gray-500 font-medium">{{ userProfileName }}</p>
               </div>
               <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
             </div>
@@ -231,45 +231,45 @@ export class AdminDashboardLayoutComponent implements OnInit, OnDestroy {
   private readonly readStorageKey = 'jamm-admin-read-notifications';
 
   navItems: NavItem[] = [
-    { path: '/admin/dashboard', label: 'Tableau de bord', icon: 'fa-solid fa-chart-pie' },
+    { path: '/admin/dashboard', label: 'Tableau de bord', icon: 'fa-solid fa-chart-pie', permission: 'dashboard.read' },
     
     // Citoyens & Interactions
-    { path: '/admin/adherents', label: 'Adhérents', icon: 'fa-solid fa-users', category: 'Citoyens & Interactions' },
-    { path: '/admin/besoins', label: 'Besoins', icon: 'fa-solid fa-hand-holding-heart', category: 'Citoyens & Interactions' },
-    { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb', category: 'Citoyens & Interactions' },
-    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', category: 'Citoyens & Interactions' },
-    { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical', category: 'Citoyens & Interactions' },
+    { path: '/admin/adherents', label: 'Adhérents', icon: 'fa-solid fa-users', permission: 'members.read', category: 'Citoyens & Interactions' },
+    { path: '/admin/besoins', label: 'Besoins', icon: 'fa-solid fa-hand-holding-heart', permission: 'besoins.read', category: 'Citoyens & Interactions' },
+    { path: '/admin/idees', label: 'Idées', icon: 'fa-solid fa-lightbulb', permission: 'idees.read', category: 'Citoyens & Interactions' },
+    { path: '/admin/messages', label: 'Messages', icon: 'fa-solid fa-envelope', permission: 'messages.read', category: 'Citoyens & Interactions' },
+    { path: '/admin/sondages', label: 'Sondages', icon: 'fa-solid fa-square-poll-vertical', permission: 'sondages.read', category: 'Citoyens & Interactions' },
 
     // Terrain & Actions
-    { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group', category: 'Terrain & Actions' },
-    { path: '/admin/activites', label: 'Activités', icon: 'fa-solid fa-calendar-days', category: 'Terrain & Actions' },
-    { path: '/admin/evenements', label: 'Agenda (Événements)', icon: 'fa-solid fa-calendar-check', category: 'Terrain & Actions' },
-    { path: '/admin/commissions', label: 'Commissions', icon: 'fa-solid fa-sitemap', category: 'Terrain & Actions' },
-    { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines', category: 'Terrain & Actions' },
-    { path: '/admin/agents-terrain', label: 'Agents Terrain', icon: 'fa-solid fa-street-view', category: 'Terrain & Actions' },
+    { path: '/admin/poles', label: 'Pôles d\'action', icon: 'fa-solid fa-layer-group', permission: 'poles.read', category: 'Terrain & Actions' },
+    { path: '/admin/activites', label: 'Activités', icon: 'fa-solid fa-calendar-days', permission: 'activities.read', category: 'Terrain & Actions' },
+    { path: '/admin/evenements', label: 'Agenda (Événements)', icon: 'fa-solid fa-calendar-check', permission: 'events.read', category: 'Terrain & Actions' },
+    { path: '/admin/commissions', label: 'Commissions', icon: 'fa-solid fa-sitemap', permission: 'groups.read', category: 'Terrain & Actions' },
+    { path: '/admin/comptes-rendus', label: 'Comptes-rendus', icon: 'fa-solid fa-file-lines', permission: 'comptes_rendus.read', category: 'Terrain & Actions' },
+    { path: '/admin/agents-terrain', label: 'Agents Terrain', icon: 'fa-solid fa-street-view', permission: 'agents_terrain.read', category: 'Terrain & Actions' },
 
     // Communication
-    { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib', category: 'Communication' },
-    { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell', category: 'Communication' },
+    { path: '/admin/editorial', label: 'Contenu', icon: 'fa-solid fa-pen-nib', permission: 'content.read', category: 'Communication' },
+    { path: '/admin/notifications', label: 'Notifications Push', icon: 'fa-solid fa-bell', permission: 'notifications.read', category: 'Communication' },
 
     // Finances
-    { path: '/admin/finance/dashboard', label: 'Tableau Financier', icon: 'fa-solid fa-chart-line', permission: 'finances:read', category: 'Finances' },
-    { path: '/admin/finance/contributions', label: 'Cotisations', icon: 'fa-solid fa-hand-holding-dollar', permission: 'finances:read', category: 'Finances' },
-    { path: '/admin/finance/expenses', label: 'Dépenses', icon: 'fa-solid fa-file-invoice-dollar', permission: 'finances:read', category: 'Finances' },
-    { path: '/admin/finance/manual-payments', label: 'Paiements manuels', icon: 'fa-solid fa-money-bill-transfer', permission: 'finances:read', category: 'Finances' },
-    { path: '/admin/finance/movements', label: 'Journal des mouvements', icon: 'fa-solid fa-clock-rotate-left', permission: 'finances:read', category: 'Finances' },
-    { path: '/admin/finances', label: 'Comptes & API', icon: 'fa-solid fa-sack-dollar', permission: 'finances:read', category: 'Finances' },
+    { path: '/admin/finance/dashboard', label: 'Tableau Financier', icon: 'fa-solid fa-chart-line', permission: 'finance.dashboard.read', category: 'Finances' },
+    { path: '/admin/finance/contributions', label: 'Cotisations', icon: 'fa-solid fa-hand-holding-dollar', permission: 'finance.contributions.read', category: 'Finances' },
+    { path: '/admin/finance/expenses', label: 'Dépenses', icon: 'fa-solid fa-file-invoice-dollar', permission: 'finance.expenses.read', category: 'Finances' },
+    { path: '/admin/finance/manual-payments', label: 'Paiements manuels', icon: 'fa-solid fa-money-bill-transfer', permission: 'finance.dashboard.read', category: 'Finances' },
+    { path: '/admin/finance/movements', label: 'Journal des mouvements', icon: 'fa-solid fa-clock-rotate-left', permission: 'finance.dashboard.read', category: 'Finances' },
+    { path: '/admin/finances', label: 'Comptes & API', icon: 'fa-solid fa-sack-dollar', permission: 'finance.dashboard.read', category: 'Finances' },
 
     // Administration
-    { path: '/admin/membres', label: 'Équipe & Profils', icon: 'fa-solid fa-user-shield', permission: 'admin:read', category: 'Administration' },
-    { path: '/admin/groups', label: 'Groupes', icon: 'fa-solid fa-users-rectangle', permission: 'admin:read', category: 'Administration' },
-    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul', category: 'Administration' },
+    { path: '/admin/membres', label: 'Équipe & Profils', icon: 'fa-solid fa-user-shield', permission: 'settings.read', category: 'Administration' },
+    { path: '/admin/groups', label: 'Groupes', icon: 'fa-solid fa-users-rectangle', permission: 'settings.read', category: 'Administration' },
+    { path: '/admin/options', label: 'Quartiers & Catégories', icon: 'fa-solid fa-list-ul', permission: 'settings.read', category: 'Administration' },
 
     // Système
-    { path: '/admin/settings/roles', label: 'Profils & Modules', icon: 'fa-solid fa-user-lock', permission: 'admin:read', category: 'Système' },
-    { path: '/admin/audit', label: 'Audit & Logs', icon: 'fa-solid fa-clipboard-list', permission: 'admin:read', category: 'Système' },
-    { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear', permission: 'admin:read', category: 'Système' },
-    { path: '/admin/settings/providers', label: 'API & Providers', icon: 'fa-solid fa-server', permission: 'admin:read', category: 'Système' }
+    { path: '/admin/settings/roles', label: 'Profils & Modules', icon: 'fa-solid fa-user-lock', permission: 'settings.read', category: 'Système' },
+    { path: '/admin/audit', label: 'Audit & Logs', icon: 'fa-solid fa-clipboard-list', permission: 'settings.read', category: 'Système' },
+    { path: '/admin/settings', label: 'Paramètres', icon: 'fa-solid fa-gear', permission: 'settings.read', category: 'Système' },
+    { path: '/admin/settings/providers', label: 'API & Providers', icon: 'fa-solid fa-server', permission: 'settings.read', category: 'Système' }
   ];
 
   constructor(

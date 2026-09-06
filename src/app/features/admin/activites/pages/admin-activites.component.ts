@@ -16,6 +16,7 @@ import {
   AdminDataService,
   Option,
 } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BulkActionsBarComponent } from '../../../../shared/components/bulk-actions-bar/bulk-actions-bar.component';
 import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
@@ -39,7 +40,7 @@ import { environment } from '../../../../../environments/environment';
             <p class="text-sm font-medium text-gray-500">{{ total() }} activité(s) enregistrée(s)</p>
           </div>
         </div>
-        <button (click)="openCreateModal()" class="bg-[#022c16] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
+        <button *ngIf="rbac.hasPermission('activities.create')" (click)="openCreateModal()" class="bg-[#022c16] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
           <i class="fa-solid fa-plus"></i> Nouvelle activité
         </button>
       </div>
@@ -107,7 +108,7 @@ import { environment } from '../../../../../environments/environment';
         </div>
         <h3 class="text-lg font-bold text-gray-900 mb-1">Aucune activité</h3>
         <p class="text-sm text-gray-500 mb-6">Commencez par ajouter votre première activité.</p>
-        <button (click)="openCreateModal()" class="text-[#008d36] bg-[#e6f3eb] font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#d1e8d9] transition-colors">
+        <button *ngIf="rbac.hasPermission('activities.create')" (click)="openCreateModal()" class="text-[#008d36] bg-[#e6f3eb] font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#d1e8d9] transition-colors">
           Créer une activité
         </button>
       </div>
@@ -159,14 +160,14 @@ import { environment } from '../../../../../environments/environment';
             <h3 class="text-[15px] font-bold text-gray-900 mb-4 line-clamp-2 leading-tight">{{ a.titre }}</h3>
             
             <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-              <button (click)="toggleStatus(a)" 
+              <button *ngIf="rbac.hasPermission('activities.update')" (click)="toggleStatus(a)" 
                 [ngClass]="a.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
                 class="text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase transition-colors"
                 title="Cliquer pour changer le statut">
                 <i class="fa-solid" [ngClass]="a.statut === 'PUBLIE' ? 'fa-check-circle' : 'fa-pen'"></i> 
                 {{ a.statut === 'PUBLIE' ? 'PUBLIÉE' : 'BROUILLON' }}
               </button>
-              <button (click)="openEditModal(a)" class="text-gray-500 text-xs font-bold hover:text-[#022c16] flex items-center gap-1.5 transition-colors"><i class="fa-solid fa-pen"></i> Modifier</button>
+              <button *ngIf="rbac.hasPermission('activities.update')" (click)="openEditModal(a)" class="text-gray-500 text-xs font-bold hover:text-[#022c16] flex items-center gap-1.5 transition-colors"><i class="fa-solid fa-pen"></i> Modifier</button>
             </div>
           </div>
         </div>
@@ -223,7 +224,7 @@ import { environment } from '../../../../../environments/environment';
                 <td class="p-4 text-gray-500 font-medium text-[13px]">{{ a.date | date:'dd/MM/yyyy' }}</td>
                 <td class="p-4 text-gray-500 text-[13px] font-medium">{{ a.mediaCount > 0 ? a.mediaCount + ' médias' : '-' }}</td>
                 <td class="p-4">
-                   <button (click)="toggleStatus(a)" 
+                   <button *ngIf="rbac.hasPermission('activities.update')" (click)="toggleStatus(a)" 
                      [ngClass]="a.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
                      class="text-[10px] font-bold px-2.5 py-1 rounded flex items-center gap-1.5 w-max uppercase transition-colors"
                      title="Cliquer pour changer le statut">
@@ -237,7 +238,7 @@ import { environment } from '../../../../../environments/environment';
                      <button class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-500 flex items-center justify-center transition-colors" title="Voir">
                         <i class="fa-solid fa-eye text-[11px]"></i>
                      </button>
-                     <button (click)="openEditModal(a)" class="w-8 h-8 rounded-lg bg-[#e6f3eb] hover:bg-[#d1e8d9] text-[#008d36] flex items-center justify-center transition-colors" title="Modifier">
+                     <button *ngIf="rbac.hasPermission('activities.update')" (click)="openEditModal(a)" class="w-8 h-8 rounded-lg bg-[#e6f3eb] hover:bg-[#d1e8d9] text-[#008d36] flex items-center justify-center transition-colors" title="Modifier">
                         <i class="fa-solid fa-pen text-[11px]"></i>
                      </button>
                      <button (click)="deleteActivite(a.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors" title="Supprimer">
@@ -407,7 +408,7 @@ import { environment } from '../../../../../environments/environment';
     
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('activities.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -536,7 +537,7 @@ export class AdminactivitesComponent implements OnInit {
     this.openConfirm('Supprimer TOUS les activite(s) ?', 'ATTENTION: Cette action supprimera TOUS les activite(s) de la base.', 'bulk_delete_all');
   }
 
-constructor(private adminData: AdminDataService, private cloudinaryUpload: CloudinaryUploadService, private http: HttpClient) {}
+constructor(private adminData: AdminDataService, public rbac: RbacService, private cloudinaryUpload: CloudinaryUploadService, private http: HttpClient) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -613,6 +614,7 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
   }
 
   openCreateModal() {
+    if (!this.rbac.hasPermission('activities.create')) return;
     this.isCreating.set(true);
     this.formData = {
       titre: '',
@@ -628,6 +630,7 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
   }
 
   openEditModal(a: any) {
+    if (!this.rbac.hasPermission('activities.update')) return;
     this.isCreating.set(false);
     this.currentActiviteId.set(a.id);
     this.formData = {
@@ -884,6 +887,7 @@ constructor(private adminData: AdminDataService, private cloudinaryUpload: Cloud
   }
 
   deleteItem = (id: string) => {
+    if (!this.rbac.hasPermission('activities.delete')) return;
     const previous = this.activites();
 
     this.activites.update((list) => list.filter((a) => a.id !== id));

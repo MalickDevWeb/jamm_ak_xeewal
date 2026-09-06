@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
+import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 
 @Component({
@@ -172,8 +174,8 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
           <i class="fa-solid" [ngClass]="home.status !== 'DRAFT' ? 'fa-globe' : 'fa-lock'"></i>
           {{ home.status !== 'DRAFT' ? 'Publié' : 'Brouillon' }}
         </button>
-        <button (click)="onSave('home')"
-          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm">
+        <button (click)="onSave('home')" [disabled]="!rbac.hasPermission('content.update')"
+          class="px-8 py-3 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer l'Accueil
         </button>
         <a href="/" target="_blank"
@@ -400,7 +402,7 @@ export class AdminEditorialComponent implements OnInit {
     ]
   };
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService, public rbac: RbacService) {}
 
   alertMessage = '';
   alertType: AlertType = 'success';

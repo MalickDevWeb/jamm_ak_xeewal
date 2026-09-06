@@ -8,6 +8,7 @@ import { jsPDF } from 'jspdf';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
 
@@ -29,11 +30,11 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
         class="w-11 h-11 bg-white border border-gray-200 text-gray-600 rounded-xl hover:text-[#008d36] hover:border-[#008d36] transition-all flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] shrink-0 disabled:opacity-50">
         <i class="fa-solid fa-arrows-rotate text-sm" [class.fa-spin]="isLoading"></i>
       </button>
-      <button (click)="downloadSelectedBadges()" [disabled]="selectedIds.size === 0 || isDownloading"
+      <button *ngIf="rbac.hasPermission('members.export')" (click)="downloadSelectedBadges()" [disabled]="selectedIds.size === 0 || isDownloading"
         class="px-4 py-3 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-amber-600 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
         <i class="fa-solid fa-id-badge"></i> Badges sélectionnés ({{ selectedIds.size }})
       </button>
-      <button (click)="openCreateModal()" class="px-5 py-3 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-[0_4px_12px_rgba(2,44,22,0.15)] hover:bg-[#008d36] transition-all flex items-center gap-2 shrink-0">
+      <button *ngIf="rbac.hasPermission('members.create')" (click)="openCreateModal()" class="px-5 py-3 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-[0_4px_12px_rgba(2,44,22,0.15)] hover:bg-[#008d36] transition-all flex items-center gap-2 shrink-0">
         <i class="fa-solid fa-user-plus"></i> Ajouter un adhérent
       </button>
     </div>
@@ -204,18 +205,18 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
             <td class="p-4 text-center pr-6">
               <div class="flex items-center justify-end gap-1.5">
                 <!-- Bouton Activer si non actif -->
-                <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Activer la carte">
+                <button *ngIf="a.statut !== 'ACTIF' && rbac.hasPermission('members.update')" (click)="action('Activer', a.id)" class="px-3 py-1.5 bg-[#008d36] text-white text-[11px] font-bold rounded-lg hover:bg-[#022c16] transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Activer la carte">
                   <i class="fa-solid fa-check text-[10px]"></i> Activer
                 </button>
                 <!-- Bouton Désactiver si actif -->
-                <button *ngIf="a.statut === 'ACTIF'" (click)="action('Désactiver', a.id)" class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Désactiver la carte">
+                <button *ngIf="a.statut === 'ACTIF' && rbac.hasPermission('members.update')" (click)="action('Désactiver', a.id)" class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm mr-1" title="Désactiver la carte">
                   <i class="fa-solid fa-ban text-[10px]"></i> Désactiver
                 </button>
-                <button (click)="downloadBadge(a)" [disabled]="isDownloading" title="Télécharger le badge PNG"
+                <button *ngIf="rbac.hasPermission('members.export')" (click)="downloadBadge(a)" [disabled]="isDownloading" title="Télécharger le badge PNG"
                   class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors disabled:opacity-50" >
                   <i class="fa-solid fa-id-badge text-xs"></i>
                 </button>
-                <button (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Modifier / Détails">
+                <button *ngIf="rbac.hasPermission('members.update')" (click)="openEditModal(a)" class="w-8 h-8 rounded-full bg-transparent text-gray-400 hover:text-[#008d36] hover:bg-[#e6f3eb] flex items-center justify-center transition-colors" title="Modifier / Détails">
                   <i class="fa-regular fa-eye text-xs"></i>
                 </button>
                 <div class="relative group/dropdown">
@@ -223,16 +224,16 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
                     <i class="fa-solid fa-ellipsis text-xs"></i>
                   </button>
                   <div class="absolute right-0 top-full mt-1 bg-white border border-gray-100 shadow-lg rounded-xl py-2 w-36 hidden group-hover/dropdown:block z-10 text-left">
-                    <button *ngIf="a.statut !== 'ACTIF'" (click)="action('Activer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-[#008d36] hover:bg-green-50 flex items-center gap-2">
+                    <button *ngIf="a.statut !== 'ACTIF' && rbac.hasPermission('members.update')" (click)="action('Activer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-[#008d36] hover:bg-green-50 flex items-center gap-2">
                       <i class="fa-solid fa-check text-[10px]"></i> Activer carte
                     </button>
-                    <button *ngIf="a.statut === 'ACTIF'" (click)="action('Désactiver', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 flex items-center gap-2">
+                    <button *ngIf="a.statut === 'ACTIF' && rbac.hasPermission('members.update')" (click)="action('Désactiver', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 flex items-center gap-2">
                       <i class="fa-solid fa-ban text-[10px]"></i> Désactiver carte
                     </button>
-                    <button (click)="openEditModal(a)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36] flex items-center gap-2">
+                    <button *ngIf="rbac.hasPermission('members.update')" (click)="openEditModal(a)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#008d36] flex items-center gap-2">
                       <i class="fa-solid fa-pen text-[10px]"></i> Modifier
                     </button>
-                    <button (click)="action('Supprimer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 flex items-center gap-2">
+                    <button *ngIf="rbac.hasPermission('members.delete')" (click)="action('Supprimer', a.id)" class="w-full text-left px-4 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 flex items-center gap-2">
                       <i class="fa-solid fa-trash text-[10px]"></i> Supprimer
                     </button>
                   </div>
@@ -405,16 +406,16 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
       </div>
       <div class="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
         <div class="flex gap-3 flex-wrap">
-          <button (click)="downloadBadge(selectedAdherent)" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
+          <button *ngIf="rbac.hasPermission('members.export')" (click)="downloadBadge(selectedAdherent)" [disabled]="isDownloading" class="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-all flex items-center gap-2 shadow-sm disabled:opacity-50">
             <i class="fa-solid fa-id-badge" *ngIf="!isDownloading"></i>
             <i class="fa-solid fa-spinner fa-spin" *ngIf="isDownloading"></i>
             Badge PNG
           </button>
           <div class="flex gap-2">
-            <button *ngIf="selectedAdherent?.carteRectoUrl" (click)="downloadImageDirect(selectedAdherent.carteRectoUrl, 'recto_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
+            <button *ngIf="selectedAdherent?.carteRectoUrl && rbac.hasPermission('members.export')" (click)="downloadImageDirect(selectedAdherent.carteRectoUrl, 'recto_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
               <i class="fa-solid fa-download"></i> Recto
             </button>
-            <button *ngIf="selectedAdherent?.carteVersoUrl" (click)="downloadImageDirect(selectedAdherent.carteVersoUrl, 'verso_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
+            <button *ngIf="selectedAdherent?.carteVersoUrl && rbac.hasPermission('members.export')" (click)="downloadImageDirect(selectedAdherent.carteVersoUrl, 'verso_' + selectedAdherent.prenom + '_' + selectedAdherent.nom)" class="px-4 py-2.5 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
               <i class="fa-solid fa-download"></i> Verso
             </button>
           </div>
@@ -550,7 +551,7 @@ import { AlertPopupComponent, AlertType } from '../../../../shared/components/al
 
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('members.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -602,11 +603,13 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   bulkDeleteSelected() {
+    if (!this.rbac.hasPermission('members.delete')) return;
     if (this.selectedIds.size === 0) return;
     this.openConfirm('Supprimer la selection ?', 'Vous allez supprimer ' + this.selectedIds.size + ' adherent(s). Cette action est irreversible.', 'bulk_delete_selected');
   }
 
   bulkDeleteAll() {
+    if (!this.rbac.hasPermission('members.delete')) return;
     this.openConfirm('Supprimer TOUS les adherent(s) ?', 'ATTENTION: Cette action supprimera TOUS les adherent(s) de la base.', 'bulk_delete_all');
   }
 
@@ -669,6 +672,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
     }
   }
   constructor(private adminData: AdminDataService,
+    public rbac: RbacService,
     private bulkDelete: BulkDeleteService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -707,6 +711,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   openCreateModal() {
+    if (!this.rbac.hasPermission('members.create')) return;
     this.isEditing = false;
     this.editingId = null;
     this.formData = { prenom: '', nom: '', telephone: '', quartier: '', profession: '', competences: '', disponibilite: '', carteRectoUrl: '', carteVersoUrl: '', statut: 'NOUVEAU' };
@@ -714,6 +719,7 @@ export class AdminadherentsComponent implements OnInit, OnDestroy {
   }
 
   openEditModal(adherent: any) {
+    if (!this.rbac.hasPermission('members.update')) return;
     this.isEditing = true;
     this.editingId = adherent.id;
     this.formData = {

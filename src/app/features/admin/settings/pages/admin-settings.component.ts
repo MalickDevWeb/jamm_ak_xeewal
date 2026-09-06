@@ -1,11 +1,11 @@
-
-import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
+import { AlertPopupComponent, AlertType } from '../../../../shared/components/alert-popup/alert-popup.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-settings',
@@ -305,7 +305,7 @@ import { AdminDataService } from '../../../../core/services/admin-data.service';
           </div>
         </div>
 
-        <button (click)="onSave()" [disabled]="isSaving"
+        <button (click)="onSave()" [disabled]="isSaving || !rbac.hasPermission('settings.update')"
           class="w-full py-4 bg-[#022c16] text-white font-black rounded-xl hover:bg-[#008d36] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
           <i [class]="isSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'"></i>
           {{ isSaving ? 'Enregistrement en cours...' : 'Enregistrer toutes les modifications' }}
@@ -438,7 +438,7 @@ export class AdminSettingsComponent implements OnInit {
     // Logique de confirmation selon this.confirmActionType si nécessaire
   }
 
-  constructor(private adminData: AdminDataService) {}
+  constructor(private adminData: AdminDataService, public rbac: RbacService) {}
 
   ngOnInit() {
     this.adminData.getSettings().subscribe({

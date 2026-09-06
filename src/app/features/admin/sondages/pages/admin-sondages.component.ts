@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
 
 @Component({
@@ -35,7 +36,7 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
     </app-confirm-dialog>
 
     <!-- Bulk Actions Bar -->
-    <app-bulk-actions-bar
+    <app-bulk-actions-bar *ngIf="rbac.hasPermission('sondages.delete')"
       [selectedCount]="selectedIds.size"
       [loading]="loadingBulk"
       (deleteSelected)="bulkDeleteSelected()"
@@ -55,7 +56,7 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <button (click)="action('Créer un sondage')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
+        <button *ngIf="rbac.hasPermission('sondages.create')" (click)="action('Créer un sondage')" class="px-5 py-2.5 bg-[#022c16] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-[#008d36] transition-colors flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Créer un sondage
         </button>
       </div>
@@ -140,10 +141,10 @@ import { CloudinaryUploadService } from '../../../../core/services/cloudinary-up
               Créé le {{ s.createdAt | date:'dd/MM/yyyy' }}
             </div>
             <div class="flex gap-2">
-              <button (click)="action('Clôturer', s.id)" *ngIf="s.statut === 'ACTIF'" class="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+              <button (click)="action('Clôturer', s.id)" *ngIf="s.statut === 'ACTIF' && rbac.hasPermission('sondages.update')" class="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
                 Clôturer
               </button>
-              <button (click)="action('Supprimer', s.id)" class="w-9 h-9 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
+              <button *ngIf="rbac.hasPermission('sondages.delete')" (click)="action('Supprimer', s.id)" class="w-9 h-9 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
                 <i class="fa-solid fa-trash text-xs"></i>
               </button>
             </div>
@@ -304,6 +305,7 @@ export class AdminsondagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminData: AdminDataService,
+    public rbac: RbacService,
     private uploadService: CloudinaryUploadService,
     private cdr: ChangeDetectorRef
   ) {}

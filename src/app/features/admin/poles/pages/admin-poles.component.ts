@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../../../core/services/admin-data.service';
+import { RbacService } from '../../../../core/services/rbac.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -22,7 +23,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
             <p class="text-sm font-medium text-gray-500">Gérez les pôles et leurs objectifs</p>
           </div>
         </div>
-        <button (click)="openCreateModal()" class="bg-[#022c16] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
+        <button *ngIf="rbac.hasPermission('poles.create')" (click)="openCreateModal()" class="bg-[#022c16] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-[#008d36] transition-colors shadow-sm">
           <i class="fa-solid fa-plus"></i> Nouveau pôle
         </button>
       </div>
@@ -40,7 +41,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
         </div>
         <h3 class="text-lg font-bold text-gray-900 mb-1">Aucun pôle</h3>
         <p class="text-sm text-gray-500 mb-6">Créez votre premier pôle d'action.</p>
-        <button (click)="openCreateModal()" class="text-[#008d36] bg-[#e6f3eb] font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#d1e8d9] transition-colors">
+        <button *ngIf="rbac.hasPermission('poles.create')" (click)="openCreateModal()" class="text-[#008d36] bg-[#e6f3eb] font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#d1e8d9] transition-colors">
           Créer un pôle
         </button>
       </div>
@@ -50,7 +51,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
           <div class="p-5 flex-1 flex flex-col">
             <div class="flex items-center justify-between mb-3">
               <!-- Toggle Button -->
-              <button (click)="toggleStatus(pole)" 
+              <button *ngIf="rbac.hasPermission('poles.update')" (click)="toggleStatus(pole)" 
                 [ngClass]="pole.statut === 'PUBLIE' ? 'bg-[#e6f3eb] text-[#008d36] hover:bg-[#d1e8d9]' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'"
                 class="text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1.5 uppercase transition-colors"
                 title="Cliquer pour changer le statut">
@@ -59,10 +60,10 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
               </button>
               
               <div class="flex gap-2">
-                <button (click)="openEditModal(pole)" class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-[#e6f3eb] text-gray-500 hover:text-[#008d36] flex items-center justify-center transition-colors">
+                <button *ngIf="rbac.hasPermission('poles.update')" (click)="openEditModal(pole)" class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-[#e6f3eb] text-gray-500 hover:text-[#008d36] flex items-center justify-center transition-colors">
                   <i class="fa-solid fa-pen text-[11px]"></i>
                 </button>
-                <button (click)="deletePole(pole.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors">
+                <button *ngIf="rbac.hasPermission('poles.delete')" (click)="deletePole(pole.id)" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors">
                   <i class="fa-solid fa-trash text-[11px]"></i>
                 </button>
               </div>
@@ -176,6 +177,7 @@ export class AdminPolesComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private adminData = inject(AdminDataService);
+  public rbac = inject(RbacService);
 
   poles = signal<any[]>([]);
   isLoading = signal(true);
@@ -230,6 +232,7 @@ export class AdminPolesComponent implements OnInit {
   }
 
   openCreateModal() {
+    if (!this.rbac.hasPermission('poles.create')) return;
     this.isCreating.set(true);
     this.currentId.set(null);
     this.formData = { titre: '', description: '', objectifs: '', icone: 'fa-solid fa-star', statut: 'PUBLIE' };
@@ -238,6 +241,7 @@ export class AdminPolesComponent implements OnInit {
   }
 
   openEditModal(pole: any) {
+    if (!this.rbac.hasPermission('poles.update')) return;
     this.isCreating.set(false);
     this.currentId.set(pole.id);
     this.formData = {
@@ -256,6 +260,7 @@ export class AdminPolesComponent implements OnInit {
   }
 
   deletePole(id: string) {
+    if (!this.rbac.hasPermission('poles.delete')) return;
     this.currentId.set(id);
     this.showConfirmDialog.set(true);
   }
